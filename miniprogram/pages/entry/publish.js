@@ -80,6 +80,8 @@ Page({
     try {
       wx.showLoading({ title: '发布中' })
       const images = await this.uploadSelectedImages()
+      console.log('[entry.publish] local images=', this.data.images)
+      console.log('[entry.publish] uploaded fileIDs=', images)
       await api.call('entry_create', { text, images })
       wx.hideLoading()
       wx.showToast({ title: '已点亮今天', icon: 'none' })

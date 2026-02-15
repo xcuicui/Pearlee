@@ -43,26 +43,41 @@ Page({
       const idToUrl = new Map()
       if (allFileIds.length) {
         const t = await wx.cloud.getTempFileURL({ fileList: allFileIds })
-        for (const x of (t && t.fileList) || []) {
+        const list = (t && t.fileList) || []
+        console.log('[day.detail] getTempFileURL count=', list.length)
+        console.log('[day.detail] getTempFileURL sample=', list.slice(0, 2))
+        for (const x of list) {
           if (x && x.fileID && x.tempFileURL) idToUrl.set(x.fileID, x.tempFileURL)
         }
+      } else {
+        console.log('[day.detail] no image fileIDs in response')
       }
 
-      const items = (res.items || []).map(x => ({
-        id: x.id,
-        text: x.text,
-        images: Array.isArray(x.images)
-          ? x.images
-              .map(fid => idToUrl.get(String(fid || '').trim()))
-              .filter(Boolean)
-              .slice(0, 9)
-          : [],
-        createdAt: x.createdAt,
-        timeText: timeText(x.createdAt),
-        likeCount: x.likeCount || 0,
-        liked: !!x.liked,
-        comment: x.comment || null
-      }))
+      console.log('[day.detail] entries count=', (res.items || []).length)
+      console.log('[day.detail] first raw images=', res && res.items && res.items[0] ? res.items[0].images : null)
+
+      const items = (res.items || []).map(x => {
+        const raw = Array.isArray(x.images) ? x.images : []
+        const mapped = raw
+          .map(fid => idToUrl.get(String(fid || '').trim()))
+          .filter(Boolean)
+          .slice(0, 9)
+
+        if (raw.length && !mapped.length) {
+          console.warn('[day.detail] image mapping empty for entry', x.id, { raw: raw.slice(0, 2) })
+        }
+
+        return {
+          id: x.id,
+          text: x.text,
+          images: mapped,
+          createdAt: x.createdAt,
+          timeText: timeText(x.createdAt),
+          likeCount: x.likeCount || 0,
+          liked: !!x.liked,
+          comment: x.comment || null
+        }
+      })
 
       this.setData({ items, error: '' })
     } catch (e) {
