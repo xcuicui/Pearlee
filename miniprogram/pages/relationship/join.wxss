@@ -1,0 +1,7 @@
+.page{padding:48rpx}
+.section{padding:40rpx 36rpx}
+.title{font-size:32rpx;font-weight:700}
+.desc{margin-top:12rpx;font-size:24rpx;line-height:1.7;color:rgba(38,35,31,.55)}
+.code{margin-top:22rpx;height:96rpx;border-radius:22rpx;padding:0 24rpx;background:rgba(245,247,251,.92);font-size:30rpx;letter-spacing:2rpx}
+.actions{margin-top:22rpx;display:flex;gap:16rpx;flex-wrap:wrap}
+.err{margin-top:22rpx;color:#b24a4a;font-size:24rpx}

@@ -1,0 +1,17 @@
+.page{padding:48rpx}
+.head{margin-bottom:22rpx}
+.date{font-size:34rpx;font-weight:700}
+.entry{padding:38rpx 36rpx;margin-bottom:22rpx}
+.text{font-size:30rpx;line-height:1.8;white-space:pre-wrap}
+.meta{margin-top:18rpx;display:flex;justify-content:space-between;align-items:center}
+.time{font-size:22rpx;color:rgba(38,35,31,.45)}
+.like{display:flex;align-items:center;gap:8rpx;font-size:22rpx;color:rgba(38,35,31,.55)}
+.like-icon{color:rgba(231,92,140,.92)}
+.comment{margin-top:18rpx;padding:20rpx 22rpx;border-radius:22rpx;background:rgba(245,247,251,.92)}
+.comment-tag{font-size:20rpx;color:rgba(38,35,31,.45)}
+.comment-text{margin-top:8rpx;font-size:26rpx;line-height:1.7;color:rgba(38,35,31,.75)}
+.comment-edit{margin-top:18rpx;display:flex;gap:12rpx;align-items:center}
+.comment-input{flex:1;height:84rpx;border-radius:22rpx;padding:0 22rpx;background:rgba(245,247,251,.92);font-size:26rpx}
+.comment-send{height:84rpx;padding:0 22rpx;border-radius:22rpx;background:rgba(95,125,149,.16);color:rgba(38,35,31,.72);display:flex;align-items:center;justify-content:center;font-size:24rpx;font-weight:600}
+.empty{margin-top:60rpx;text-align:center;color:rgba(38,35,31,.45)}
+.err{margin-top:22rpx;color:#b24a4a;font-size:24rpx}

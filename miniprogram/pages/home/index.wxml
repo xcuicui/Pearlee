@@ -1,0 +1,53 @@
+<view class="home">
+  <view class="bg"></view>
+
+  <view class="top">
+    <view class="rel-title">和 TA 的第 <text class="days">{{days}}</text> 天</view>
+    <view class="year">{{year}} 年</view>
+  </view>
+
+  <!-- Emotion card (now first) -->
+  <view class="emotion card" bindtap="openEmotion" hover-class="tap-down" hover-stay-time="80">
+    <view wx:if="{{emotion.empty}}" class="emotion-empty">
+      <view class="emotion-time">现在</view>
+      <view class="emotion-text">写一句给 TA 的话吧。</view>
+      <view class="emotion-from">来自你们</view>
+    </view>
+
+    <view wx:else>
+      <view class="emotion-time">{{emotion.timeText}}</view>
+      <view class="emotion-text">{{emotion.text}}</view>
+      <view class="emotion-from">来自 {{emotion.from}}</view>
+    </view>
+  </view>
+
+  <!-- Calendar -->
+  <view class="cal card">
+    <view class="cal-head">
+      <view class="cal-month">{{monthLabel}}</view>
+      <view class="cal-actions">
+        <view class="cal-btn" bindtap="prevMonth" hover-class="tap-down" hover-stay-time="60">上月</view>
+        <view class="cal-btn" bindtap="nextMonth" hover-class="tap-down" hover-stay-time="60">下月</view>
+      </view>
+    </view>
+
+    <month-grid
+      year="{{month.year}}"
+      month="{{month.month}}"
+      marks="{{marks}}"
+      bind:select="onPickDay"
+    />
+  </view>
+
+  <!-- Today entry point -->
+  <view class="today card">
+    <view wx:if="{{today.hasAny}}" class="today-text">今天已被点亮</view>
+    <view wx:else class="today-text">今天还没有留下记录</view>
+
+    <view class="today-actions">
+      <view class="btn-primary" bindtap="goPublish" hover-class="tap-down" hover-stay-time="80">留下些什么？</view>
+    </view>
+  </view>
+
+  <view wx:if="{{error}}" class="err">{{error}}</view>
+</view>

@@ -1,0 +1,23 @@
+<view class="page">
+  <view class="card section">
+    <view class="title">建立小世界</view>
+    <view class="row">
+      <view class="label">关系名称</view>
+      <input class="input" value="{{name}}" placeholder="我们" bindinput="onName" />
+    </view>
+
+    <view class="row">
+      <view class="label">开始日期</view>
+      <picker mode="date" value="{{startDate}}" bindchange="onPickDate">
+        <view class="picker">{{startDate || '请选择'}} </view>
+      </picker>
+    </view>
+
+    <view class="actions">
+      <view class="btn-primary" bindtap="create" hover-class="tap-down" hover-stay-time="80">创建关系</view>
+      <view class="btn-ghost" bindtap="goJoin" hover-class="tap-down" hover-stay-time="80">我有邀请码</view>
+    </view>
+  </view>
+
+  <view wx:if="{{error}}" class="err">{{error}}</view>
+</view>

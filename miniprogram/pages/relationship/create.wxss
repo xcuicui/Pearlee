@@ -1,0 +1,9 @@
+.page{padding:48rpx}
+.section{padding:40rpx 36rpx}
+.title{font-size:32rpx;font-weight:700;margin-bottom:22rpx}
+.row{display:flex;align-items:center;justify-content:space-between;margin-bottom:18rpx}
+.label{font-size:24rpx;color:rgba(38,35,31,.55)}
+.input{flex:1;margin-left:20rpx;text-align:right;font-size:26rpx;color:rgba(38,35,31,.78)}
+.picker{text-align:right;font-size:26rpx;color:rgba(38,35,31,.78)}
+.actions{margin-top:22rpx;display:flex;gap:16rpx;flex-wrap:wrap}
+.err{margin-top:22rpx;color:#b24a4a;font-size:24rpx}

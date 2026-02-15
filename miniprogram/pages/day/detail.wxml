@@ -1,0 +1,31 @@
+<view class="page">
+  <view class="head">
+    <view class="date">{{date}}</view>
+  </view>
+
+  <view wx:for="{{items}}" wx:key="id" class="card entry">
+    <view class="text">{{item.text}}</view>
+    <view class="meta">
+      <view class="time">{{item.timeText}}</view>
+      <view class="actions">
+        <view class="like" bindtap="toggleLike" data-id="{{item.id}}" hover-class="tap-down" hover-stay-time="60">
+          <text class="like-icon">♥</text>
+          <text class="like-count">{{item.likeCount}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="comment" wx:if="{{item.comment}}">
+      <view class="comment-tag">回应</view>
+      <view class="comment-text">{{item.comment.content}}</view>
+    </view>
+
+    <view class="comment-edit" wx:if="{{!item.comment}}">
+      <input class="comment-input" value="{{draft[item.id] || ''}}" placeholder="留下一句回应（仅 1 条）" maxlength="120" bindinput="onDraft" data-id="{{item.id}}" />
+      <view class="comment-send" bindtap="sendComment" data-id="{{item.id}}" hover-class="tap-down" hover-stay-time="60">发送</view>
+    </view>
+  </view>
+
+  <view wx:if="{{items.length===0}}" class="empty">这一天还没有记录。</view>
+  <view wx:if="{{error}}" class="err">{{error}}</view>
+</view>

@@ -1,0 +1,14 @@
+# WeChat DevTools
+project.private.config.json
+
+# macOS
+.DS_Store
+
+# Node
+**/node_modules/
+
+# Cloud functions local state
+.cloudbase/
+
+# Logs
+*.log

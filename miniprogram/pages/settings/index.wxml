@@ -1,0 +1,38 @@
+<view class="page">
+  <view class="card section">
+    <view class="title">关系设置</view>
+
+    <view class="row">
+      <view class="label">关系名称</view>
+      <input class="input" value="{{name}}" placeholder="我们" bindinput="onName" />
+    </view>
+
+    <view class="row">
+      <view class="label">开始日期</view>
+      <picker mode="date" value="{{startDate}}" bindchange="onPickDate">
+        <view class="picker">{{startDate || '请选择'}} </view>
+      </picker>
+    </view>
+
+    <view class="actions">
+      <view class="btn-primary" bindtap="save" hover-class="tap-down" hover-stay-time="80">保存</view>
+    </view>
+  </view>
+
+  <view class="card section">
+    <view class="title">邀请对方</view>
+    <view class="desc">把邀请码发给对方，对方在“加入关系”里输入即可。</view>
+    <view class="code">{{inviteCode || '—'}}</view>
+
+    <view class="actions">
+      <view class="btn-ghost" bindtap="copy" hover-class="tap-down" hover-stay-time="80">复制邀请码</view>
+      <view class="btn-ghost" bindtap="goJoin" hover-class="tap-down" hover-stay-time="80">加入关系</view>
+    </view>
+  </view>
+
+  <view class="danger">
+    <view class="btn-ghost danger-btn" bindtap="archive" hover-class="tap-down" hover-stay-time="80">解除关系（封存）</view>
+  </view>
+
+  <view wx:if="{{error}}" class="err">{{error}}</view>
+</view>

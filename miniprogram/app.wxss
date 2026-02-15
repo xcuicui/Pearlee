@@ -1,0 +1,45 @@
+page {
+  background: #faf9f7;
+  color: #26231f;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+
+:root {
+  --bg: #faf9f7;
+  --card: rgba(255, 255, 255, 0.92);
+  --text: #26231f;
+  --muted: rgba(38, 35, 31, 0.55);
+  --brand: #5f7d95;
+  --radius: 24rpx;
+}
+
+.btn-primary {
+  height: 96rpx;
+  padding: 0 44rpx;
+  border-radius: 999px;
+  background: rgba(95, 125, 149, 0.92);
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-ghost {
+  height: 88rpx;
+  padding: 0 38rpx;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  color: rgba(38, 35, 31, 0.75);
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 44rpx;
+  box-shadow: 0 18rpx 48rpx rgba(31, 41, 55, 0.08);
+}
+
+.tap-down { opacity: 0.7; }

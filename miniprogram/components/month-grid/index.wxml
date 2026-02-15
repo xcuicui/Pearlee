@@ -1,0 +1,18 @@
+<view class="grid">
+  <view class="dow">
+    <view class="dow-item" wx:for="{{dows}}" wx:key="x">{{item}}</view>
+  </view>
+
+  <view class="cells">
+    <view
+      class="cell {{item.isCurrentMonth ? '' : 'is-dim'}}"
+      wx:for="{{cells}}"
+      wx:key="key"
+      bindtap="onSelect"
+      data-key="{{item.key}}"
+    >
+      <view class="num">{{item.day}}</view>
+      <view wx:if="{{item.mark && item.mark.level}}" class="dot dot-{{item.mark.level}}"></view>
+    </view>
+  </view>
+</view>
