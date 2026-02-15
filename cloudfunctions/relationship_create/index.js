@@ -1,5 +1,5 @@
 const cloud = require('wx-server-sdk')
-const { BizError, now, inviteCode } = require('../_shared')
+const { BizError, now, inviteCode } = require('./_shared')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()

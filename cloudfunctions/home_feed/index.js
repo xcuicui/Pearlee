@@ -1,5 +1,5 @@
 const cloud = require('wx-server-sdk')
-const { BizError, dayKey } = require('../_shared')
+const { BizError, dayKey } = require('./_shared')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
