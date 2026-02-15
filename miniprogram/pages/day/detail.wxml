@@ -5,6 +5,19 @@
 
   <view wx:for="{{items}}" wx:key="id" class="card entry">
     <view class="text">{{item.text}}</view>
+    <view class="images" wx:if="{{item.images && item.images.length}}">
+      <image
+        class="entry-image"
+        wx:for="{{item.images}}"
+        wx:for-item="img"
+        wx:key="*this"
+        src="{{img}}"
+        mode="aspectFill"
+        bindtap="previewEntryImage"
+        data-id="{{item.id}}"
+        data-idx="{{index}}"
+      />
+    </view>
     <view class="meta">
       <view class="time">{{item.timeText}}</view>
       <view class="actions">

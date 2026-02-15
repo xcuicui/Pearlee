@@ -3,6 +3,8 @@
 .date{font-size:34rpx;font-weight:700}
 .entry{padding:38rpx 36rpx;margin-bottom:22rpx}
 .text{font-size:30rpx;line-height:1.8;white-space:pre-wrap}
+.images{margin-top:16rpx;display:flex;gap:12rpx;flex-wrap:wrap}
+.entry-image{width:180rpx;height:180rpx;border-radius:16rpx;background:rgba(245,247,251,.92)}
 .meta{margin-top:18rpx;display:flex;justify-content:space-between;align-items:center}
 .time{font-size:22rpx;color:rgba(38,35,31,.45)}
 .like{display:flex;align-items:center;gap:8rpx;font-size:22rpx;color:rgba(38,35,31,.55)}

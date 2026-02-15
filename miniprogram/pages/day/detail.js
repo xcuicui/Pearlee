@@ -32,6 +32,7 @@ Page({
       const items = (res.items || []).map(x => ({
         id: x.id,
         text: x.text,
+        images: Array.isArray(x.images) ? x.images.slice(0, 3) : [],
         createdAt: x.createdAt,
         timeText: timeText(x.createdAt),
         likeCount: x.likeCount || 0,
@@ -76,5 +77,14 @@ Page({
         return this.load()
       })
       .catch(err => wx.showToast({ title: err.message || '失败', icon: 'none' }))
+  },
+
+  previewEntryImage(e) {
+    const entryId = e && e.currentTarget && e.currentTarget.dataset ? String(e.currentTarget.dataset.id || '') : ''
+    const idx = Number(e && e.currentTarget && e.currentTarget.dataset ? e.currentTarget.dataset.idx : -1)
+    if (!entryId || Number.isNaN(idx) || idx < 0) return
+    const hit = (this.data.items || []).find(x => x.id === entryId)
+    if (!hit || !Array.isArray(hit.images) || idx >= hit.images.length) return
+    wx.previewImage({ current: hit.images[idx], urls: hit.images })
   }
 })

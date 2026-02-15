@@ -58,6 +58,9 @@ exports.main = async (event = {}) => {
     items: entries.map(e => ({
       id: e._id,
       text: e.contentText || '',
+      images: Array.isArray(e.images)
+        ? e.images.map(x => String(x || '').trim()).filter(Boolean).slice(0, 3)
+        : [],
       createdAt: e.createdAt,
       likeCount: likeCount.get(e._id) || 0,
       liked: likedSet.has(e._id),

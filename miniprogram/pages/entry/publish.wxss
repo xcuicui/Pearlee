@@ -2,5 +2,12 @@
 .section{padding:38rpx 36rpx}
 .input{width:100%;min-height:240rpx;max-height:700rpx;padding:26rpx;border-radius:26rpx;background:rgba(245,247,251,.92);font-size:30rpx;line-height:1.7}
 .count{margin-top:12rpx;text-align:right;font-size:22rpx;color:rgba(38,35,31,.45)}
+.img-head{margin-top:20rpx;display:flex;align-items:center;justify-content:space-between}
+.img-title{font-size:24rpx;color:rgba(38,35,31,.65)}
+.img-add{padding:10rpx 18rpx;border-radius:18rpx;background:rgba(95,125,149,.14);font-size:22rpx;color:rgba(38,35,31,.72)}
+.img-list{margin-top:14rpx;display:flex;gap:14rpx;flex-wrap:wrap}
+.img-item{width:170rpx}
+.img{width:170rpx;height:170rpx;border-radius:16rpx;background:rgba(245,247,251,.92)}
+.img-remove{margin-top:8rpx;text-align:center;font-size:20rpx;color:rgba(178,74,74,.92)}
 .actions{margin-top:18rpx;display:flex;gap:16rpx;flex-wrap:wrap}
 .err{margin-top:22rpx;color:#b24a4a;font-size:24rpx}

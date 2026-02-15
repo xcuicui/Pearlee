@@ -13,6 +13,14 @@ function cleanText(s) {
   return String(s || '').replace(/\r\n/g, '\n').trim()
 }
 
+function cleanImages(images) {
+  if (!Array.isArray(images)) return []
+  return images
+    .map(x => String(x || '').trim())
+    .filter(Boolean)
+    .slice(0, 3)
+}
+
 exports.main = async (event = {}) => {
   const { OPENID } = cloud.getWXContext()
 
@@ -22,6 +30,10 @@ exports.main = async (event = {}) => {
   const text = cleanText(event.text)
   if (!text) throw new BizError('写点什么吧', 'EMPTY')
   if (text.length > 500) throw new BizError('最多 500 字', 'TOO_LONG')
+  if (Array.isArray(event.images) && event.images.length > 3) {
+    throw new BizError('最多 3 张图片', 'TOO_MANY_IMAGES')
+  }
+  const images = cleanImages(event.images)
 
   const ts = now()
   const res = await db.collection('entries').add({
@@ -29,7 +41,7 @@ exports.main = async (event = {}) => {
       relationshipId: rel._id,
       userOpenid: OPENID,
       contentText: text,
-      images: [],
+      images,
       createdAt: ts,
       updatedAt: ts,
       dayKey: dayKey(ts),
