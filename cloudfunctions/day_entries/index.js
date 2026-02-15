@@ -59,7 +59,7 @@ exports.main = async (event = {}) => {
       id: e._id,
       text: e.contentText || '',
       images: Array.isArray(e.images)
-        ? e.images.map(x => String(x || '').trim()).filter(Boolean).slice(0, 3)
+        ? e.images.map(x => String(x || '').trim()).filter(Boolean).slice(0, 9)
         : [],
       createdAt: e.createdAt,
       likeCount: likeCount.get(e._id) || 0,

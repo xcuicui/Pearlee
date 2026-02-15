@@ -11,7 +11,7 @@
     <view class="count">{{text.length}}/500</view>
 
     <view class="img-head">
-      <view class="img-title">图片（{{images.length}}/3）</view>
+      <view class="img-title">图片（{{images.length}}/9）</view>
       <view class="img-add" bindtap="chooseImages" hover-class="tap-down" hover-stay-time="60">添加</view>
     </view>
     <view class="img-list" wx:if="{{images.length}}">

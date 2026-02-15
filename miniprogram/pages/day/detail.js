@@ -32,7 +32,7 @@ Page({
       const items = (res.items || []).map(x => ({
         id: x.id,
         text: x.text,
-        images: Array.isArray(x.images) ? x.images.slice(0, 3) : [],
+        images: Array.isArray(x.images) ? x.images.slice(0, 9) : [],
         createdAt: x.createdAt,
         timeText: timeText(x.createdAt),
         likeCount: x.likeCount || 0,
