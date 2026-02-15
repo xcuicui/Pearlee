@@ -7,6 +7,17 @@ function timeText(ts) {
   return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`
 }
 
+const norm = v => String(v || '').trim()
+
+// images field may be an array of cloud fileIDs (string), or an array of objects
+// like {fileID: 'cloud://...'} depending on environment/version.
+function extractFileID(v) {
+  if (!v) return ''
+  if (typeof v === 'string') return v
+  // tolerate different casings/keys
+  return v.fileID || v.fileId || v.fileid || v.id || ''
+}
+
 Page({
   data: {
     date: '',
@@ -34,9 +45,10 @@ Page({
       // we must convert to temporary HTTPS URLs first.
       const allFileIds = []
       for (const it of (res.items || [])) {
-        for (const fid of (it.images || [])) {
-          const s = String(fid || '').trim()
-          if (s) allFileIds.push(s)
+        const imgs = Array.isArray(it.images) ? it.images : []
+        for (const v of imgs) {
+          const fid = norm(extractFileID(v))
+          if (fid) allFileIds.push(fid)
         }
       }
 
@@ -47,7 +59,8 @@ Page({
         console.log('[day.detail] getTempFileURL count=', list.length)
         console.log('[day.detail] getTempFileURL sample=', list.slice(0, 2))
         for (const x of list) {
-          if (x && x.fileID && x.tempFileURL) idToUrl.set(x.fileID, x.tempFileURL)
+          const k = norm(x && (x.fileID || x.fileId))
+          if (k && x && x.tempFileURL) idToUrl.set(k, x.tempFileURL)
         }
       } else {
         console.log('[day.detail] no image fileIDs in response')
@@ -59,16 +72,23 @@ Page({
       const items = (res.items || []).map(x => {
         const raw = Array.isArray(x.images) ? x.images : []
         const mapped = raw
-          .map(fid => idToUrl.get(String(fid || '').trim()))
+          .map(v => norm(extractFileID(v)))
+          .map(fid => idToUrl.get(fid))
           .filter(Boolean)
           .slice(0, 9)
 
+        const entryId = x.id || x._id
         if (raw.length && !mapped.length) {
-          console.warn('[day.detail] image mapping empty for entry', x.id, { raw: raw.slice(0, 2) })
+          console.warn('[day.detail] image mapping empty for entry', entryId, {
+            raw0: raw[0],
+            raw0Type: typeof raw[0],
+            raw0Keys: raw[0] && typeof raw[0] === 'object' ? Object.keys(raw[0]) : null,
+            rawSample: raw.slice(0, 2)
+          })
         }
 
         return {
-          id: x.id,
+          id: entryId,
           text: x.text,
           images: mapped,
           createdAt: x.createdAt,
