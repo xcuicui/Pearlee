@@ -29,17 +29,41 @@ Page({
   async load() {
     try {
       const res = await api.call('day_entries', { date: this.data.date })
-      console.log('[day_entries] first images =', res && res.items && res.items[0] ? res.items[0].images : null)
+
+      // DB stores cloud fileIDs (cloud://...). <image src> can't load them directly;
+      // we must convert to temporary HTTPS URLs first.
+      const allFileIds = []
+      for (const it of (res.items || [])) {
+        for (const fid of (it.images || [])) {
+          const s = String(fid || '').trim()
+          if (s) allFileIds.push(s)
+        }
+      }
+
+      const idToUrl = new Map()
+      if (allFileIds.length) {
+        const t = await wx.cloud.getTempFileURL({ fileList: allFileIds })
+        for (const x of (t && t.fileList) || []) {
+          if (x && x.fileID && x.tempFileURL) idToUrl.set(x.fileID, x.tempFileURL)
+        }
+      }
+
       const items = (res.items || []).map(x => ({
         id: x.id,
         text: x.text,
-        images: Array.isArray(x.images) ? x.images.slice(0, 9) : [],
+        images: Array.isArray(x.images)
+          ? x.images
+              .map(fid => idToUrl.get(String(fid || '').trim()))
+              .filter(Boolean)
+              .slice(0, 9)
+          : [],
         createdAt: x.createdAt,
         timeText: timeText(x.createdAt),
         likeCount: x.likeCount || 0,
         liked: !!x.liked,
         comment: x.comment || null
       }))
+
       this.setData({ items, error: '' })
     } catch (e) {
       this.setData({ error: e.message || '加载失败' })
