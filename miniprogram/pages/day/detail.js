@@ -29,6 +29,7 @@ Page({
   async load() {
     try {
       const res = await api.call('day_entries', { date: this.data.date })
+      console.log('[day_entries] first images =', res && res.items && res.items[0] ? res.items[0].images : null)
       const items = (res.items || []).map(x => ({
         id: x.id,
         text: x.text,
