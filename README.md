@@ -40,6 +40,26 @@
 5. 完成后归档：
    - `openspec archive ...`（归档变更并更新主 specs）
 
+### 本仓库命令示例（OpenSpec + Codex）
+- 规格目录：`openspec/specs/`
+- 初始化（已初始化过可跳过）：
+  - `openspec init openspec`
+- 更新指令文件：
+  - `openspec update openspec`
+- 创建变更提案（示例）：
+  - `openspec change new add-home-feed-adjustment`
+- 查看当前 specs：
+  - `openspec list --specs`
+  - `openspec show page-home --type spec`
+- 校验 specs / changes：
+  - `openspec validate --specs --strict --no-interactive`
+  - `openspec validate add-home-feed-adjustment --strict --no-interactive`
+- 归档变更（示例）：
+  - `openspec archive add-home-feed-adjustment --yes`
+- 用 Codex 按 spec 执行实现（示例）：
+  - `codex exec "Implement miniprogram home page by openspec/specs/page-home/spec.md"`
+  - `codex exec "Implement cloud function home_feed by openspec/specs/fn-home_feed/spec.md"`
+
 ---
 
 ## 本地结构
