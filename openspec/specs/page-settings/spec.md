@@ -2,7 +2,6 @@
 
 ## Purpose
 定义设置页对关系信息读取、修改、邀请码复制、封存关系及跳转的可验收行为，并约束与相关云函数契约的输入输出。
-
 ## Requirements
 ### Requirement: Context Loading
 页面 MUST 在显示时调用 `ctx_get`，并在无关系时跳转创建页。
@@ -32,6 +31,13 @@
 - **GIVEN** 用户在确认弹窗点击封存
 - **WHEN** 页面调用 `relationship_archive`
 - **THEN** 页面提示成功并跳转关系创建页
+
+### Requirement: Update relationship nickname
+页面 MUST 支持修改关系内昵称。
+
+#### Scenario: Save nickname
+- **WHEN** 用户保存昵称
+- **THEN** 调用 `relationship_update({ nickname })` 并提示成功
 
 ## Data Contracts
 ### Client State
