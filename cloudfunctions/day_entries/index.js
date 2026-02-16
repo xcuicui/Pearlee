@@ -9,6 +9,27 @@ async function getRel(OPENID) {
   return (q.data || [])[0] || null
 }
 
+async function getTempUrlMap(fileIds) {
+  const list = Array.from(new Set((fileIds || []).map(x => String(x || '').trim()).filter(Boolean)))
+  const map = new Map()
+  if (!list.length) return map
+
+  try {
+    const res = await cloud.getTempFileURL({ fileList: list })
+    const out = (res && res.fileList) || []
+    for (const x of out) {
+      const fid = String((x && (x.fileID || x.fileId)) || '').trim()
+      const url = String((x && x.tempFileURL) || '').trim()
+      if (fid && url) map.set(fid, url)
+    }
+  } catch (e) {
+    // If it fails, fall back to returning original fileIDs (client may still load if permitted)
+    console.log('[day_entries] getTempFileURL failed:', e)
+  }
+
+  return map
+}
+
 exports.main = async (event = {}) => {
   const { OPENID } = cloud.getWXContext()
 
@@ -26,6 +47,14 @@ exports.main = async (event = {}) => {
   const entries = entriesQ.data || []
 
   const entryIds = entries.map(x => x._id)
+
+  // Build temp URLs for images on server side to avoid per-user storage permission issues
+  const allFileIds = []
+  for (const e of entries) {
+    const imgs = Array.isArray(e.images) ? e.images : []
+    for (const fid of imgs) allFileIds.push(String(fid || '').trim())
+  }
+  const tempUrlMap = await getTempUrlMap(allFileIds)
 
   const [likesQ, commentsQ] = await Promise.all([
     entryIds.length
@@ -55,23 +84,32 @@ exports.main = async (event = {}) => {
 
   return {
     ok: true,
-    items: entries.map(e => ({
-      id: e._id,
-      text: e.contentText || '',
-      images: Array.isArray(e.images)
+    items: entries.map(e => {
+      const fileIds = Array.isArray(e.images)
         ? e.images.map(x => String(x || '').trim()).filter(Boolean).slice(0, 9)
-        : [],
-      createdAt: e.createdAt,
-      likeCount: likeCount.get(e._id) || 0,
-      liked: likedSet.has(e._id),
-      comment: commentMap.get(e._id)
-        ? {
-            id: commentMap.get(e._id)._id,
-            content: commentMap.get(e._id).content || '',
-            userOpenid: commentMap.get(e._id).userOpenid,
-            createdAt: commentMap.get(e._id).createdAt
-          }
-        : null
-    }))
+        : []
+
+      const urls = fileIds
+        .map(fid => tempUrlMap.get(fid) || fid)
+        .filter(Boolean)
+        .slice(0, 9)
+
+      return {
+        id: e._id,
+        text: e.contentText || '',
+        images: urls,
+        createdAt: e.createdAt,
+        likeCount: likeCount.get(e._id) || 0,
+        liked: likedSet.has(e._id),
+        comment: commentMap.get(e._id)
+          ? {
+              id: commentMap.get(e._id)._id,
+              content: commentMap.get(e._id).content || '',
+              userOpenid: commentMap.get(e._id).userOpenid,
+              createdAt: commentMap.get(e._id).createdAt
+            }
+          : null
+      }
+    })
   }
 }

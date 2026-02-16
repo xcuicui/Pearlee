@@ -64,6 +64,19 @@ function formatTime(ts) {
   return `${d.getFullYear()}.${pad2(d.getMonth() + 1)}.${pad2(d.getDate())}`
 }
 
+async function toTempUrl(fileId) {
+  const fid = String(fileId || '').trim()
+  if (!fid) return ''
+  try {
+    const res = await cloud.getTempFileURL({ fileList: [fid] })
+    const x = res && res.fileList && res.fileList[0]
+    return (x && x.tempFileURL) ? String(x.tempFileURL) : ''
+  } catch (e) {
+    console.log('[home_feed] getTempFileURL failed:', e)
+    return ''
+  }
+}
+
 async function getEmotion(relId, myOpenid, partnerOpenid) {
   // Priority (simplified MVP):
   // 1) partner entry within last 3 days
@@ -81,6 +94,8 @@ async function getEmotion(relId, myOpenid, partnerOpenid) {
     const hit = (q.data || [])[0]
     if (hit) {
       const imgs = Array.isArray(hit.images) ? hit.images.filter(Boolean) : []
+      const coverFileId = imgs[0] || ''
+      const coverUrl = coverFileId ? await toTempUrl(coverFileId) : ''
       return {
         empty: false,
         entryId: hit._id,
@@ -89,7 +104,7 @@ async function getEmotion(relId, myOpenid, partnerOpenid) {
         text: hit.contentText || '',
         from: 'TA',
         images: imgs,
-        coverImage: imgs[0] || ''
+        coverImage: coverUrl || coverFileId
       }
     }
   }
@@ -104,6 +119,8 @@ async function getEmotion(relId, myOpenid, partnerOpenid) {
 
   const pick = list[Math.floor(Math.random() * list.length)]
   const imgs = Array.isArray(pick.images) ? pick.images.filter(Boolean) : []
+  const coverFileId = imgs[0] || ''
+  const coverUrl = coverFileId ? await toTempUrl(coverFileId) : ''
   return {
     empty: false,
     entryId: pick._id,
@@ -112,7 +129,7 @@ async function getEmotion(relId, myOpenid, partnerOpenid) {
     text: pick.contentText || '',
     from: pick.userOpenid === myOpenid ? '你' : 'TA',
     images: imgs,
-    coverImage: imgs[0] || ''
+    coverImage: coverUrl || coverFileId
   }
 }
 
