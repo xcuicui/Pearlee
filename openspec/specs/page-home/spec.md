@@ -51,7 +51,8 @@
 - `days: number`
 - `month: { year: number, month: number }`
 - `marks: Record<YYYY-MM-DD, { level: 1 | 2 }>`
-- `emotion: { empty: boolean, entryId?: string, date?: string, text?: string, from?: string, timeText?: string }`
+- `emotion: { empty: boolean, entryId?: string, date?: string, text?: string, from?: string, timeText?: string, coverImage?: string }`
+  - `coverImage` 存在时首页情绪卡片展示图片情绪封面
 - `today: { key: string, hasAny: boolean }`
 
 ### Upstream Function Contract

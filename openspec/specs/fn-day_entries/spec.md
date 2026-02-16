@@ -41,5 +41,6 @@
 - `date: string (YYYY-MM-DD)`
 
 ### Output
-- Success: `{ ok: true, items: Array<{ id: string, text: string, createdAt: number, likeCount: number, liked: boolean, comment: null | { id: string, content: string, userOpenid: string, createdAt: number } }> }`
+- Success: `{ ok: true, items: Array<{ id: string, text: string, images: string[], createdAt: number, likeCount: number, liked: boolean, comment: null | { id: string, content: string, userOpenid: string, createdAt: number } }> }`
+  - `images`: 图片可访问 URL 列表（优先为 `https://...` 临时链接；若生成失败可回退为 `cloud://...` fileID，由客户端自行处理）
 - Errors: `NO_REL | MISSING_DATE`

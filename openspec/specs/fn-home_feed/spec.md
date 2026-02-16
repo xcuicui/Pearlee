@@ -59,5 +59,6 @@
   - `relationshipName: string`
   - `startDate: string`
   - `marks: Record<YYYY-MM-DD, { level: 1 | 2 }>`
-  - `emotion: { empty: boolean, entryId?: string, date?: string, timeText?: string, text?: string, from?: 'TA' | '你' }`
+  - `emotion: { empty: boolean, entryId?: string, date?: string, timeText?: string, text?: string, from?: 'TA' | '你', images?: string[], coverImage?: string }`
+    - `coverImage`: 情绪卡片封面图 URL（优先为 `https://...` 临时链接；失败时回退为 `cloud://...` fileID）
   - `today: { key: string, hasAny: boolean }`

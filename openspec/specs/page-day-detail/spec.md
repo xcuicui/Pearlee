@@ -39,7 +39,8 @@
 - `focus?: string`
 
 ### Client State
-- `items: Array<{ id: string, text: string, createdAt: number, timeText: string, likeCount: number, liked: boolean, comment: null | { id: string, content: string, userOpenid: string, createdAt: number } }>`
+- `items: Array<{ id: string, text: string, images: string[], createdAt: number, timeText: string, likeCount: number, liked: boolean, comment: null | { id: string, content: string, userOpenid: string, createdAt: number } }>`
+  - `images` 支持直接渲染 `https://...` 临时链接；若为 `cloud://...` fileID，客户端需转换为临时链接后再渲染
 - `draft: Record<entryId, string>`
 - `error: string`
 
