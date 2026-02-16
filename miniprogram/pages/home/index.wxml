@@ -26,9 +26,14 @@
         data-key="{{item.date}}"
         bindtap="onPickDay"
       >
-        <view class="week-name">{{item.weekLabel}}</view>
-        <view class="week-num {{item.isToday ? 'today' : ''}}">{{item.dayLabel}}</view>
-        <view class="dot {{item.hasRecord ? 'active' : ''}}"></view>
+        <view class="week-chip {{item.isToday ? 'today' : ''}}">
+          <view class="week-name">{{item.weekLabel}}</view>
+          <view class="week-num">{{item.dayLabel}}</view>
+          <view class="dot-row {{item.hasRecord ? 'active' : ''}} {{item.hasRecord && item.recordLevel === 2 ? 'lv2' : ''}}">
+            <view class="dot"></view>
+            <view wx:if="{{item.hasRecord && item.recordLevel === 2}}" class="dot ghost"></view>
+          </view>
+        </view>
       </view>
     </view>
   </view>

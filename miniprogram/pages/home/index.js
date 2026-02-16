@@ -72,13 +72,21 @@ Page({
       }
 
       const week = res.week || {}
-      const weekDays = (Array.isArray(week.days) ? week.days : []).map((date) => ({
-        date,
-        dayLabel: String(date || '').slice(-2),
-        weekLabel: weekdayLabel(date),
-        hasRecord: Array.isArray(week.activeDates) && week.activeDates.includes(date),
-        isToday: date === week.todayKey
-      }))
+      const levelByDate = week && week.levelByDate && typeof week.levelByDate === 'object' ? week.levelByDate : {}
+      const activeDates = Array.isArray(week.activeDates) ? week.activeDates : []
+      const normalizedWeekDays = (Array.isArray(week.days) ? week.days : []).map((date) => {
+        const baseLevel = Number(levelByDate[date] || 0)
+        const hasRecord = activeDates.includes(date)
+        const recordLevel = hasRecord ? Math.max(baseLevel, 1) : baseLevel
+        return {
+          date,
+          dayLabel: String(date || '').slice(-2),
+          weekLabel: weekdayLabel(date),
+          hasRecord,
+          recordLevel,
+          isToday: date === week.todayKey
+        }
+      })
 
       this.setData({
         relationshipId: res.relationshipId,
@@ -90,7 +98,7 @@ Page({
         emotion: res.emotion || { empty: true },
         weekStart: (week.start || this.data.weekStart),
         weekTitle: weekTitle(week.start || this.data.weekStart),
-        weekDays,
+        weekDays: normalizedWeekDays,
         today: res.today || { key: this.data.today.key, hasAny: false },
         loading: false
       })
