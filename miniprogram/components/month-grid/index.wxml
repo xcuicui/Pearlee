@@ -5,7 +5,7 @@
 
   <view class="cells">
     <view
-      class="cell {{item.isCurrentMonth ? '' : 'is-dim'}}"
+      class="cell {{item.isCurrentMonth ? '' : 'is-dim'}} {{item.mark && item.mark.level ? ('has-mark has-mark-' + item.mark.level) : ''}}"
       wx:for="{{cells}}"
       wx:key="key"
       bindtap="onSelect"
