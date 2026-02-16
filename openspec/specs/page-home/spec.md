@@ -30,6 +30,23 @@
 - **WHEN** 用户点击下个月
 - **THEN** 页面更新年月并重新调用 `home_feed(year, month)`
 
+### Requirement: Calendar Mark Visibility
+首页月历中的 marks MUST 在保持简洁风格下可被清晰感知，并保留现有交互行为。
+
+#### Scenario: Marked day visual hierarchy
+- **GIVEN** 月历某日期存在 `marks[date].level`
+- **WHEN** 页面渲染该日期
+- **THEN** 日期数字后方展示低对比度圆形 halo
+- **AND** 日期底部展示较原有更明显的圆点标记
+- **AND** `level=2` 的 halo 与圆点视觉权重高于 `level=1`
+- **AND** 不使用厚边框或明显阴影
+
+#### Scenario: Existing calendar interactions unchanged
+- **GIVEN** 月历任意日期单元格
+- **WHEN** 用户点击日期
+- **THEN** 组件继续触发包含 `key` 的 `select` 事件
+- **AND** 非当月日期继续保持弱化显示
+
 ### Requirement: Emotion Card Routing
 页面 MUST 支持从情绪卡片进入对应日详情，若无可用 entry 则进入发布页。
 

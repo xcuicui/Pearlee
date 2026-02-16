@@ -16,13 +16,13 @@
   width:54rpx;
   height:54rpx;
   border-radius:999px;
-  background:rgba(95,125,149,.08);
+  background:rgba(95,125,149,.09);
 }
-.has-mark-2::before{ background:rgba(95,125,149,.13); }
+.has-mark-2::before{ background:rgba(95,125,149,.15); }
 
 .num{position:relative;z-index:1;font-size:24rpx;color:rgba(38,35,31,.78)}
 .has-mark .num{font-weight:600;color:rgba(38,35,31,.86)}
 
-.dot{position:absolute;bottom:10rpx;width:16rpx;height:16rpx;border-radius:999px;opacity:.92}
-.dot-1{background:rgba(95,125,149,.32)}
-.dot-2{background:rgba(95,125,149,.78)}
+.dot{position:absolute;bottom:10rpx;width:17rpx;height:17rpx;border-radius:999px;opacity:.92}
+.dot-1{background:rgba(95,125,149,.36)}
+.dot-2{width:20rpx;height:20rpx;background:rgba(95,125,149,.8)}
