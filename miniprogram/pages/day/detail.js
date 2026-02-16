@@ -41,14 +41,14 @@ Page({
     try {
       const res = await api.call('day_entries', { date: this.data.date })
 
-      // DB stores cloud fileIDs (cloud://...). <image src> can't load them directly;
-      // we must convert to temporary HTTPS URLs first.
+      // images may already be temp HTTPS URLs (returned by cloud function),
+      // or cloud fileIDs (cloud://...). Only fileIDs need conversion.
       const allFileIds = []
       for (const it of (res.items || [])) {
         const imgs = Array.isArray(it.images) ? it.images : []
         for (const v of imgs) {
           const fid = norm(extractFileID(v))
-          if (fid) allFileIds.push(fid)
+          if (fid && fid.startsWith('cloud://')) allFileIds.push(fid)
         }
       }
 
@@ -73,7 +73,12 @@ Page({
         const raw = Array.isArray(x.images) ? x.images : []
         const mapped = raw
           .map(v => norm(extractFileID(v)))
-          .map(fid => idToUrl.get(fid))
+          .map(v => {
+            if (!v) return ''
+            if (v.startsWith('http://') || v.startsWith('https://')) return v
+            if (v.startsWith('cloud://')) return idToUrl.get(v) || ''
+            return ''
+          })
           .filter(Boolean)
           .slice(0, 9)
 
