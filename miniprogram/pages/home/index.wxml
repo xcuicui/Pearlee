@@ -41,7 +41,7 @@
   <view class="emotion card" bindtap="openEmotion" hover-class="tap-down" hover-stay-time="80">
     <view wx:if="{{emotion.empty}}" class="emotion-empty">
       <view class="emotion-time">现在</view>
-      <view class="emotion-text">写一句给 TA 的话吧。</view>
+      <view class="emotion-text">写一句给对方的话吧。</view>
       <view class="emotion-from">来自你们</view>
     </view>
 

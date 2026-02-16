@@ -1,5 +1,5 @@
 const cloud = require('wx-server-sdk')
-const { BizError, dayKey } = require('./_shared')
+const { dayKey } = require('./_shared')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
@@ -54,6 +54,23 @@ function dayRange(dateYmd) {
 async function getRel(OPENID) {
   const q = await db.collection('relationships').where({ memberOpenids: OPENID, archived: false }).limit(1).get()
   return (q.data || [])[0] || null
+}
+
+async function getMemberNicknameMap(relationshipId, openids) {
+  const ids = Array.from(new Set((Array.isArray(openids) ? openids : []).filter(Boolean)))
+  if (!ids.length) return {}
+
+  const q = await db.collection('relationship_members')
+    .where({ relationshipId, userOpenid: db.command.in(ids) })
+    .limit(ids.length)
+    .get()
+
+  const map = {}
+  for (const item of (q.data || [])) {
+    if (!item || !item.userOpenid) continue
+    map[item.userOpenid] = String(item.nicknameInRelationship || '').trim()
+  }
+  return map
 }
 
 async function listEntriesByCreatedAt(relId, startTs, endTs, limit = 1000) {
@@ -155,7 +172,7 @@ async function mapImagesToUrls(images) {
   return out
 }
 
-async function getEmotion(relId, myOpenid, partnerOpenid) {
+async function getEmotion(relId, myOpenid, partnerOpenid, myNickname, partnerNickname) {
   const now = Date.now()
   const threeDaysAgo = now - 3 * 86400000
 
@@ -175,7 +192,7 @@ async function getEmotion(relId, myOpenid, partnerOpenid) {
         date: entryDate(hit),
         timeText: formatTime(hit.createdAt),
         text: hit.contentText || '',
-        from: 'TA',
+        from: partnerNickname || '对方',
         images: imgs,
         coverImage: imgs[0] || ''
       }
@@ -202,7 +219,7 @@ async function getEmotion(relId, myOpenid, partnerOpenid) {
     date: entryDate(pick),
     timeText: formatTime(pick.createdAt),
     text: pick.contentText || '',
-    from: pick.userOpenid === myOpenid ? '你' : 'TA',
+    from: pick.userOpenid === myOpenid ? (myNickname || '你') : (partnerNickname || '对方'),
     images: imgs,
     coverImage: imgs[0] || ''
   }
@@ -228,10 +245,14 @@ function calcDays(startDate) {
   return Math.floor((n - s) / 86400000) + 1
 }
 
-function pickNickname(rel, openid) {
-  const m = rel && rel.memberNicknames && typeof rel.memberNicknames === 'object' ? rel.memberNicknames : {}
-  const raw = String(m[openid] || '').trim()
-  return raw || ''
+function resolveNickname(openid, isSelf, memberNicknames, legacyNicknames) {
+  const current = String((memberNicknames && memberNicknames[openid]) || '').trim()
+  if (current) return current
+
+  const legacy = String((legacyNicknames && legacyNicknames[openid]) || '').trim()
+  if (legacy) return legacy
+
+  return isSelf ? '你' : '对方'
 }
 
 exports.main = async (event = {}) => {
@@ -251,21 +272,31 @@ exports.main = async (event = {}) => {
   const marks = buildWeekMarks(weekEntries)
 
   const partnerOpenid = pickPartner(rel, OPENID)
+  const memberNicknames = await getMemberNicknameMap(rel._id, [OPENID, partnerOpenid])
+  const legacyNicknames = rel.memberNicknames && typeof rel.memberNicknames === 'object'
+    ? rel.memberNicknames
+    : {}
+  const myNickname = resolveNickname(OPENID, true, memberNicknames, legacyNicknames)
+  const partnerNickname = partnerOpenid
+    ? resolveNickname(partnerOpenid, false, memberNicknames, legacyNicknames)
+    : '对方'
+
   const [emotion, streak] = await Promise.all([
-    getEmotion(rel._id, OPENID, partnerOpenid),
+    getEmotion(rel._id, OPENID, partnerOpenid, myNickname, partnerNickname),
     getStreak(rel._id)
   ])
 
   const todayKey = dayKey(Date.now())
   const todayHasAny = await hasAnyEntryByDate(rel._id, todayKey)
-  const nickname = pickNickname(rel, partnerOpenid) || 'TA'
 
   return {
     ok: true,
     relationshipId: rel._id,
     relationshipName: rel.name || '我们',
     startDate: rel.startDate || '',
-    nickname,
+    nickname: partnerNickname,
+    myNickname,
+    partnerNickname,
     daysSinceStart: rel.startDate ? calcDays(rel.startDate) : 1,
     streak,
     week: {

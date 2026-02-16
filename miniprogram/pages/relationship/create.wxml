@@ -7,6 +7,11 @@
     </view>
 
     <view class="row">
+      <view class="label">你希望 TA 在这里怎么称呼你？</view>
+      <input class="input" value="{{nickname}}" placeholder="1-10字，不含表情" maxlength="10" bindinput="onNickname" />
+    </view>
+
+    <view class="row">
       <view class="label">开始日期</view>
       <picker mode="date" value="{{startDate}}" bindchange="onPickDate">
         <view class="picker">{{startDate || '请选择'}} </view>

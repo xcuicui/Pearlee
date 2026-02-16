@@ -40,7 +40,7 @@ Page({
   data: {
     relationshipId: '',
     relName: '我们',
-    nickname: 'TA',
+    nickname: '对方',
     startDate: '',
     days: 1,
     streak: { current: 0, visible: false },
@@ -91,7 +91,7 @@ Page({
       this.setData({
         relationshipId: res.relationshipId,
         relName: res.relationshipName || '我们',
-        nickname: res.nickname || 'TA',
+        nickname: res.partnerNickname || res.nickname || '对方',
         startDate: res.startDate || '',
         days: Number(res.daysSinceStart || 1),
         streak: res.streak || { current: 0, visible: false },

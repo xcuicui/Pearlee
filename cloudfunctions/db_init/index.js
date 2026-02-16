@@ -6,12 +6,15 @@ const db = cloud.database()
 
 const INIT_VERSION = '2026-02-15'
 
-const REQUIRED_COLLECTIONS = ['users', 'relationships', 'entries', 'likes', 'comments', 'relationship_stats']
+const REQUIRED_COLLECTIONS = ['users', 'relationships', 'relationship_members', 'entries', 'likes', 'comments', 'relationship_stats']
 
 const REQUIRED_INDEXES = {
   relationships: [
     { name: 'idx_inviteCode', keys: { inviteCode: 1 } },
     { name: 'idx_memberOpenids_archived', keys: { memberOpenids: 1, archived: 1 } }
+  ],
+  relationship_members: [
+    { name: 'idx_relationshipId_userOpenid', keys: { relationshipId: 1, userOpenid: 1 }, unique: true }
   ],
   relationship_stats: [
     { name: 'idx_relationshipId', keys: { relationshipId: 1 } }
@@ -46,6 +49,11 @@ function isCollectionMissingError(err) {
 function isIndexAlreadyExistsError(err) {
   const msg = toErrorMessage(err).toLowerCase()
   return msg.includes('already exists') || msg.includes('已存在') || msg.includes('index name conflict')
+}
+
+function isDuplicateKeyError(err) {
+  const msg = toErrorMessage(err).toLowerCase()
+  return msg.includes('duplicate') || msg.includes('dup key') || msg.includes('唯一') || msg.includes('重复')
 }
 
 async function probeCollection(name) {
@@ -129,9 +137,10 @@ async function ensureCollection(name) {
 }
 
 async function createIndexWithFallback(coll, spec) {
+  const unique = !!spec.unique
   const attempts = [
-    { name: spec.name, keys: spec.keys },
-    { index: { name: spec.name, keys: spec.keys }, options: { unique: false } }
+    { name: spec.name, keys: spec.keys, unique },
+    { index: { name: spec.name, keys: spec.keys }, options: { unique } }
   ]
 
   let lastErr = null
@@ -183,6 +192,76 @@ async function ensureIndex(collectionName, spec) {
   }
 }
 
+async function ensureRelationshipMemberDoc(relationshipId, userOpenid, ts) {
+  const q = await db.collection('relationship_members')
+    .where({ relationshipId, userOpenid })
+    .limit(1)
+    .get()
+
+  if ((q.data || []).length > 0) return { created: false, existed: true }
+
+  try {
+    await db.collection('relationship_members').add({
+      data: {
+        relationshipId,
+        userOpenid,
+        nicknameInRelationship: null,
+        createdAt: ts,
+        updatedAt: ts
+      }
+    })
+    return { created: true, existed: false }
+  } catch (err) {
+    if (isDuplicateKeyError(err)) return { created: false, existed: true }
+    throw err
+  }
+}
+
+async function backfillRelationshipMembers() {
+  const pageSize = 100
+  let skip = 0
+  let scannedRelationships = 0
+  let createdMembers = 0
+  let existedMembers = 0
+  const startedAt = now()
+
+  while (true) {
+    const relQ = await db.collection('relationships')
+      .orderBy('createdAt', 'asc')
+      .skip(skip)
+      .limit(pageSize)
+      .get()
+
+    const rels = relQ.data || []
+    if (!rels.length) break
+
+    for (const rel of rels) {
+      scannedRelationships += 1
+      const relId = rel && rel._id ? String(rel._id) : ''
+      if (!relId) continue
+      const members = Array.isArray(rel.memberOpenids) ? rel.memberOpenids : []
+      const uniqueMembers = Array.from(new Set(members.filter(Boolean)))
+      for (const openid of uniqueMembers) {
+        const r = await ensureRelationshipMemberDoc(relId, openid, now())
+        if (r.created) createdMembers += 1
+        else existedMembers += 1
+      }
+    }
+
+    skip += rels.length
+    if (rels.length < pageSize) break
+  }
+
+  return {
+    ok: true,
+    startedAt,
+    finishedAt: now(),
+    scannedRelationships,
+    createdMembers,
+    existedMembers
+  }
+}
+
 exports.main = async () => {
   const startedAt = now()
 
@@ -217,21 +296,33 @@ exports.main = async () => {
 
   const collectionOk = collections.every(x => x.ok)
   const indexOk = indexes.every(x => x.ok || x.skipped)
+  let backfill = {
+    ok: false,
+    skipped: true,
+    reason: 'relationship_members collection unavailable'
+  }
+
+  const memberCollection = collections.find(x => x.name === 'relationship_members')
+  if (memberCollection && memberCollection.ok) {
+    backfill = await backfillRelationshipMembers()
+  }
 
   return {
-    ok: collectionOk && indexOk,
+    ok: collectionOk && indexOk && backfill.ok,
     version: INIT_VERSION,
     startedAt,
     finishedAt: now(),
     report: {
       collections,
       indexes,
+      backfill,
       summary: {
         totalCollections: collections.length,
         okCollections: collections.filter(x => x.ok).length,
         totalIndexes: indexes.length,
         okIndexes: indexes.filter(x => x.ok).length,
-        skippedIndexes: indexes.filter(x => x.skipped).length
+        skippedIndexes: indexes.filter(x => x.skipped).length,
+        backfillCreatedMembers: Number(backfill.createdMembers || 0)
       }
     }
   }

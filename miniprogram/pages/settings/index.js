@@ -23,7 +23,7 @@ Page({
       }
       this.setData({
         relationshipId: ctx.relationship.id,
-        nickname: ctx.relationship.nickname || '',
+        nickname: (ctx.relationship.me && ctx.relationship.me.nicknameRaw) || '',
         startDate: ctx.relationship.startDate || '',
         inviteCode: ctx.relationship.inviteCode || ''
       })
@@ -46,7 +46,10 @@ Page({
       wx.showLoading({ title: '保存中' })
       await api.call('relationship_update', { nickname: this.data.nickname, startDate: this.data.startDate })
       wx.hideLoading()
-      wx.showToast({ title: '已保存', icon: 'none' })
+      wx.showToast({ title: '已更新', icon: 'none' })
+      setTimeout(() => {
+        wx.switchTab({ url: '/pages/home/index' })
+      }, 220)
     } catch (e) {
       wx.hideLoading()
       wx.showToast({ title: e.message || '保存失败', icon: 'none' })
