@@ -4,8 +4,6 @@
 定义通过邀请码加入关系的校验和写入行为。
 
 本规格用于指导实现与验收；任何与实现不一致之处必须先更新 spec 再改代码。
-
-
 ## Requirements
 ### Requirement: Invite Code Validation
 函数 MUST 校验邀请码非空并转大写。
@@ -38,6 +36,16 @@
 - **GIVEN** 邀请码有效且关系未满
 - **WHEN** 调用 `relationship_join({ inviteCode })`
 - **THEN** 更新关系成员并返回关系 id
+
+### Requirement: Ensure Member Doc On Join
+加入关系时 MUST 确保当前用户在 relationship_members 中有记录。
+
+#### Scenario: Join creates member doc
+- **GIVEN** 用户通过 inviteCode 加入关系
+- **WHEN** 调用 `relationship_join`
+- **THEN** relationship.memberOpenids 包含当前 OPENID
+- **AND** upsert relationship_members(relationship_id, user_openid)
+- **AND** nickname_in_relationship 初始为 NULL
 
 ## Data Contracts
 ### Input

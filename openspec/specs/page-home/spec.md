@@ -110,6 +110,26 @@
 - **WHEN** 渲染顶部
 - **THEN** 展示“最近 {N} 天都有记录”
 
+### Requirement: Title Uses Relationship Nickname
+首页顶部标题 MUST 使用关系级昵称（对方昵称），并按 fallback 策略回退。
+
+#### Scenario: Title uses partner nickname
+- **GIVEN** home_feed 返回 `partnerNickname`
+- **WHEN** 渲染标题
+- **THEN** 展示：`和 {partnerNickname} 的第 {X} 天`
+
+#### Scenario: Title fallback
+- **GIVEN** 对方昵称为空
+- **WHEN** 渲染标题
+- **THEN** 使用 fallback “对方”
+
+### Requirement: No TA Placeholder
+首页所有用户可见文案 MUST 不再出现“TA”占位符。
+
+#### Scenario: No TA in UI
+- **WHEN** 渲染首页（含情绪空态/来源/CTA）
+- **THEN** 不出现字符串“TA”
+
 ## Data Contracts
 ### Client State
 - `relationshipId: string`

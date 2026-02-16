@@ -69,24 +69,12 @@
 - **THEN** `levelByDate[date] = 2`
 
 ### Requirement: Emotion Priority (Now first)
-函数 MUST 优先展示对方近 3 天最新记录；否则随机历史（排除近 3 天）；否则空态。
+情绪卡片来源字段 MUST 使用 relationship nickname（或 fallback 的“对方/你”），不得出现“TA”。
 
-#### Scenario: Partner recent entry exists
-- **GIVEN** 对方近 3 天存在记录
-- **WHEN** 选择情绪卡片
-- **THEN** 返回对方近 3 天内最新一条
-- **AND** `emotion.from = 'TA'`
-
-#### Scenario: Partner recent missing, fallback to history
-- **GIVEN** 对方近 3 天无记录但关系存在历史
-- **WHEN** 选择情绪卡片
-- **THEN** 从历史池随机回退 1 条
-- **AND** 回退池 MUST 排除最近 3 天内的所有记录
-
-#### Scenario: No history
-- **GIVEN** 关系内无记录
-- **WHEN** 选择情绪卡片
-- **THEN** 返回 `{ empty: true }`
+#### Scenario: Emotion from partner
+- **GIVEN** 选中对方记录作为情绪卡片
+- **WHEN** 返回 emotion
+- **THEN** emotion.from 为 partnerNickname（或“对方”）
 
 ### Requirement: Streak Summary
 函数 MUST 返回连续天数 streak（>=2 才展示）。
@@ -100,6 +88,15 @@
 - **GIVEN** `streak.current < 2`
 - **WHEN** 返回结果
 - **THEN** `streak.visible = false`
+
+### Requirement: Relationship Nicknames In Home Feed
+home_feed MUST 返回关系级昵称（已做 fallback）用于统一展示，且不再返回硬编码“TA”。
+
+#### Scenario: Provide my/partner nicknames
+- **GIVEN** OPENID 属于关系
+- **WHEN** 调用 `home_feed`
+- **THEN** 返回 `myNickname` 与 `partnerNickname`
+- **AND** 若 member 昵称为空，则按展示策略回退（我的为“你”，对方为“对方”）
 
 ## Data Contracts
 ### Input
