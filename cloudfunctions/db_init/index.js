@@ -6,16 +6,20 @@ const db = cloud.database()
 
 const INIT_VERSION = '2026-02-15'
 
-const REQUIRED_COLLECTIONS = ['users', 'relationships', 'entries', 'likes', 'comments']
+const REQUIRED_COLLECTIONS = ['users', 'relationships', 'entries', 'likes', 'comments', 'relationship_stats']
 
 const REQUIRED_INDEXES = {
   relationships: [
     { name: 'idx_inviteCode', keys: { inviteCode: 1 } },
     { name: 'idx_memberOpenids_archived', keys: { memberOpenids: 1, archived: 1 } }
   ],
+  relationship_stats: [
+    { name: 'idx_relationshipId', keys: { relationshipId: 1 } }
+  ],
   entries: [
     { name: 'idx_relationshipId_createdAt', keys: { relationshipId: 1, createdAt: -1 } },
-    { name: 'idx_relationshipId_dayKey_createdAt', keys: { relationshipId: 1, dayKey: 1, createdAt: 1 } }
+    { name: 'idx_relationshipId_dayKey_createdAt', keys: { relationshipId: 1, dayKey: 1, createdAt: 1 } },
+    { name: 'idx_relationshipId_date_createdAt', keys: { relationshipId: 1, date: 1, createdAt: 1 } }
   ],
   likes: [
     { name: 'idx_entryId_createdAt', keys: { entryId: 1, createdAt: -1 } },
