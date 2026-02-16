@@ -16,6 +16,11 @@
 
     <view wx:else>
       <view class="emotion-time">{{emotion.timeText}}</view>
+
+      <view wx:if="{{emotion.coverImage}}" class="emotion-media" aria-label="emotion image">
+        <image class="emotion-img" src="{{emotion.coverImage}}" mode="aspectFill" lazy-load="true" />
+      </view>
+
       <view class="emotion-text">{{emotion.text}}</view>
       <view class="emotion-from">来自 {{emotion.from}}</view>
     </view>

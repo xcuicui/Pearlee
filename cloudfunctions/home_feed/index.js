@@ -80,13 +80,16 @@ async function getEmotion(relId, myOpenid, partnerOpenid) {
 
     const hit = (q.data || [])[0]
     if (hit) {
+      const imgs = Array.isArray(hit.images) ? hit.images.filter(Boolean) : []
       return {
         empty: false,
         entryId: hit._id,
         date: hit.dayKey || dayKey(hit.createdAt),
         timeText: formatTime(hit.createdAt),
         text: hit.contentText || '',
-        from: 'TA'
+        from: 'TA',
+        images: imgs,
+        coverImage: imgs[0] || ''
       }
     }
   }
@@ -100,13 +103,16 @@ async function getEmotion(relId, myOpenid, partnerOpenid) {
   if (!list.length) return { empty: true }
 
   const pick = list[Math.floor(Math.random() * list.length)]
+  const imgs = Array.isArray(pick.images) ? pick.images.filter(Boolean) : []
   return {
     empty: false,
     entryId: pick._id,
     date: pick.dayKey || dayKey(pick.createdAt),
     timeText: formatTime(pick.createdAt),
     text: pick.contentText || '',
-    from: pick.userOpenid === myOpenid ? '你' : 'TA'
+    from: pick.userOpenid === myOpenid ? '你' : 'TA',
+    images: imgs,
+    coverImage: imgs[0] || ''
   }
 }
 
