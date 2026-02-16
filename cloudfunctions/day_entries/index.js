@@ -9,6 +9,13 @@ async function getRel(OPENID) {
   return (q.data || [])[0] || null
 }
 
+function getImageRef(v) {
+  if (!v) return ''
+  if (typeof v === 'string') return String(v || '').trim()
+  if (typeof v === 'object') return String(v.url || v.fileID || v.fileId || '').trim()
+  return ''
+}
+
 async function getTempUrlMap(fileIds) {
   const list = Array.from(new Set((fileIds || []).map(x => String(x || '').trim()).filter(Boolean)))
   const map = new Map()
@@ -39,8 +46,12 @@ exports.main = async (event = {}) => {
   const date = String(event.date || '').trim()
   if (!date) throw new BizError('缺少日期', 'MISSING_DATE')
 
+  const where = db.command.or([
+    { relationshipId: rel._id, date, isDeleted: false },
+    { relationshipId: rel._id, dayKey: date, isDeleted: false }
+  ])
   const entriesQ = await db.collection('entries')
-    .where({ relationshipId: rel._id, dayKey: date, isDeleted: false })
+    .where(where)
     .orderBy('createdAt', 'asc')
     .limit(200)
     .get()
@@ -52,7 +63,10 @@ exports.main = async (event = {}) => {
   const allFileIds = []
   for (const e of entries) {
     const imgs = Array.isArray(e.images) ? e.images : []
-    for (const fid of imgs) allFileIds.push(String(fid || '').trim())
+    for (const fid of imgs) {
+      const ref = getImageRef(fid)
+      if (ref && ref.startsWith('cloud://')) allFileIds.push(ref)
+    }
   }
   const tempUrlMap = await getTempUrlMap(allFileIds)
 
@@ -86,7 +100,7 @@ exports.main = async (event = {}) => {
     ok: true,
     items: entries.map(e => {
       const fileIds = Array.isArray(e.images)
-        ? e.images.map(x => String(x || '').trim()).filter(Boolean).slice(0, 9)
+        ? e.images.map(x => getImageRef(x)).filter(Boolean).slice(0, 9)
         : []
 
       const urls = fileIds

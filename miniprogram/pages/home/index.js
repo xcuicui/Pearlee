@@ -1,43 +1,59 @@
 const api = require('../../utils/api')
 
 function pad2(n) { return String(n).padStart(2, '0') }
-function dayKeyFromDate(d) {
-  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`
+function ymdDate(d) { return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}` }
+function parseYmd(s) {
+  const m = String(s || '').trim().match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (!m) return null
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+  return Number.isNaN(d.getTime()) ? null : d
 }
-
-function calcDays(startDate) {
-  // startDate: YYYY-MM-DD
-  const [y, m, d] = String(startDate || '').split('-').map(Number)
-  if (!y || !m || !d) return 1
-  const start = new Date(y, m - 1, d)
-  const now = new Date()
-  const diff = now.setHours(0, 0, 0, 0) - start.setHours(0, 0, 0, 0)
-  return Math.floor(diff / 86400000) + 1
+function weekStartOfToday() {
+  const d = new Date()
+  d.setHours(0, 0, 0, 0)
+  const dow = d.getDay()
+  const diff = dow === 0 ? -6 : 1 - dow
+  d.setDate(d.getDate() + diff)
+  return ymdDate(d)
 }
-
-function monthLabel(year, month) {
-  return `${year}年${month}月`
+function addDaysYmd(s, delta) {
+  const d = parseYmd(s)
+  if (!d) return ''
+  d.setDate(d.getDate() + delta)
+  return ymdDate(d)
+}
+function weekdayLabel(dateYmd) {
+  const d = parseYmd(dateYmd)
+  if (!d) return ''
+  const labels = ['一', '二', '三', '四', '五', '六', '日']
+  return labels[(d.getDay() + 6) % 7]
+}
+function weekTitle(startYmd) {
+  const s = parseYmd(startYmd)
+  if (!s) return ''
+  const e = new Date(s.getTime())
+  e.setDate(e.getDate() + 6)
+  return `${s.getMonth() + 1}.${s.getDate()} - ${e.getMonth() + 1}.${e.getDate()}`
 }
 
 Page({
   data: {
     relationshipId: '',
     relName: '我们',
+    nickname: 'TA',
     startDate: '',
-
     days: 1,
-    year: new Date().getFullYear(),
+    streak: { current: 0, visible: false },
 
     loading: false,
     error: '',
 
     emotion: { empty: true },
-
-    month: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-    monthLabel: '',
-    marks: {},
-
-    today: { key: dayKeyFromDate(new Date()), hasAny: false }
+    today: { key: ymdDate(new Date()), hasAny: false },
+    weekStart: weekStartOfToday(),
+    weekTitle: '',
+    weekDays: [],
+    touchStartX: 0
   },
 
   onShow() {
@@ -48,54 +64,77 @@ Page({
     this.setData({ loading: true, error: '' })
 
     try {
-      const { year, month } = this.data.month
-      const res = await api.call('home_feed', { year, month })
+      const res = await api.call('home_feed', { weekStart: this.data.weekStart })
 
       if (!res || !res.relationshipId) {
         wx.redirectTo({ url: '/pages/relationship/create' })
         return
       }
 
+      const week = res.week || {}
+      const weekDays = (Array.isArray(week.days) ? week.days : []).map((date) => ({
+        date,
+        dayLabel: String(date || '').slice(-2),
+        weekLabel: weekdayLabel(date),
+        hasRecord: Array.isArray(week.activeDates) && week.activeDates.includes(date),
+        isToday: date === week.todayKey
+      }))
+
       this.setData({
         relationshipId: res.relationshipId,
         relName: res.relationshipName || '我们',
+        nickname: res.nickname || 'TA',
         startDate: res.startDate || '',
-        days: res.startDate ? calcDays(res.startDate) : 1,
-        year: new Date().getFullYear(),
+        days: Number(res.daysSinceStart || 1),
+        streak: res.streak || { current: 0, visible: false },
         emotion: res.emotion || { empty: true },
-        marks: res.marks || {},
+        weekStart: (week.start || this.data.weekStart),
+        weekTitle: weekTitle(week.start || this.data.weekStart),
+        weekDays,
         today: res.today || { key: this.data.today.key, hasAny: false },
-        monthLabel: monthLabel(year, month),
         loading: false
       })
 
-      // reflect relationship name in nav bar subtly
       wx.setNavigationBarTitle({ title: '贝忆' })
     } catch (e) {
       this.setData({ loading: false, error: e.message || '加载失败' })
     }
   },
 
-  prevMonth() {
-    let { year, month } = this.data.month
-    month -= 1
-    if (month <= 0) { month = 12; year -= 1 }
-    this.setData({ month: { year, month } })
+  prevWeek() {
+    const nextStart = addDaysYmd(this.data.weekStart, -7)
+    if (!nextStart) return
+    this.setData({ weekStart: nextStart })
     this.refresh()
   },
 
-  nextMonth() {
-    let { year, month } = this.data.month
-    month += 1
-    if (month >= 13) { month = 1; year += 1 }
-    this.setData({ month: { year, month } })
+  nextWeek() {
+    const nextStart = addDaysYmd(this.data.weekStart, 7)
+    if (!nextStart) return
+    this.setData({ weekStart: nextStart })
     this.refresh()
   },
 
   onPickDay(e) {
-    const key = e && e.detail ? e.detail.key : ''
+    const key = e && e.currentTarget && e.currentTarget.dataset ? String(e.currentTarget.dataset.key || '') : ''
     if (!key) return
     wx.navigateTo({ url: `/pages/day/detail?date=${key}` })
+  },
+
+  onWeekTouchStart(e) {
+    const x = e && e.changedTouches && e.changedTouches[0] ? Number(e.changedTouches[0].clientX) : 0
+    this.setData({ touchStartX: x })
+  },
+
+  onWeekTouchEnd(e) {
+    const x = e && e.changedTouches && e.changedTouches[0] ? Number(e.changedTouches[0].clientX) : 0
+    const delta = x - Number(this.data.touchStartX || 0)
+    if (Math.abs(delta) < 40) return
+    if (delta > 0) {
+      this.prevWeek()
+      return
+    }
+    this.nextWeek()
   },
 
   openEmotion() {

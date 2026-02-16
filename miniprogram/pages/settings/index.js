@@ -3,7 +3,7 @@ const api = require('../../utils/api')
 Page({
   data: {
     relationshipId: '',
-    name: '我们',
+    nickname: '',
     startDate: '',
     inviteCode: '',
     error: ''
@@ -23,7 +23,7 @@ Page({
       }
       this.setData({
         relationshipId: ctx.relationship.id,
-        name: ctx.relationship.name || '我们',
+        nickname: ctx.relationship.nickname || '',
         startDate: ctx.relationship.startDate || '',
         inviteCode: ctx.relationship.inviteCode || ''
       })
@@ -32,8 +32,8 @@ Page({
     }
   },
 
-  onName(e) {
-    this.setData({ name: (e && e.detail ? String(e.detail.value || '') : '').trim() })
+  onNickname(e) {
+    this.setData({ nickname: (e && e.detail ? String(e.detail.value || '') : '').trim() })
   },
 
   onPickDate(e) {
@@ -44,7 +44,7 @@ Page({
   async save() {
     try {
       wx.showLoading({ title: '保存中' })
-      await api.call('relationship_update', { name: this.data.name, startDate: this.data.startDate })
+      await api.call('relationship_update', { nickname: this.data.nickname, startDate: this.data.startDate })
       wx.hideLoading()
       wx.showToast({ title: '已保存', icon: 'none' })
     } catch (e) {

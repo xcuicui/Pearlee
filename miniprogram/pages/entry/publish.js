@@ -1,6 +1,6 @@
 const api = require('../../utils/api')
 
-const MAX_IMAGES = 9
+const MAX_IMAGES = 3
 
 function extOf(path) {
   const s = String(path || '')
@@ -12,6 +12,39 @@ function makeCloudPath(localPath, i) {
   const ts = Date.now()
   const rand = Math.random().toString(36).slice(2, 8)
   return `entries/${ts}_${i}_${rand}${extOf(localPath)}`
+}
+
+function getImageInfo(filePath) {
+  return new Promise((resolve) => {
+    wx.getImageInfo({
+      src: filePath,
+      success: (res) => {
+        resolve({
+          path: filePath,
+          width: Number(res.width || 0),
+          height: Number(res.height || 0)
+        })
+      },
+      fail: () => resolve({ path: filePath, width: 0, height: 0 })
+    })
+  })
+}
+
+function compressImageBestEffort(filePath, width) {
+  return new Promise((resolve) => {
+    const options = {
+      src: filePath,
+      quality: 75,
+      success: (res) => resolve(String(res.tempFilePath || filePath)),
+      fail: () => resolve(filePath)
+    }
+
+    if (Number(width) > 1080) {
+      options.compressedWidth = 1080
+    }
+
+    wx.compressImage(options)
+  })
 }
 
 Page({
@@ -29,7 +62,7 @@ Page({
     const current = Array.isArray(this.data.images) ? this.data.images : []
     const remain = MAX_IMAGES - current.length
     if (remain <= 0) {
-      wx.showToast({ title: '最多 9 张图片', icon: 'none' })
+      wx.showToast({ title: '最多 3 张图片', icon: 'none' })
       return
     }
 
@@ -37,9 +70,10 @@ Page({
       count: remain,
       sizeType: ['compressed'],
       sourceType: ['album', 'camera'],
-      success: (res) => {
+      success: async (res) => {
         const picked = (res && res.tempFilePaths) || []
-        const next = current.concat(picked).slice(0, MAX_IMAGES)
+        const normalized = await Promise.all(picked.map(p => getImageInfo(p)))
+        const next = current.concat(normalized).slice(0, MAX_IMAGES)
         this.setData({ images: next, error: '' })
       }
     })
@@ -57,31 +91,38 @@ Page({
     const idx = Number(e && e.currentTarget && e.currentTarget.dataset ? e.currentTarget.dataset.idx : -1)
     const list = Array.isArray(this.data.images) ? this.data.images : []
     if (Number.isNaN(idx) || idx < 0 || idx >= list.length) return
-    wx.previewImage({ current: list[idx], urls: list })
+    wx.previewImage({ current: list[idx].path, urls: list.map(x => x.path) })
   },
 
   async uploadSelectedImages() {
     const list = Array.isArray(this.data.images) ? this.data.images : []
     if (!list.length) return []
-    const tasks = list.map((filePath, i) => wx.cloud.uploadFile({
-      cloudPath: makeCloudPath(filePath, i),
-      filePath
-    }).then(res => res.fileID))
+    const tasks = list.map(async (img, i) => {
+      const filePath = await compressImageBestEffort(img.path, img.width)
+      const uploaded = await wx.cloud.uploadFile({
+        cloudPath: makeCloudPath(filePath, i),
+        filePath
+      })
+      return {
+        url: uploaded.fileID,
+        width: Number(img.width || 0),
+        height: Number(img.height || 0)
+      }
+    })
     return Promise.all(tasks)
   },
 
   async publish() {
     const text = String(this.data.text || '').trim()
-    if (!text) {
-      this.setData({ error: '写点什么吧。' })
+    const hasImages = Array.isArray(this.data.images) && this.data.images.length > 0
+    if (!text && !hasImages) {
+      this.setData({ error: '至少写点文字或上传一张图。' })
       return
     }
 
     try {
       wx.showLoading({ title: '发布中' })
       const images = await this.uploadSelectedImages()
-      console.log('[entry.publish] local images=', this.data.images)
-      console.log('[entry.publish] uploaded fileIDs=', images)
       await api.call('entry_create', { text, images })
       wx.hideLoading()
       wx.showToast({ title: '已点亮今天', icon: 'none' })

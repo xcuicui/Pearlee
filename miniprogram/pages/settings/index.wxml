@@ -3,8 +3,8 @@
     <view class="title">关系设置</view>
 
     <view class="row">
-      <view class="label">关系名称</view>
-      <input class="input" value="{{name}}" placeholder="我们" bindinput="onName" />
+      <view class="label">你的昵称</view>
+      <input class="input" value="{{nickname}}" placeholder="例如：小猫" bindinput="onNickname" />
     </view>
 
     <view class="row">

@@ -1,6 +1,4 @@
 {
   "navigationBarTitleText": "贝忆",
-  "usingComponents": {
-    "month-grid": "/components/month-grid/index"
-  }
+  "usingComponents": {}
 }

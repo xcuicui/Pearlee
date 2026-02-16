@@ -11,12 +11,12 @@
     <view class="count">{{text.length}}/500</view>
 
     <view class="img-head">
-      <view class="img-title">图片（{{images.length}}/9）</view>
+      <view class="img-title">图片（{{images.length}}/3）</view>
       <view class="img-add" bindtap="chooseImages" hover-class="tap-down" hover-stay-time="60">添加</view>
     </view>
     <view class="img-list" wx:if="{{images.length}}">
-      <view class="img-item" wx:for="{{images}}" wx:key="*this">
-        <image class="img" src="{{item}}" mode="aspectFill" bindtap="previewImage" data-idx="{{index}}" />
+      <view class="img-item" wx:for="{{images}}" wx:key="index">
+        <image class="img" src="{{item.path}}" mode="aspectFill" bindtap="previewImage" data-idx="{{index}}" />
         <view class="img-remove" bindtap="removeImage" data-idx="{{index}}" hover-class="tap-down" hover-stay-time="60">移除</view>
       </view>
     </view>

@@ -20,14 +20,20 @@ exports.main = async () => {
     return { ok: true, relationship: null }
   }
 
+  const memberNicknames = rel.memberNicknames && typeof rel.memberNicknames === 'object'
+    ? rel.memberNicknames
+    : {}
+
   return {
     ok: true,
     relationship: {
       id: rel._id,
       name: rel.name || '我们',
+      nickname: String(memberNicknames[OPENID] || ''),
       startDate: rel.startDate || '',
       inviteCode: rel.inviteCode || '',
-      memberOpenids: rel.memberOpenids || []
+      memberOpenids: rel.memberOpenids || [],
+      memberNicknames
     }
   }
 }

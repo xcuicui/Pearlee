@@ -2,11 +2,37 @@
   <view class="bg"></view>
 
   <view class="top">
-    <view class="rel-title">和 TA 的第 <text class="days">{{days}}</text> 天</view>
-    <view class="year">{{year}} 年</view>
+    <view class="rel-title">和 {{nickname}} 的第 <text class="days">{{days}}</text> 天</view>
+    <view wx:if="{{streak.visible}}" class="streak">最近 {{streak.current}} 天都有记录</view>
   </view>
 
-  <!-- Emotion card (now first) -->
+  <view
+    class="week card"
+    catchtouchstart="onWeekTouchStart"
+    catchtouchend="onWeekTouchEnd"
+  >
+    <view class="week-head">
+      <view class="week-range">{{weekTitle}}</view>
+      <view class="week-actions">
+        <view class="week-btn" bindtap="prevWeek" hover-class="tap-down" hover-stay-time="60">上周</view>
+        <view class="week-btn" bindtap="nextWeek" hover-class="tap-down" hover-stay-time="60">下周</view>
+      </view>
+    </view>
+    <view class="week-bar">
+      <view
+        class="week-day"
+        wx:for="{{weekDays}}"
+        wx:key="date"
+        data-key="{{item.date}}"
+        bindtap="onPickDay"
+      >
+        <view class="week-name">{{item.weekLabel}}</view>
+        <view class="week-num {{item.isToday ? 'today' : ''}}">{{item.dayLabel}}</view>
+        <view class="dot {{item.hasRecord ? 'active' : ''}}"></view>
+      </view>
+    </view>
+  </view>
+
   <view class="emotion card" bindtap="openEmotion" hover-class="tap-down" hover-stay-time="80">
     <view wx:if="{{emotion.empty}}" class="emotion-empty">
       <view class="emotion-time">现在</view>
@@ -26,31 +52,12 @@
     </view>
   </view>
 
-  <!-- Calendar -->
-  <view class="cal card">
-    <view class="cal-head">
-      <view class="cal-month">{{monthLabel}}</view>
-      <view class="cal-actions">
-        <view class="cal-btn" bindtap="prevMonth" hover-class="tap-down" hover-stay-time="60">上月</view>
-        <view class="cal-btn" bindtap="nextMonth" hover-class="tap-down" hover-stay-time="60">下月</view>
-      </view>
-    </view>
-
-    <month-grid
-      year="{{month.year}}"
-      month="{{month.month}}"
-      marks="{{marks}}"
-      bind:select="onPickDay"
-    />
-  </view>
-
-  <!-- Today entry point -->
   <view class="today card">
     <view wx:if="{{today.hasAny}}" class="today-text">今天已被点亮</view>
     <view wx:else class="today-text">今天还没有留下记录</view>
 
     <view class="today-actions">
-      <view class="btn-primary" bindtap="goPublish" hover-class="tap-down" hover-stay-time="80">留下些什么？</view>
+      <view class="btn-primary" bindtap="goPublish" hover-class="tap-down" hover-stay-time="80">记录这一刻</view>
     </view>
   </view>
 
