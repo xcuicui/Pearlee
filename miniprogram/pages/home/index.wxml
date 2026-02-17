@@ -67,13 +67,8 @@
     </view>
   </view>
 
-  <view class="today card">
-    <view wx:if="{{today.hasAny}}" class="today-text">今天已被点亮</view>
-    <view wx:else class="today-text">今天还没有留下记录</view>
-
-    <view class="today-actions">
-      <view class="btn-primary" bindtap="goPublish" hover-class="tap-down" hover-stay-time="80">记录这一刻</view>
-    </view>
+  <view class="fab" bindtap="goPublish" hover-class="tap-down" hover-stay-time="80" aria-label="new entry">
+    <view class="fab-icon">+</view>
   </view>
 
   <view wx:if="{{error}}" class="err">{{error}}</view>

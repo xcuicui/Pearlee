@@ -1,4 +1,4 @@
-.home{position:relative;min-height:100vh;padding:48rpx 48rpx 120rpx;box-sizing:border-box}
+.home{position:relative;min-height:100vh;padding:48rpx 48rpx 192rpx;box-sizing:border-box}
 .bg{position:fixed;inset:0;z-index:0;background:
   radial-gradient(800rpx 600rpx at 22% 12%, rgba(95,125,149,.22), rgba(255,255,255,0) 60%),
   radial-gradient(900rpx 700rpx at 78% 22%, rgba(255,170,190,.14), rgba(255,255,255,0) 62%),
@@ -36,3 +36,6 @@
 .today-text{font-size:26rpx;color:rgba(38,35,31,.72)}
 .today-actions{margin-top:22rpx;display:flex;justify-content:flex-start}
 .err{position:relative;z-index:1;margin-top:22rpx;color:#b24a4a;font-size:24rpx}
+
+.fab{position:fixed;right:40rpx;bottom:calc(env(safe-area-inset-bottom) + 48rpx);width:112rpx;height:112rpx;border-radius:9999rpx;background:#5F7D95;z-index:100;display:flex;align-items:center;justify-content:center}
+.fab-icon{color:#fff;font-size:56rpx;line-height:1;font-weight:500;margin-top:-4rpx}
