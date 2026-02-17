@@ -4,8 +4,6 @@
 定义加入关系页的邀请码输入、校验、提交与返回行为。
 
 本规格用于指导实现与验收；任何与实现不一致之处必须先更新 spec 再改代码。
-
-
 ## Requirements
 ### Requirement: Invite Code Input
 页面 MUST 支持邀请码输入，提交前去除空白并转大写。
@@ -35,6 +33,14 @@
 - **GIVEN** 用户在加入页
 - **WHEN** 点击返回
 - **THEN** 页面执行 `navigateBack`
+
+### Requirement: Relationship join copy uses naming system
+加入关系页 MUST 使用统一 strings key 管理文案，并遵循温柔克制语气。
+
+#### Scenario: No hard-coded copy
+- **WHEN** 渲染加入关系页
+- **THEN** 页面关键文案来自 strings key
+- **AND** 避免工具/任务化措辞（如“发布/取消/完成任务”）
 
 ## Data Contracts
 ### Client State
