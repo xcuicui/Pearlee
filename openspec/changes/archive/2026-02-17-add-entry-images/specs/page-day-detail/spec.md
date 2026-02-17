@@ -7,9 +7,9 @@
 - **WHEN** 页面显示并调用 `day_entries({ date })`
 - **THEN** 页面展示按时间排序的 entry 列表及点赞数、点赞态、评论、图片
 
-## ADDED Requirements
+## MODIFIED Requirements
 ### Requirement: Entry Images Display
-页面 MUST 在每条 entry 中展示最多 3 张图片缩略图。
+页面 MUST 在每条 entry 中展示图片缩略图（最多 3 张），并在无图片时不展示图片区域。
 
 #### Scenario: Render images
 - **GIVEN** entry 包含 `images` 数组

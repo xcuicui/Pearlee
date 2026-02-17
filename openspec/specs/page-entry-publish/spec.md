@@ -52,17 +52,17 @@
 - **THEN** 宽 1080px、JPEG 0.75、不裁剪
 
 ### Requirement: Image Selection Management
-页面 MUST 支持最多 9 张图片的选择、预览与移除。
+页面 MUST 支持图片的选择、预览与移除，并遵守图片数量上限。
 
 #### Scenario: Select images
-- **GIVEN** 当前已选图片少于 9 张
+- **GIVEN** 当前已选图片少于上限
 - **WHEN** 用户点击添加图片
-- **THEN** 页面允许从相册/拍照选择并加入已选列表，累计不超过 9 张
+- **THEN** 页面允许从相册/拍照选择并加入已选列表，累计不超过上限
 
 #### Scenario: Select over limit blocked
-- **GIVEN** 当前已选图片已达 9 张
+- **GIVEN** 当前已选图片已达上限
 - **WHEN** 用户尝试继续添加
-- **THEN** 页面提示最多 9 张并不再添加
+- **THEN** 页面提示达到上限并不再添加
 
 #### Scenario: Remove selected image
 - **GIVEN** 已选列表存在图片

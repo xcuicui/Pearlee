@@ -26,7 +26,7 @@
 - **THEN** 新增记录并返回 entry id
 - **AND** 记录包含 `images` 字段（数组，默认空数组）
 
-## ADDED Requirements
+## MODIFIED Requirements
 ### Requirement: Images Payload Compatibility
 函数 MUST 接受可选 `images` 字段并保持向后兼容。
 

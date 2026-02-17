@@ -33,17 +33,12 @@
 - **THEN** 页面清空该条草稿并重新加载列表
 
 ### Requirement: Entry Images Display
-页面 MUST 在每条 entry 中展示最多 9 张图片缩略图，并支持点击预览全量图片列表。
+页面 MUST 在每条 entry 中展示图片缩略图（最多 3 张），并在无图片时不展示图片区域。
 
 #### Scenario: Render images
 - **GIVEN** entry 包含 `images` 数组
 - **WHEN** 页面渲染该条 entry
-- **THEN** 页面展示最多前 9 张图片缩略图，并以 3 列换行布局显示
-
-#### Scenario: Preview image
-- **GIVEN** entry 包含多张图片
-- **WHEN** 用户点击任一缩略图
-- **THEN** 页面调用预览并传入该条 entry 的完整图片列表
+- **THEN** 页面展示最多前 3 张图片缩略图
 
 #### Scenario: No images
 - **GIVEN** entry 不包含图片或为空数组
