@@ -1,4 +1,6 @@
 const api = require('../../utils/api')
+const { t } = require('../../utils/strings')
+const { fallbackTa } = require('../../utils/naming')
 
 function pad2(n) { return String(n).padStart(2, '0') }
 function ymdDate(d) { return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}` }
@@ -85,6 +87,15 @@ Page({
     relationshipId: '',
     relName: '我们',
     nickname: '对方',
+
+    // naming system copies
+    streakText: '',
+    weekTodayText: '',
+    emotionEmptyTimeText: '',
+    emotionEmptyText: '',
+    fabAriaLabel: '',
+    fabBubbleText: '',
+    emotionFromText: '',
     startDate: '',
     days: 1,
     streak: { current: 0, visible: false },
@@ -107,6 +118,32 @@ Page({
 
   onShow() {
     this.refreshAll()
+  },
+
+  applyNamingCopies() {
+    const ta = fallbackTa(this.data.nickname)
+    const streakN = this.data.streak && this.data.streak.current ? Number(this.data.streak.current) : 0
+
+    // emotion from
+    const e = this.data.emotion || {}
+    let emotionFromText = ''
+    if (e.empty) {
+      emotionFromText = t('HOME_EMOTION_FROM_US')
+    } else {
+      const from = String(e.from || '').trim()
+      if (from === '我') emotionFromText = t('HOME_EMOTION_FROM_ME_MURMUR', { TaNickname: ta })
+      else emotionFromText = t('HOME_EMOTION_FROM_PARTNER_MURMUR', { TaNickname: ta })
+    }
+
+    this.setData({
+      streakText: streakN >= 2 ? t('HOME_STREAK', { N: streakN }) : '',
+      weekTodayText: t('HOME_WEEK_TODAY'),
+      emotionEmptyTimeText: t('HOME_EMOTION_EMPTY_TIME'),
+      emotionEmptyText: t('HOME_EMOTION_EMPTY_TEXT'),
+      fabAriaLabel: t('FAB_MURMUR_ENTRY_NAME'),
+      fabBubbleText: t('FAB_MURMUR_ENTRY_NAME'),
+      emotionFromText
+    })
   },
 
   _ensureCache() {
@@ -180,6 +217,8 @@ Page({
         weekPages: this._buildPagesForCurrent(current, weekStart),
         loading: false
       })
+
+      this.applyNamingCopies()
 
       this._prefetchWeek(addDaysYmd(weekStart, -7))
       this._prefetchWeek(addDaysYmd(weekStart, 7))

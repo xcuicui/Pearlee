@@ -1,4 +1,7 @@
 const api = require('../../utils/api')
+const { t } = require('../../utils/strings')
+const { formatMonthDay } = require('../../utils/format')
+const { fallbackMe, fallbackTa } = require('../../utils/naming')
 
 const MAX_IMAGES = 9
 
@@ -48,10 +51,7 @@ function compressImageBestEffort(filePath, width) {
 }
 
 function titleForToday() {
-  const d = new Date()
-  const m = d.getMonth() + 1
-  const day = d.getDate()
-  return `${m}月${day}日`
+  return formatMonthDay(new Date())
 }
 
 Page({
@@ -60,11 +60,40 @@ Page({
     images: [],
     error: '',
     showCount: false,
-    canSubmit: false
+    canSubmit: false,
+
+    // naming system copies
+    subtitleText: '',
+    hintText: '',
+    placeholderText: '',
+    addPhotoText: '',
+    submitText: ''
   },
 
-  onLoad() {
+  async onLoad() {
     wx.setNavigationBarTitle({ title: titleForToday() })
+
+    // load relationship context for nicknames
+    let me = '我'
+    let ta = 'TA'
+    try {
+      const ctx = await api.call('ctx_get')
+      if (ctx && ctx.relationship) {
+        me = fallbackMe(ctx.relationship.me && ctx.relationship.me.nickname)
+        ta = fallbackTa(ctx.relationship.partner && ctx.relationship.partner.nickname)
+      }
+    } catch (e) {
+      // best-effort
+    }
+
+    this.setData({
+      subtitleText: t('COMPOSER_SUBTITLE_BOX', { MyNickname: me }),
+      hintText: t('COMPOSER_HINT_LINE'),
+      placeholderText: t('COMPOSER_PLACEHOLDER'),
+      addPhotoText: t('COMPOSER_ADD_PHOTO'),
+      submitText: t('COMPOSER_SUBMIT')
+    })
+
     this.recompute()
   },
 

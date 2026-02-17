@@ -1,11 +1,23 @@
 const api = require('../../utils/api')
+const { t } = require('../../utils/strings')
 
 Page({
   data: {
     name: '我们',
     nickname: '',
     startDate: '',
-    error: ''
+    error: '',
+    copy: {
+      title: t('REL_CREATE_TITLE'),
+      relName: t('REL_CREATE_REL_NAME'),
+      relNamePlaceholder: t('REL_CREATE_REL_NAME_PLACEHOLDER'),
+      nicknameAsk: t('REL_CREATE_NICKNAME_ASK'),
+      nicknamePlaceholder: t('REL_CREATE_NICKNAME_PLACEHOLDER'),
+      startDate: t('REL_CREATE_START_DATE'),
+      datePickPlaceholder: t('REL_CREATE_DATE_PICK_PLACEHOLDER'),
+      submit: t('REL_CREATE_SUBMIT'),
+      haveCode: t('REL_CREATE_HAVE_CODE')
+    }
   },
 
   onShow() {
@@ -40,31 +52,31 @@ Page({
   async create() {
     const nickname = String(this.data.nickname || '').trim()
     if (!nickname) {
-      this.setData({ error: '请填写你在这段关系里的名字' })
+      this.setData({ error: t('REL_ERR_NICKNAME_REQUIRED') })
       return
     }
     if (Array.from(nickname).length > 10) {
-      this.setData({ error: '昵称最多 10 个字' })
+      this.setData({ error: t('REL_ERR_NICKNAME_TOO_LONG') })
       return
     }
     if (nickname === '你' || nickname === '对方' || nickname.toUpperCase() === 'TA') {
-      this.setData({ error: '昵称不能使用占位词' })
+      this.setData({ error: t('REL_ERR_NICKNAME_PLACEHOLDER') })
       return
     }
     if (/[\p{Extended_Pictographic}\u200d\ufe0f]/u.test(nickname)) {
-      this.setData({ error: '昵称不能包含表情符号' })
+      this.setData({ error: t('REL_ERR_NICKNAME_EMOJI') })
       return
     }
 
     try {
       this.setData({ error: '' })
-      wx.showLoading({ title: '创建中' })
+      wx.showLoading({ title: t('REL_LOADING_CREATING') })
       await api.call('relationship_create', { name: this.data.name, startDate: this.data.startDate, nickname })
       wx.hideLoading()
       wx.switchTab({ url: '/pages/home/index' })
     } catch (e) {
       wx.hideLoading()
-      this.setData({ error: e.message || '创建失败' })
+      this.setData({ error: e.message || t('REL_ERR_CREATE_FAIL') })
     }
   },
 

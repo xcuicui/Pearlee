@@ -1,37 +1,37 @@
 <view class="page">
   <view class="card section">
-    <view class="title">关系设置</view>
+    <view class="title">{{titleRel}}</view>
 
     <view class="row">
-      <view class="label">在这段关系里的名字</view>
-      <input class="input" value="{{nickname}}" placeholder="例如：小猫" bindinput="onNickname" />
+      <view class="label">{{labelNickname}}</view>
+      <input class="input" value="{{nickname}}" placeholder="{{nicknamePlaceholder}}" bindinput="onNickname" />
     </view>
 
     <view class="row">
-      <view class="label">开始日期</view>
+      <view class="label">{{labelStartDate}}</view>
       <picker mode="date" value="{{startDate}}" bindchange="onPickDate">
-        <view class="picker">{{startDate || '请选择'}} </view>
+        <view class="picker">{{startDate || datePickPlaceholder}} </view>
       </picker>
     </view>
 
     <view class="actions">
-      <view class="btn-primary" bindtap="save" hover-class="tap-down" hover-stay-time="80">保存</view>
+      <view class="btn-primary" bindtap="save" hover-class="tap-down" hover-stay-time="80">{{saveText}}</view>
     </view>
   </view>
 
   <view class="card section">
-    <view class="title">邀请对方</view>
-    <view class="desc">把邀请码发给对方，对方在“加入关系”里输入即可。</view>
+    <view class="title">{{titleInvite}}</view>
+    <view class="desc">{{inviteDesc}}</view>
     <view class="code">{{inviteCode || '—'}}</view>
 
     <view class="actions">
-      <view class="btn-ghost" bindtap="copy" hover-class="tap-down" hover-stay-time="80">复制邀请码</view>
-      <view class="btn-ghost" bindtap="goJoin" hover-class="tap-down" hover-stay-time="80">加入关系</view>
+      <view class="btn-ghost" bindtap="copy" hover-class="tap-down" hover-stay-time="80">{{copyCodeText}}</view>
+      <view class="btn-ghost" bindtap="goJoin" hover-class="tap-down" hover-stay-time="80">{{goJoinText}}</view>
     </view>
   </view>
 
   <view class="danger">
-    <view class="btn-ghost danger-btn" bindtap="archive" hover-class="tap-down" hover-stay-time="80">解除关系（封存）</view>
+    <view class="btn-ghost danger-btn" bindtap="archive" hover-class="tap-down" hover-stay-time="80">{{archiveText}}</view>
   </view>
 
   <view wx:if="{{error}}" class="err">{{error}}</view>

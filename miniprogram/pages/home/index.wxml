@@ -3,14 +3,14 @@
 
   <view class="top">
     <view class="rel-title">和 {{nickname}} 的第 <text class="days">{{days}}</text> 天</view>
-    <view wx:if="{{streak.visible}}" class="streak">最近 {{streak.current}} 天都有记录</view>
+    <view wx:if="{{streak.visible}}" class="streak">{{streakText}}</view>
   </view>
 
   <view class="week card">
     <view class="week-head">
       <view class="week-range">{{weekTitle}}</view>
       <view class="week-actions" aria-hidden="true">
-        <view class="week-today" bindtap="goTodayWeek" hover-class="tap-down" hover-stay-time="60">今天</view>
+        <view class="week-today" bindtap="goTodayWeek" hover-class="tap-down" hover-stay-time="60">{{weekTodayText}}</view>
         <view class="week-arrow" bindtap="tapPrevWeek" hover-class="tap-down" hover-stay-time="60">‹</view>
         <view class="week-arrow" bindtap="tapNextWeek" hover-class="tap-down" hover-stay-time="60">›</view>
       </view>
@@ -50,9 +50,9 @@
 
   <view class="emotion card" bindtap="openEmotion" hover-class="tap-down" hover-stay-time="80">
     <view wx:if="{{emotion.empty}}" class="emotion-empty">
-      <view class="emotion-time">现在</view>
-      <view class="emotion-text">写一句给对方的话吧。</view>
-      <view class="emotion-from">来自你们</view>
+      <view class="emotion-time">{{emotionEmptyTimeText}}</view>
+      <view class="emotion-text">{{emotionEmptyText}}</view>
+      <view class="emotion-from">{{emotionFromText}}</view>
     </view>
 
     <view wx:else>
@@ -63,11 +63,12 @@
       </view>
 
       <view class="emotion-text">{{emotion.text}}</view>
-      <view class="emotion-from">来自 {{emotion.from}}</view>
+      <view class="emotion-from">{{emotionFromText}}</view>
     </view>
   </view>
 
-  <view class="fab" bindtap="goPublish" hover-class="tap-down" hover-stay-time="80" aria-label="new entry">
+  <view class="fab" bindtap="goPublish" hover-class="tap-down" hover-stay-time="80" aria-label="{{fabAriaLabel}}">
+    <view class="fab-bubble">{{fabBubbleText}}</view>
     <view class="fab-icon">+</view>
   </view>
 

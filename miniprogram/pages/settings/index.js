@@ -1,4 +1,5 @@
 const api = require('../../utils/api')
+const { t } = require('../../utils/strings')
 
 Page({
   data: {
@@ -6,10 +7,36 @@ Page({
     nickname: '',
     startDate: '',
     inviteCode: '',
-    error: ''
+    error: '',
+
+    // naming system copies
+    titleRel: '',
+    labelNickname: '',
+    nicknamePlaceholder: '',
+    labelStartDate: '',
+    datePickPlaceholder: '',
+    saveText: '',
+    titleInvite: '',
+    inviteDesc: '',
+    copyCodeText: '',
+    goJoinText: '',
+    archiveText: ''
   },
 
   onShow() {
+    this.setData({
+      titleRel: t('SETTINGS_TITLE_REL'),
+      labelNickname: t('SETTINGS_LABEL_NICKNAME'),
+      nicknamePlaceholder: t('SETTINGS_NICKNAME_PLACEHOLDER'),
+      labelStartDate: t('SETTINGS_LABEL_START_DATE'),
+      datePickPlaceholder: t('SETTINGS_DATE_PICK_PLACEHOLDER'),
+      saveText: t('SETTINGS_SAVE'),
+      titleInvite: t('SETTINGS_TITLE_INVITE'),
+      inviteDesc: t('SETTINGS_INVITE_DESC'),
+      copyCodeText: t('SETTINGS_COPY_CODE'),
+      goJoinText: t('SETTINGS_GO_JOIN'),
+      archiveText: t('SETTINGS_ARCHIVE')
+    })
     this.load()
   },
 
@@ -68,9 +95,9 @@ Page({
 
   archive() {
     wx.showModal({
-      title: '解除关系',
-      content: '将封存关系，不删除历史记录，但不可继续发布。确定吗？',
-      confirmText: '封存',
+      title: t('SETTINGS_ARCHIVE_MODAL_TITLE'),
+      content: t('SETTINGS_ARCHIVE_MODAL_CONTENT'),
+      confirmText: t('SETTINGS_ARCHIVE_CONFIRM'),
       confirmColor: '#c34848',
       success: async (res) => {
         if (!res || !res.confirm) return

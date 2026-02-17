@@ -1,4 +1,5 @@
 const api = require('../../utils/api')
+const { t } = require('../../utils/strings')
 
 function pad2(n) { return String(n).padStart(2, '0') }
 function timeText(ts) {
@@ -39,6 +40,14 @@ Page({
     focus: '',
     items: [],
 
+    // naming system copies
+    commentTagText: '',
+    commentPlaceholderText: '',
+    commentSubmitText: '',
+    loadMoreText: '',
+    loadingText: '',
+    emptyText: '',
+
     // per-entry draft input
     draft: {},
 
@@ -53,7 +62,16 @@ Page({
   onLoad(query) {
     const date = query && query.date ? String(query.date) : ''
     const focus = query && query.focus ? String(query.focus) : ''
-    this.setData({ date, focus })
+    this.setData({
+      date,
+      focus,
+      commentTagText: t('DAY_COMMENT_TAG'),
+      commentPlaceholderText: t('DAY_COMMENT_PLACEHOLDER'),
+      commentSubmitText: t('DAY_COMMENT_SUBMIT'),
+      loadMoreText: t('DAY_LOAD_MORE'),
+      loadingText: t('DAY_LOADING'),
+      emptyText: t('DAY_EMPTY')
+    })
   },
 
   onShow() {

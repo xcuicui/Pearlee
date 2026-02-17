@@ -1,8 +1,11 @@
 <view class="page">
   <view class="section">
+    <view class="subtitle">{{subtitleText}}</view>
+    <view class="hint">{{hintText}}</view>
+
     <textarea
       class="input"
-      placeholder="在想什么？"
+      placeholder="{{placeholderText}}"
       maxlength="500"
       value="{{text}}"
       bindinput="onText"
@@ -13,7 +16,7 @@
     <view class="count" wx:if="{{showCount}}">{{text.length}}/500</view>
 
     <view class="img-head">
-      <view class="img-add" bindtap="chooseImages" hover-class="tap-down" hover-stay-time="60">+ 添加照片</view>
+      <view class="img-add" bindtap="chooseImages" hover-class="tap-down" hover-stay-time="60">{{addPhotoText}}</view>
     </view>
     <view class="img-list" wx:if="{{images.length}}">
       <view class="img-item" wx:for="{{images}}" wx:key="index">
@@ -23,7 +26,7 @@
     </view>
 
     <view class="actions">
-      <view class="btn-primary {{canSubmit ? '' : 'btn-primary--disabled'}}" bindtap="onSubmit" hover-class="tap-down" hover-stay-time="80">说完了</view>
+      <view class="btn-primary {{canSubmit ? '' : 'btn-primary--disabled'}}" bindtap="onSubmit" hover-class="tap-down" hover-stay-time="80">{{submitText}}</view>
     </view>
   </view>
 

@@ -30,7 +30,7 @@
 
     <view class="comments">
       <view class="comment-head">
-        <view class="comment-tag">回应</view>
+        <view class="comment-tag">{{commentTagText}}</view>
         <view class="comment-count" wx:if="{{item.commentCount}}">{{item.commentCount}}</view>
       </view>
 
@@ -54,17 +54,17 @@
       </view>
 
       <view class="comment-more" wx:if="{{cursorByEntry[item.id]}}" bindtap="onLoadMoreComments" data-entry-id="{{item.id}}" hover-class="tap-down" hover-stay-time="60">
-        <text wx:if="{{loadingMoreByEntry[item.id]}}">加载中…</text>
-        <text wx:else>加载更多</text>
+        <text wx:if="{{loadingMoreByEntry[item.id]}}">{{loadingText}}</text>
+        <text wx:else>{{loadMoreText}}</text>
       </view>
 
       <view class="comment-edit">
-        <input class="comment-input" value="{{draft[item.id] || ''}}" placeholder="写点什么再发送" maxlength="200" bindinput="onDraft" data-id="{{item.id}}" />
-        <view class="comment-send" bindtap="sendComment" data-id="{{item.id}}" hover-class="tap-down" hover-stay-time="60">发送</view>
+        <input class="comment-input" value="{{draft[item.id] || ''}}" placeholder="{{commentPlaceholderText}}" maxlength="200" bindinput="onDraft" data-id="{{item.id}}" />
+        <view class="comment-send" bindtap="sendComment" data-id="{{item.id}}" hover-class="tap-down" hover-stay-time="60">{{commentSubmitText}}</view>
       </view>
     </view>
   </view>
 
-  <view wx:if="{{items.length===0}}" class="empty">这一天还没有记录。</view>
+  <view wx:if="{{items.length===0}}" class="empty">{{emptyText}}</view>
   <view wx:if="{{error}}" class="err">{{error}}</view>
 </view>

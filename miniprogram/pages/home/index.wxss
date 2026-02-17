@@ -38,4 +38,5 @@
 .err{position:relative;z-index:1;margin-top:22rpx;color:#b24a4a;font-size:24rpx}
 
 .fab{position:fixed;right:40rpx;bottom:calc(env(safe-area-inset-bottom) + 48rpx);width:112rpx;height:112rpx;border-radius:9999rpx;background:#5F7D95;z-index:100;display:flex;align-items:center;justify-content:center}
+.fab-bubble{position:absolute;right:0;bottom:124rpx;padding:10rpx 14rpx;border-radius:18rpx;background:rgba(255,255,255,.78);color:rgba(38,35,31,.66);font-size:22rpx;white-space:nowrap}
 .fab-icon{color:#fff;font-size:56rpx;line-height:1;font-weight:500;margin-top:-4rpx}
