@@ -47,15 +47,42 @@ function compressImageBestEffort(filePath, width) {
   })
 }
 
+function titleForToday() {
+  const d = new Date()
+  const m = d.getMonth() + 1
+  const day = d.getDate()
+  return `${m}月${day}日`
+}
+
 Page({
   data: {
     text: '',
     images: [],
-    error: ''
+    error: '',
+    showCount: false,
+    canSubmit: false
+  },
+
+  onLoad() {
+    wx.setNavigationBarTitle({ title: titleForToday() })
+    this.recompute()
+  },
+
+  recompute() {
+    const text = String(this.data.text || '')
+    const remaining = 500 - text.length
+    const hasText = text.trim().length > 0
+    const hasImages = Array.isArray(this.data.images) && this.data.images.length > 0
+
+    this.setData({
+      showCount: remaining <= 50,
+      canSubmit: hasText || hasImages
+    })
   },
 
   onText(e) {
     this.setData({ text: e && e.detail ? String(e.detail.value || '') : '' })
+    this.recompute()
   },
 
   chooseImages() {
@@ -75,6 +102,7 @@ Page({
         const normalized = await Promise.all(picked.map(p => getImageInfo(p)))
         const next = current.concat(normalized).slice(0, MAX_IMAGES)
         this.setData({ images: next, error: '' })
+        this.recompute()
       }
     })
   },
@@ -85,6 +113,7 @@ Page({
     if (Number.isNaN(idx) || idx < 0 || idx >= list.length) return
     const next = list.slice(0, idx).concat(list.slice(idx + 1))
     this.setData({ images: next })
+    this.recompute()
   },
 
   previewImage(e) {
@@ -112,13 +141,10 @@ Page({
     return Promise.all(tasks)
   },
 
-  async publish() {
+  async onSubmit() {
+    if (!this.data.canSubmit) return
+
     const text = String(this.data.text || '').trim()
-    const hasImages = Array.isArray(this.data.images) && this.data.images.length > 0
-    if (!text && !hasImages) {
-      this.setData({ error: '至少写点文字或上传一张图。' })
-      return
-    }
 
     try {
       wx.showLoading({ title: '发布中' })
@@ -131,9 +157,5 @@ Page({
       wx.hideLoading()
       this.setData({ error: e.message || '发布失败' })
     }
-  },
-
-  cancel() {
-    wx.navigateBack({ delta: 1 })
   }
 })
