@@ -11,15 +11,17 @@
 .week{position:relative;z-index:1;padding:24rpx 22rpx;margin-bottom:28rpx}
 .week-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14rpx}
 .week-range{font-size:26rpx;font-weight:600}
-.week-actions{display:flex;gap:14rpx}
-.week-btn{font-size:22rpx;color:rgba(38,35,31,.55);padding:8rpx 12rpx;border-radius:16rpx;background:rgba(255,255,255,.55)}
+.week-actions{display:flex;gap:8rpx;align-items:center}
+.week-today{padding:10rpx 16rpx;border-radius:999rpx;font-size:22rpx;color:rgba(38,35,31,.38);background:rgba(255,255,255,.18)}
+.week-arrow{width:44rpx;height:44rpx;display:flex;align-items:center;justify-content:center;border-radius:999rpx;color:rgba(38,35,31,.32);background:rgba(255,255,255,.28);font-size:30rpx;line-height:1}
+.week-swiper{height:138rpx}
 .week-bar{display:flex;justify-content:space-between;gap:10rpx;padding:4rpx 0}
 .week-day{flex:1;display:flex;align-items:center;justify-content:center}
-.week-chip{width:76rpx;min-height:118rpx;padding:12rpx 8rpx 10rpx;border-radius:999rpx;display:flex;flex-direction:column;align-items:center;box-sizing:border-box;background:rgba(255,255,255,.18);border:2rpx solid rgba(255,255,255,0)}
-.week-chip.today{background:rgba(95,125,149,.08);border-color:rgba(95,125,149,.32)}
-.week-name{font-size:20rpx;line-height:1;color:rgba(38,35,31,.52)}
-.week-num{margin-top:12rpx;font-size:28rpx;line-height:1.1;font-weight:600;color:rgba(38,35,31,.82)}
-.dot-row{margin-top:12rpx;min-height:16rpx;display:flex;align-items:center;justify-content:center;gap:5rpx;opacity:0}
+.week-chip{width:76rpx;height:118rpx;padding:12rpx 8rpx 10rpx;border-radius:999rpx;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;box-sizing:border-box;background:rgba(255,255,255,.18);border:2rpx solid rgba(255,255,255,0)}
+.week-chip.today{background:rgba(95,125,149,.08);border-color:rgba(95,125,149,.32);padding-top:10rpx}
+.week-name{font-size:20rpx;height:20rpx;display:flex;align-items:center;justify-content:center;color:rgba(38,35,31,.52)}
+.week-num{margin-top:12rpx;font-size:28rpx;height:32rpx;display:flex;align-items:center;justify-content:center;font-weight:600;color:rgba(38,35,31,.82)}
+.dot-row{margin-top:12rpx;height:16rpx;display:flex;align-items:center;justify-content:center;gap:5rpx;opacity:0}
 .dot-row.active{opacity:1}
 .dot{width:10rpx;height:10rpx;border-radius:999rpx;background:rgba(95,125,149,.58)}
 .dot-row.lv2 .dot{width:12rpx;height:12rpx;background:rgba(95,125,149,.72)}

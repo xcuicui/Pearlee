@@ -6,36 +6,46 @@
     <view wx:if="{{streak.visible}}" class="streak">最近 {{streak.current}} 天都有记录</view>
   </view>
 
-  <view
-    class="week card"
-    catchtouchstart="onWeekTouchStart"
-    catchtouchend="onWeekTouchEnd"
-  >
+  <view class="week card">
     <view class="week-head">
       <view class="week-range">{{weekTitle}}</view>
-      <view class="week-actions">
-        <view class="week-btn" bindtap="prevWeek" hover-class="tap-down" hover-stay-time="60">上周</view>
-        <view class="week-btn" bindtap="nextWeek" hover-class="tap-down" hover-stay-time="60">下周</view>
+      <view class="week-actions" aria-hidden="true">
+        <view class="week-today" bindtap="goTodayWeek" hover-class="tap-down" hover-stay-time="60">今天</view>
+        <view class="week-arrow" bindtap="tapPrevWeek" hover-class="tap-down" hover-stay-time="60">‹</view>
+        <view class="week-arrow" bindtap="tapNextWeek" hover-class="tap-down" hover-stay-time="60">›</view>
       </view>
     </view>
-    <view class="week-bar">
-      <view
-        class="week-day"
-        wx:for="{{weekDays}}"
-        wx:key="date"
-        data-key="{{item.date}}"
-        bindtap="onPickDay"
-      >
-        <view class="week-chip {{item.isToday ? 'today' : ''}}">
-          <view class="week-name">{{item.weekLabel}}</view>
-          <view class="week-num">{{item.dayLabel}}</view>
-          <view class="dot-row {{item.hasRecord ? 'active' : ''}} {{item.hasRecord && item.recordLevel === 2 ? 'lv2' : ''}}">
-            <view class="dot"></view>
-            <view wx:if="{{item.hasRecord && item.recordLevel === 2}}" class="dot ghost"></view>
+
+    <swiper
+      class="week-swiper"
+      current="{{swiperCurrent}}"
+      duration="240"
+      easing-function="easeOutCubic"
+      circular="true"
+      skip-hidden-item-layout="true"
+      bindanimationfinish="onWeekSwipeFinish"
+    >
+      <swiper-item wx:for="{{weekPages}}" wx:for-index="idx" wx:key="idx">
+        <view class="week-bar">
+          <view
+            class="week-day"
+            wx:for="{{item}}"
+            wx:key="date"
+            data-key="{{item.date}}"
+            bindtap="onPickDay"
+          >
+            <view class="week-chip {{item.isToday ? 'today' : ''}}">
+              <view class="week-name">{{item.weekLabel}}</view>
+              <view class="week-num">{{item.dayLabel}}</view>
+              <view class="dot-row {{item.hasRecord ? 'active' : ''}} {{item.hasRecord && item.recordLevel === 2 ? 'lv2' : ''}}">
+                <view class="dot"></view>
+                <view wx:if="{{item.hasRecord && item.recordLevel === 2}}" class="dot ghost"></view>
+              </view>
+            </view>
           </view>
         </view>
-      </view>
-    </view>
+      </swiper-item>
+    </swiper>
   </view>
 
   <view class="emotion card" bindtap="openEmotion" hover-class="tap-down" hover-stay-time="80">

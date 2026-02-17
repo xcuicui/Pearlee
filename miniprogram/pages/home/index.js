@@ -8,13 +8,16 @@ function parseYmd(s) {
   const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
   return Number.isNaN(d.getTime()) ? null : d
 }
-function weekStartOfToday() {
-  const d = new Date()
+function weekStartOf(d0) {
+  const d = new Date(d0.getTime())
   d.setHours(0, 0, 0, 0)
   const dow = d.getDay()
   const diff = dow === 0 ? -6 : 1 - dow
   d.setDate(d.getDate() + diff)
-  return ymdDate(d)
+  return d
+}
+function weekStartOfToday() {
+  return ymdDate(weekStartOf(new Date()))
 }
 function addDaysYmd(s, delta) {
   const d = parseYmd(s)
@@ -36,6 +39,47 @@ function weekTitle(startYmd) {
   return `${s.getMonth() + 1}.${s.getDate()} - ${e.getMonth() + 1}.${e.getDate()}`
 }
 
+function normalizeWeekDays(week) {
+  const w = week || {}
+  const days = Array.isArray(w.days) ? w.days : []
+  const levelByDate = w && w.levelByDate && typeof w.levelByDate === 'object' ? w.levelByDate : {}
+  const activeDates = Array.isArray(w.activeDates) ? w.activeDates : []
+  const todayKey = String(w.todayKey || '')
+
+  return days.map((date) => {
+    const baseLevel = Number(levelByDate[date] || 0)
+    const hasRecord = activeDates.includes(date)
+    const recordLevel = hasRecord ? Math.max(baseLevel, 1) : baseLevel
+    return {
+      date,
+      dayLabel: String(date || '').slice(-2),
+      weekLabel: weekdayLabel(date),
+      hasRecord,
+      recordLevel,
+      isToday: date === todayKey
+    }
+  })
+}
+
+function buildPlaceholderWeekDays(startYmd, todayKey) {
+  return Array.from({ length: 7 }).map((_, i) => {
+    const date = addDaysYmd(startYmd, i)
+    return {
+      date,
+      dayLabel: String(date || '').slice(-2),
+      weekLabel: weekdayLabel(date),
+      hasRecord: false,
+      recordLevel: 0,
+      isToday: date === todayKey
+    }
+  })
+}
+
+function mod3(n) {
+  const x = n % 3
+  return x < 0 ? x + 3 : x
+}
+
 Page({
   data: {
     relationshipId: '',
@@ -50,43 +94,74 @@ Page({
 
     emotion: { empty: true },
     today: { key: ymdDate(new Date()), hasAny: false },
+
+    // week strip
     weekStart: weekStartOfToday(),
     weekTitle: '',
     weekDays: [],
-    touchStartX: 0
+
+    // swiper state (IMPORTANT: we do NOT reset current after swipe)
+    swiperCurrent: 1,
+    weekPages: [[], [], []]
   },
 
   onShow() {
-    this.refresh()
+    this.refreshAll()
   },
 
-  async refresh() {
+  _ensureCache() {
+    if (!this._weekCache) this._weekCache = Object.create(null)
+  },
+
+  _getCachedWeek(startYmd) {
+    this._ensureCache()
+    return this._weekCache[startYmd] || null
+  },
+
+  _setCachedWeek(startYmd, weekDays) {
+    if (!startYmd || !Array.isArray(weekDays)) return
+    this._ensureCache()
+    this._weekCache[startYmd] = { weekDays }
+  },
+
+  _getWeekDaysFor(startYmd) {
+    const cached = this._getCachedWeek(startYmd)
+    if (cached && Array.isArray(cached.weekDays) && cached.weekDays.length) return cached.weekDays
+
+    const todayKey = this.data.today && this.data.today.key ? this.data.today.key : ymdDate(new Date())
+    return buildPlaceholderWeekDays(startYmd, todayKey)
+  },
+
+  _buildPagesForCurrent(currentIndex, centerStart) {
+    const pages = [[], [], []]
+
+    const prevIdx = mod3(currentIndex - 1)
+    const nextIdx = mod3(currentIndex + 1)
+
+    pages[currentIndex] = this._getWeekDaysFor(centerStart)
+    pages[prevIdx] = this._getWeekDaysFor(addDaysYmd(centerStart, -7))
+    pages[nextIdx] = this._getWeekDaysFor(addDaysYmd(centerStart, 7))
+
+    return pages
+  },
+
+  async refreshAll() {
     this.setData({ loading: true, error: '' })
 
     try {
       const res = await api.call('home_feed', { weekStart: this.data.weekStart })
-
       if (!res || !res.relationshipId) {
         wx.redirectTo({ url: '/pages/relationship/create' })
         return
       }
 
       const week = res.week || {}
-      const levelByDate = week && week.levelByDate && typeof week.levelByDate === 'object' ? week.levelByDate : {}
-      const activeDates = Array.isArray(week.activeDates) ? week.activeDates : []
-      const normalizedWeekDays = (Array.isArray(week.days) ? week.days : []).map((date) => {
-        const baseLevel = Number(levelByDate[date] || 0)
-        const hasRecord = activeDates.includes(date)
-        const recordLevel = hasRecord ? Math.max(baseLevel, 1) : baseLevel
-        return {
-          date,
-          dayLabel: String(date || '').slice(-2),
-          weekLabel: weekdayLabel(date),
-          hasRecord,
-          recordLevel,
-          isToday: date === week.todayKey
-        }
-      })
+      const weekStart = week.start || this.data.weekStart
+      const weekDays = normalizeWeekDays(week)
+
+      this._setCachedWeek(weekStart, weekDays)
+
+      const current = Number(this.data.swiperCurrent || 1)
 
       this.setData({
         relationshipId: res.relationshipId,
@@ -96,12 +171,18 @@ Page({
         days: Number(res.daysSinceStart || 1),
         streak: res.streak || { current: 0, visible: false },
         emotion: res.emotion || { empty: true },
-        weekStart: (week.start || this.data.weekStart),
-        weekTitle: weekTitle(week.start || this.data.weekStart),
-        weekDays: normalizedWeekDays,
         today: res.today || { key: this.data.today.key, hasAny: false },
+
+        weekStart,
+        weekTitle: weekTitle(weekStart),
+        weekDays,
+
+        weekPages: this._buildPagesForCurrent(current, weekStart),
         loading: false
       })
+
+      this._prefetchWeek(addDaysYmd(weekStart, -7))
+      this._prefetchWeek(addDaysYmd(weekStart, 7))
 
       wx.setNavigationBarTitle({ title: '贝忆' })
     } catch (e) {
@@ -109,40 +190,126 @@ Page({
     }
   },
 
-  prevWeek() {
-    const nextStart = addDaysYmd(this.data.weekStart, -7)
-    if (!nextStart) return
-    this.setData({ weekStart: nextStart })
-    this.refresh()
+  async _prefetchWeek(startYmd) {
+    if (!startYmd) return
+    if (this._getCachedWeek(startYmd)) return
+
+    try {
+      const res = await api.call('home_feed', { weekStart: startYmd })
+      const week = res && res.week ? res.week : null
+      if (!week || !week.start) return
+
+      const weekDays = normalizeWeekDays(week)
+      this._setCachedWeek(week.start, weekDays)
+
+      // best-effort: refresh pages while keeping swiperCurrent unchanged
+      const current = Number(this.data.swiperCurrent || 1)
+      this.setData({ weekPages: this._buildPagesForCurrent(current, this.data.weekStart) })
+    } catch (e) {
+      // ignore
+    }
   },
 
-  nextWeek() {
-    const nextStart = addDaysYmd(this.data.weekStart, 7)
-    if (!nextStart) return
-    this.setData({ weekStart: nextStart })
-    this.refresh()
+  // ---------- interactions ----------
+  tapPrevWeek() {
+    // no animation: keep stable; user can swipe for animation
+    this._switchWeekBy(-1)
   },
 
+  tapNextWeek() {
+    this._switchWeekBy(1)
+  },
+
+  goTodayWeek() {
+    const start = weekStartOfToday()
+    this._switchWeekTo(start)
+  },
+
+  _switchWeekBy(delta) {
+    const targetStart = addDaysYmd(this.data.weekStart, delta * 7)
+    this._switchWeekTo(targetStart)
+  },
+
+  _switchWeekTo(targetStart) {
+    if (!targetStart) return
+
+    const current = Number(this.data.swiperCurrent || 1)
+    const weekDays = this._getWeekDaysFor(targetStart)
+
+    this.setData({
+      weekStart: targetStart,
+      weekTitle: weekTitle(targetStart),
+      weekDays,
+      weekPages: this._buildPagesForCurrent(current, targetStart)
+    })
+
+    this._loadWeek(targetStart)
+  },
+
+  // swiper: only react after animation finished, and we DO NOT reset current
+  onWeekSwipeFinish(e) {
+    const detail = e && e.detail ? e.detail : {}
+    const nextCurrent = Number(detail.current)
+    const prevCurrent = Number(this.data.swiperCurrent || 1)
+
+    if (nextCurrent === prevCurrent) return
+
+    // Determine direction in a circular 3-page swiper.
+    // From prev -> next:
+    //  +1 (or -2) means swipe to the right item (next week)
+    //  -1 (or +2) means swipe to the left item (prev week)
+    const diff = nextCurrent - prevCurrent
+    const isNext = (diff === 1 || diff === -2)
+    const delta = isNext ? 1 : -1
+
+    const targetStart = addDaysYmd(this.data.weekStart, delta * 7)
+    if (!targetStart) return
+
+    const weekDays = this._getWeekDaysFor(targetStart)
+
+    // Update center week to match the *current visible page index* (no reset).
+    this.setData({
+      swiperCurrent: nextCurrent,
+      weekStart: targetStart,
+      weekTitle: weekTitle(targetStart),
+      weekDays,
+      weekPages: this._buildPagesForCurrent(nextCurrent, targetStart)
+    })
+
+    this._loadWeek(targetStart)
+  },
+
+  async _loadWeek(weekStart) {
+    try {
+      const res = await api.call('home_feed', { weekStart })
+      const week = res && res.week ? res.week : null
+      if (!week || !week.start) return
+
+      const start = week.start
+      const weekDays = normalizeWeekDays(week)
+      this._setCachedWeek(start, weekDays)
+
+      if (start !== this.data.weekStart) return
+
+      const current = Number(this.data.swiperCurrent || 1)
+      this.setData({
+        weekTitle: weekTitle(start),
+        weekDays,
+        weekPages: this._buildPagesForCurrent(current, start)
+      })
+
+      this._prefetchWeek(addDaysYmd(start, -7))
+      this._prefetchWeek(addDaysYmd(start, 7))
+    } catch (e) {
+      // ignore
+    }
+  },
+
+  // ---------- routing ----------
   onPickDay(e) {
     const key = e && e.currentTarget && e.currentTarget.dataset ? String(e.currentTarget.dataset.key || '') : ''
     if (!key) return
     wx.navigateTo({ url: `/pages/day/detail?date=${key}` })
-  },
-
-  onWeekTouchStart(e) {
-    const x = e && e.changedTouches && e.changedTouches[0] ? Number(e.changedTouches[0].clientX) : 0
-    this.setData({ touchStartX: x })
-  },
-
-  onWeekTouchEnd(e) {
-    const x = e && e.changedTouches && e.changedTouches[0] ? Number(e.changedTouches[0].clientX) : 0
-    const delta = x - Number(this.data.touchStartX || 0)
-    if (Math.abs(delta) < 40) return
-    if (delta > 0) {
-      this.prevWeek()
-      return
-    }
-    this.nextWeek()
   },
 
   openEmotion() {
