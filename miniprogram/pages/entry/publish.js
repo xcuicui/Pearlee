@@ -63,6 +63,7 @@ Page({
     canSubmit: false,
 
     // naming system copies
+    titleText: '',
     subtitleText: '',
     hintText: '',
     placeholderText: '',
@@ -71,7 +72,8 @@ Page({
   },
 
   async onLoad() {
-    wx.setNavigationBarTitle({ title: titleForToday() })
+    const title = titleForToday()
+    wx.setNavigationBarTitle({ title })
 
     // load relationship context for nicknames
     let me = '我'
@@ -87,6 +89,7 @@ Page({
     }
 
     this.setData({
+      titleText: title,
       subtitleText: t('COMPOSER_SUBTITLE_BOX', { MyNickname: me }),
       hintText: t('COMPOSER_HINT_LINE'),
       placeholderText: t('COMPOSER_PLACEHOLDER'),
