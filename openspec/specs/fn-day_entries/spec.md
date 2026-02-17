@@ -29,18 +29,18 @@
 - **THEN** 返回当日所有 entry 视图列表
 
 ### Requirement: Likes and Comment Aggregation
-函数 MUST 聚合点赞数量、我的点赞态，以及单条评论视图。
+函数 MUST 聚合点赞数量、我的点赞态，以及评论数量。
 
 #### Scenario: Aggregate interactions
 - **GIVEN** 当天存在点赞和评论数据
 - **WHEN** 返回列表
-- **THEN** 每条 entry 包含 `likeCount`、`liked`、`comment|null`
+- **THEN** 每条 entry 包含 `likeCount`、`liked`、`commentCount`
 
 ## Data Contracts
 ### Input
 - `date: string (YYYY-MM-DD)`
 
 ### Output
-- Success: `{ ok: true, items: Array<{ id: string, text: string, images: string[], createdAt: number, likeCount: number, liked: boolean, comment: null | { id: string, content: string, userOpenid: string, createdAt: number } }> }`
+- Success: `{ ok: true, items: Array<{ id: string, text: string, images: string[], createdAt: number, likeCount: number, liked: boolean, commentCount: number }> }`
   - `images`: 图片可访问 URL 列表（优先为 `https://...` 临时链接；若生成失败可回退为 `cloud://...` fileID，由客户端自行处理）
 - Errors: `NO_REL | MISSING_DATE`

@@ -1,7 +1,9 @@
 # Spec: fn-comment_set
 
 ## Purpose
-定义对 entry 设置回应的能力（MVP 每条记录仅 1 条回应）。
+定义对 entry 设置回应的能力（历史遗留：旧接口）。
+
+> 说明：MVP 曾限制“每条记录仅 1 条回应”。从 multi-comments-v1 起，推荐使用 `comment_add/comment_list/comment_delete`。
 
 本规格用于指导实现与验收；任何与实现不一致之处必须先更新 spec 再改代码。
 

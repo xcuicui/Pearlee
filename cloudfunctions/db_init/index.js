@@ -29,7 +29,9 @@ const REQUIRED_INDEXES = {
     { name: 'idx_entryId_userOpenid', keys: { entryId: 1, userOpenid: 1 } }
   ],
   comments: [
-    { name: 'idx_entryId_createdAt', keys: { entryId: 1, createdAt: -1 } }
+    { name: 'idx_entryId_createdAt', keys: { entryId: 1, createdAt: -1 } },
+    // For multi-comment list (createdAt asc + cursor)
+    { name: 'idx_entryId_createdAt_asc', keys: { entryId: 1, createdAt: 1 } }
   ]
 }
 

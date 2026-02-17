@@ -7,6 +7,21 @@ function timeText(ts) {
   return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`
 }
 
+function mapComment(c) {
+  if (!c) return null
+  const createdAt = Number(c.createdAt || 0)
+  return {
+    id: String(c.id || ''),
+    entryId: String(c.entryId || ''),
+    userOpenid: String(c.userOpenid || ''),
+    authorNickname: String(c.authorNickname || ''),
+    content: String(c.content || ''),
+    createdAt,
+    timeText: timeText(createdAt),
+    isMine: !!c.isMine
+  }
+}
+
 const norm = v => String(v || '').trim()
 
 // images field may be an array of cloud fileIDs (string), or an array of objects
@@ -23,7 +38,15 @@ Page({
     date: '',
     focus: '',
     items: [],
+
+    // per-entry draft input
     draft: {},
+
+    // per-entry comments state
+    commentsByEntry: {},
+    cursorByEntry: {},
+    loadingMoreByEntry: {},
+
     error: ''
   },
 
@@ -100,11 +123,14 @@ Page({
           timeText: timeText(x.createdAt),
           likeCount: x.likeCount || 0,
           liked: !!x.liked,
-          comment: x.comment || null
+          commentCount: Number(x.commentCount || 0)
         }
       })
 
       this.setData({ items, error: '' })
+
+      // After entries loaded, load first page comments for each entry (MVP: limit 20)
+      await this.loadCommentsForAllEntries()
     } catch (e) {
       this.setData({ error: e.message || '加载失败' })
     }
@@ -126,22 +152,116 @@ Page({
     this.setData({ draft: { ...this.data.draft, [id]: v } })
   },
 
-  sendComment(e) {
+  async loadCommentsForAllEntries() {
+    const items = this.data.items || []
+    for (const it of items) {
+      const entryId = it && it.id ? String(it.id) : ''
+      if (!entryId) continue
+      // avoid duplicate load
+      if (this.data.commentsByEntry && Array.isArray(this.data.commentsByEntry[entryId])) continue
+      await this.loadComments(entryId, { reset: true })
+    }
+  },
+
+  async loadComments(entryId, { reset } = {}) {
+    const id = String(entryId || '').trim()
+    if (!id) return
+
+    const cursor = reset ? null : (this.data.cursorByEntry ? this.data.cursorByEntry[id] : null)
+
+    if (!reset && !cursor) return
+
+    if (!reset) {
+      this.setData({ loadingMoreByEntry: { ...this.data.loadingMoreByEntry, [id]: true } })
+    }
+
+    try {
+      const res = await api.call('comment_list', { entryId: id, limit: 20, cursor })
+      const list = Array.isArray(res.comments) ? res.comments.map(mapComment).filter(Boolean) : []
+      const next = res.nextCursor || null
+
+      const prev = reset ? [] : (this.data.commentsByEntry && Array.isArray(this.data.commentsByEntry[id]) ? this.data.commentsByEntry[id] : [])
+      const merged = prev.concat(list)
+
+      this.setData({
+        commentsByEntry: { ...this.data.commentsByEntry, [id]: merged },
+        cursorByEntry: { ...this.data.cursorByEntry, [id]: next },
+        loadingMoreByEntry: { ...this.data.loadingMoreByEntry, [id]: false }
+      })
+    } catch (err) {
+      this.setData({ loadingMoreByEntry: { ...this.data.loadingMoreByEntry, [id]: false } })
+      wx.showToast({ title: err.message || '失败', icon: 'none' })
+    }
+  },
+
+  async sendComment(e) {
     const id = e && e.currentTarget && e.currentTarget.dataset ? e.currentTarget.dataset.id : ''
     if (!id) return
 
     const content = String(this.data.draft[id] || '').trim()
     if (!content) {
-      wx.showToast({ title: '写点回应吧', icon: 'none' })
+      wx.showToast({ title: '写点什么再发送', icon: 'none' })
       return
     }
 
-    api.call('comment_set', { entryId: id, content })
-      .then(() => {
-        this.setData({ draft: { ...this.data.draft, [id]: '' } })
-        return this.load()
+    try {
+      const res = await api.call('comment_add', { entryId: id, content })
+      const c = res && res.comment ? mapComment(res.comment) : null
+
+      this.setData({ draft: { ...this.data.draft, [id]: '' } })
+
+      if (c) {
+        const prev = this.data.commentsByEntry && Array.isArray(this.data.commentsByEntry[id]) ? this.data.commentsByEntry[id] : []
+        this.setData({ commentsByEntry: { ...this.data.commentsByEntry, [id]: prev.concat([c]) } })
+      } else {
+        await this.loadComments(id, { reset: true })
+      }
+
+      // bump commentCount in items
+      const items = (this.data.items || []).map((it) => {
+        if (String(it.id) !== String(id)) return it
+        return { ...it, commentCount: Number(it.commentCount || 0) + 1 }
       })
-      .catch(err => wx.showToast({ title: err.message || '失败', icon: 'none' }))
+      this.setData({ items })
+    } catch (err) {
+      wx.showToast({ title: err.message || '失败', icon: 'none' })
+    }
+  },
+
+  async onLoadMoreComments(e) {
+    const entryId = e && e.currentTarget && e.currentTarget.dataset ? String(e.currentTarget.dataset.entryId || '') : ''
+    if (!entryId) return
+    await this.loadComments(entryId, { reset: false })
+  },
+
+  async onLongPressComment(e) {
+    const entryId = e && e.currentTarget && e.currentTarget.dataset ? String(e.currentTarget.dataset.entryId || '') : ''
+    const commentId = e && e.currentTarget && e.currentTarget.dataset ? String(e.currentTarget.dataset.commentId || '') : ''
+    const isMine = !!(e && e.currentTarget && e.currentTarget.dataset ? e.currentTarget.dataset.isMine : false)
+
+    if (!entryId || !commentId) return
+    if (!isMine) return
+
+    const r = await wx.showActionSheet({ itemList: ['删除'] }).catch(() => null)
+    if (!r || r.tapIndex !== 0) return
+
+    try {
+      await api.call('comment_delete', { commentId })
+
+      const prev = this.data.commentsByEntry && Array.isArray(this.data.commentsByEntry[entryId]) ? this.data.commentsByEntry[entryId] : []
+      const next = prev.filter(x => String(x.id) !== String(commentId))
+      this.setData({ commentsByEntry: { ...this.data.commentsByEntry, [entryId]: next } })
+
+      const items = (this.data.items || []).map((it) => {
+        if (String(it.id) !== String(entryId)) return it
+        return { ...it, commentCount: Math.max(0, Number(it.commentCount || 0) - 1) }
+      })
+      this.setData({ items })
+
+      wx.showToast({ title: '已删除', icon: 'none' })
+    } catch (err) {
+      wx.showToast({ title: err.message || '失败', icon: 'none' })
+    }
   },
 
   previewEntryImage(e) {

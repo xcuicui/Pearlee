@@ -75,7 +75,7 @@ exports.main = async (event = {}) => {
       ? db.collection('likes').where({ entryId: db.command.in(entryIds) }).get()
       : Promise.resolve({ data: [] }),
     entryIds.length
-      ? db.collection('comments').where({ entryId: db.command.in(entryIds) }).get()
+      ? db.collection('comments').where({ entryId: db.command.in(entryIds), relationshipId: rel._id }).get()
       : Promise.resolve({ data: [] })
   ])
 
@@ -89,11 +89,11 @@ exports.main = async (event = {}) => {
     if (x.userOpenid === OPENID) likedSet.add(x.entryId)
   }
 
-  const commentMap = new Map()
+  const commentCount = new Map()
   for (const c of comments) {
-    // MVP: only one comment per entry; if multiple exist, keep latest
-    const prev = commentMap.get(c.entryId)
-    if (!prev || (prev.createdAt || 0) < (c.createdAt || 0)) commentMap.set(c.entryId, c)
+    const k = String(c.entryId || '')
+    if (!k) continue
+    commentCount.set(k, (commentCount.get(k) || 0) + 1)
   }
 
   return {
@@ -115,14 +115,7 @@ exports.main = async (event = {}) => {
         createdAt: e.createdAt,
         likeCount: likeCount.get(e._id) || 0,
         liked: likedSet.has(e._id),
-        comment: commentMap.get(e._id)
-          ? {
-              id: commentMap.get(e._id)._id,
-              content: commentMap.get(e._id).content || '',
-              userOpenid: commentMap.get(e._id).userOpenid,
-              createdAt: commentMap.get(e._id).createdAt
-            }
-          : null
+        commentCount: commentCount.get(e._id) || 0
       }
     })
   }
