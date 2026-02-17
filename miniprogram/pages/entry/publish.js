@@ -1,6 +1,6 @@
 const api = require('../../utils/api')
 
-const MAX_IMAGES = 3
+const MAX_IMAGES = 9
 
 function extOf(path) {
   const s = String(path || '')
@@ -62,7 +62,7 @@ Page({
     const current = Array.isArray(this.data.images) ? this.data.images : []
     const remain = MAX_IMAGES - current.length
     if (remain <= 0) {
-      wx.showToast({ title: '最多 3 张图片', icon: 'none' })
+      wx.showToast({ title: '最多 9 张图片', icon: 'none' })
       return
     }
 

@@ -57,7 +57,7 @@ function cleanImages(images) {
   return images
     .map(normalizeImageItem)
     .filter(Boolean)
-    .slice(0, 3)
+    .slice(0, 9)
 }
 
 async function hasAnyByDate(relationshipId, date) {
@@ -132,8 +132,8 @@ exports.main = async (event = {}) => {
 
   const text = cleanText(event.text)
   if (text && text.length > 500) throw new BizError('最多 500 字', 'TOO_LONG')
-  if (Array.isArray(event.images) && event.images.length > 3) {
-    throw new BizError('最多 3 张图片', 'TOO_MANY_IMAGES')
+  if (Array.isArray(event.images) && event.images.length > 9) {
+    throw new BizError('最多 9 张图片', 'TOO_MANY_IMAGES')
   }
   const images = cleanImages(event.images)
   if (!text && images.length === 0) throw new BizError('写点什么吧', 'EMPTY')
