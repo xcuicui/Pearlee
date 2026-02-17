@@ -1,6 +1,6 @@
 # Change Spec Delta: page-entry-publish (murmur-composer-v2)
 
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Murmur Tone & Title
 页面 MUST 使用“碎碎念”语境，并将顶部标题设置为当日日期（例如“2月16日”）。
@@ -60,6 +60,25 @@
 - **GIVEN** remaining <= 50
 - **WHEN** 渲染页面
 - **THEN** 展示“{current}/{max}”
+
+## MODIFIED Requirements
+
+### Requirement: Text Validation
+页面 MUST 在提交前校验“至少有文字或图片”。
+
+#### Scenario: Empty blocked when no images
+- **GIVEN** trim(text) 为空且未选择图片
+- **WHEN** 用户尝试提交
+- **THEN** 阻止提交
+
+### Requirement: Entry Publish
+页面 MUST 在校验通过时上传已选图片并创建 entry 后返回上一页。
+
+#### Scenario: Publish success with text or images
+- **GIVEN** trim(text) 非空 或 选择了 1-9 张图片
+- **WHEN** 用户点击主按钮“说完了”
+- **THEN** 页面按既有流程上传图片（如有）并调用 `entry_create({ text, images })`
+- **AND** 成功后提示并返回上一页
 
 ## REMOVED Requirements
 
