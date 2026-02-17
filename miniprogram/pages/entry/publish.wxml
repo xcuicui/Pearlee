@@ -6,6 +6,7 @@
     <textarea
       class="input"
       placeholder="{{placeholderText}}"
+      placeholder-style="color: rgba(38,35,31,.36);"
       maxlength="500"
       value="{{text}}"
       bindinput="onText"
