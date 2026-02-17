@@ -152,6 +152,27 @@
 - **THEN** 不出现“上周/下周”文字按钮
 - **AND** 左右存在极淡小箭头（可点击或仅提示均可）
 
+### Requirement: Home Entry FAB (minimal)
+首页 MUST 提供一个右下角固定悬浮 FAB 作为“记录入口”，且不改变首页其他结构。
+
+#### Scenario: FAB always visible
+- **WHEN** 渲染首页
+- **THEN** 页面右下角存在一个圆形 FAB（仅图标，无文字）
+- **AND** FAB 不依赖 `today.hasAny`（永远存在）
+
+#### Scenario: FAB navigates to publish
+- **WHEN** 用户点击 FAB
+- **THEN** 进入现有发布页 `/pages/entry/publish`
+
+#### Scenario: No today status card
+- **WHEN** 渲染首页
+- **THEN** 页面不再出现原“今天还没有留下记录/今天已被点亮”状态卡片
+- **AND** 页面不再出现按钮“记录这一刻”
+
+#### Scenario: FAB does not block content or tabbar
+- **WHEN** 渲染首页
+- **THEN** 页面容器底部预留至少 96px 的 padding，避免 FAB 遮挡内容或 tabbar
+
 ## Data Contracts
 ### Client State
 - `relationshipId: string`
