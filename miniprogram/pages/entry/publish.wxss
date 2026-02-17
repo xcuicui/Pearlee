@@ -2,7 +2,8 @@
 .section{padding:32rpx 28rpx;border-radius:28rpx;background:rgba(255,255,255,.72)}
 .subtitle{font-size:24rpx;color:rgba(38,35,31,.52)}
 .hint{margin-top:10rpx;font-size:22rpx;line-height:1.65;color:rgba(38,35,31,.42)}
-.input{width:100%;min-height:420rpx;max-height:900rpx;padding:26rpx 26rpx 18rpx;border-radius:22rpx;background:rgba(255,255,255,.55);font-size:30rpx;line-height:1.75;color:rgba(38,35,31,.82)}
+.input{width:100%;min-height:420rpx;max-height:900rpx;padding:26rpx 26rpx 18rpx;border-radius:22rpx;background:rgba(255,255,255,.55);font-size:30rpx;line-height:1.75;color:rgba(38,35,31,.74)}
+.input::placeholder{color:rgba(38,35,31,.36)}
 .count{margin-top:10rpx;text-align:right;font-size:22rpx;color:rgba(38,35,31,.35)}
 .img-head{margin-top:20rpx;display:flex;align-items:center;justify-content:flex-start}
 .img-add{padding:10rpx 14rpx;border-radius:18rpx;background:rgba(95,125,149,.10);font-size:22rpx;color:rgba(38,35,31,.62)}
