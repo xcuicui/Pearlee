@@ -92,7 +92,7 @@ function toCardBase(entry, myOpenid) {
 
 async function toCardItem(entry, myOpenid) {
   const base = toCardBase(entry, myOpenid)
-  const imgs = (await mapImagesToUrls(entry && entry.images)).slice(0, 9)
+  const imgs = (await mapImagesToUrls(entry && entry.images)).slice(0, 3)
   base.images = imgs
   base.coverImage = imgs[0] || ''
   return base

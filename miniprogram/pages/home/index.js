@@ -209,7 +209,7 @@ Page({
       return arr
         .map((v) => String(v || '').trim())
         .filter((v) => !!v)
-        .slice(0, 9)
+        .slice(0, 3)
     }
     return list.map((item) => {
       const x = item && typeof item === 'object' ? item : {}

@@ -68,13 +68,13 @@
 - **AND** 左侧卡片更新于右侧卡片（从最新到更旧）
 
 ### Requirement: Emotion card image grid
-情绪卡片在有图片时 MUST 展示 1-9 张缩略图网格（3 列）。
+情绪卡片在有图片时 MUST 展示最多 3 张缩略图（3 列单行）。
 
 #### Scenario: Show thumbnails when images exist
 - **GIVEN** 某卡片 `images.length > 0`
 - **WHEN** 渲染该卡片
 - **THEN** 页面展示图片网格
-- **AND** 仅渲染前 9 张图片
+- **AND** 仅渲染前 3 张图片（若超过 3 张，仅展示前 3 张）
 - **AND** 每张图片使用 `aspectFill` 缩放
 
 #### Scenario: Hide image grid when empty

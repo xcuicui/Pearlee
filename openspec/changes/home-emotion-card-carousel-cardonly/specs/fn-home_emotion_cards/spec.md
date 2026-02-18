@@ -29,7 +29,7 @@
 #### Scenario: CardItem shape
 - **WHEN** `home_emotion_cards()` 返回 `cards[i]`
 - **THEN** 每一项 MUST 包含：`id`, `entryId`, `date`, `timeText`, `text`, `from`, `images`, `coverImage`
-- **AND** `images` MUST 为数组，长度 0-9，元素为可直接渲染的临时 URL 字符串
+- **AND** `images` MUST 为数组，长度 0-3，元素为可直接渲染的临时 URL 字符串
 - **AND** `coverImage` 允许为空字符串
 
 #### Scenario: coverImage is first image
@@ -63,5 +63,5 @@
 - `timeText: string`
 - `text: string`
 - `from: string`
-- `images: string[]` (0-9, temp URLs)
+- `images: string[]` (0-3, temp URLs)
 - `coverImage: string`
