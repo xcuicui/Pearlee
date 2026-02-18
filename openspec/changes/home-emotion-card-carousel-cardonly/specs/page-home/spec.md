@@ -36,7 +36,7 @@
 ## ADDED Requirements
 
 ### Requirement: Emotion cards carousel
-首页情绪卡片 MUST 以横向分页滑动（Carousel）展示，且仅卡片区域可横向滑动，不影响页面纵向滚动。
+首页情绪卡片 MUST 以横向分页滑动（Carousel）展示，且仅卡片区域可横向滑动，不影响页面纵向滚动。滑动时 MUST 由整张卡片容器切页，而不是静态外壳内局部内容切换。
 
 #### Scenario: Zero cards keeps empty state
 - **GIVEN** `cards.length === 0`
@@ -46,14 +46,29 @@
 #### Scenario: One card no indicator
 - **GIVEN** `cards.length === 1`
 - **WHEN** 渲染情绪卡片区域
-- **THEN** 展示 1 张卡片
+- **THEN** 展示 1 张可点击卡片（`swiper-item` 内含卡片容器）
 - **AND** 不显示指示器 dots
 
 #### Scenario: Multiple cards show indicator
 - **GIVEN** `cards.length > 1`
 - **WHEN** 渲染情绪卡片区域
-- **THEN** 支持左右分页滑动，一次一页
+- **THEN** 支持左右分页滑动，一次一页，且每个 `swiper-item` 都独立承载整张卡片容器
 - **AND** 在卡片下方居中显示 indicator-dots
+
+### Requirement: Emotion card image grid
+情绪卡片在有图片时 MUST 展示 1-9 张缩略图网格（3 列）。
+
+#### Scenario: Show thumbnails when images exist
+- **GIVEN** 某卡片 `images.length > 0`
+- **WHEN** 渲染该卡片
+- **THEN** 页面展示图片网格
+- **AND** 仅渲染前 9 张图片
+- **AND** 每张图片使用 `aspectFill` 缩放
+
+#### Scenario: Hide image grid when empty
+- **GIVEN** 某卡片 `images.length === 0`
+- **WHEN** 渲染该卡片
+- **THEN** 页面不渲染图片网格区域
 
 ### Requirement: Indicator style
 情绪卡片指示器 MUST 克制（不抢主视觉），使用次级文字色/淡蓝灰 token。

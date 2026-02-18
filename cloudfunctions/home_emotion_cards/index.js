@@ -108,13 +108,15 @@ function toCardBase(entry, myOpenid) {
     timeText: formatTime(entry && entry.createdAt),
     text: (entry && entry.contentText) || '',
     from: isSelf ? '你' : '对方',
+    images: [],
     coverImage: ''
   }
 }
 
 async function toCardItem(entry, myOpenid) {
   const base = toCardBase(entry, myOpenid)
-  const imgs = await mapImagesToUrls(entry && entry.images)
+  const imgs = (await mapImagesToUrls(entry && entry.images)).slice(0, 9)
+  base.images = imgs
   base.coverImage = imgs[0] || ''
   return base
 }

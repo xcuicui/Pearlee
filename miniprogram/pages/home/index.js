@@ -165,10 +165,18 @@ Page({
 
   normalizeCards(cards) {
     const list = Array.isArray(cards) ? cards : []
+    const normalizeImages = (raw) => {
+      const arr = Array.isArray(raw) ? raw : []
+      return arr
+        .map((v) => String(v || '').trim())
+        .filter((v) => !!v)
+        .slice(0, 9)
+    }
     return list.map((item) => {
       const x = item && typeof item === 'object' ? item : {}
       const id = String(x.id || x.entryId || '')
       const entryId = String(x.entryId || id)
+      const images = normalizeImages(x.images)
       return {
         id: id || entryId,
         entryId,
@@ -176,7 +184,8 @@ Page({
         timeText: String(x.timeText || ''),
         text: String(x.text || ''),
         from: String(x.from || ''),
-        coverImage: String(x.coverImage || '')
+        images,
+        coverImage: String(x.coverImage || images[0] || '')
       }
     }).filter((x) => x.id)
   },

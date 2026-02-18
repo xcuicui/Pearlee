@@ -19,8 +19,19 @@
 
 #### Scenario: CardItem shape
 - **WHEN** `home_emotion_cards()` 返回 `cards[i]`
-- **THEN** 每一项 MUST 包含：`id`, `entryId`, `date`, `timeText`, `text`, `from`, `coverImage`
+- **THEN** 每一项 MUST 包含：`id`, `entryId`, `date`, `timeText`, `text`, `from`, `images`, `coverImage`
+- **AND** `images` MUST 为数组，长度 0-9，元素为可直接渲染的临时 URL 字符串
 - **AND** `coverImage` 允许为空字符串
+
+#### Scenario: coverImage is first image
+- **GIVEN** `cards[i].images.length > 0`
+- **WHEN** 后端组装 CardItem
+- **THEN** `coverImage === images[0]`
+
+#### Scenario: coverImage empty when no image
+- **GIVEN** `cards[i].images.length === 0`
+- **WHEN** 后端组装 CardItem
+- **THEN** `coverImage === ''`
 
 ### Requirement: Compatibility with legacy single emotion
 当后端无法产出多张卡片时，`home_emotion_cards` MUST 至少返回 0 或 1 张卡片，并保持与现有 `home_feed.emotion` 字段一致的展示含义。
@@ -43,4 +54,5 @@
 - `timeText: string`
 - `text: string`
 - `from: string`
+- `images: string[]` (0-9, temp URLs)
 - `coverImage: string`

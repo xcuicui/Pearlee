@@ -48,37 +48,45 @@
     </swiper>
   </view>
 
-  <view class="emotion card" bindtap="openEmotion" hover-class="tap-down" hover-stay-time="80">
-    <view wx:if="{{!cards.length}}" class="emotion-empty">
+  <view wx:if="{{!cards.length}}" class="emotion card" bindtap="openEmotion" hover-class="tap-down" hover-stay-time="80">
+    <view class="emotion-empty">
       <view class="emotion-time">{{emotionEmptyTimeText}}</view>
       <view class="emotion-text">{{emotionEmptyText}}</view>
       <view class="emotion-from">{{emotionFromText}}</view>
     </view>
+  </view>
 
-    <view wx:else>
-      <swiper
-        class="emotion-swiper"
-        current="{{activeCardIndex}}"
-        duration="220"
-        indicator-dots="{{cards.length > 1}}"
-        indicator-color="rgba(95,125,149,.26)"
-        indicator-active-color="rgba(95,125,149,.62)"
-        bindchange="onCardSwiperChange"
-      >
-        <swiper-item wx:for="{{cards}}" wx:key="id">
-          <view class="emotion-item">
-            <view class="emotion-time">{{item.timeText}}</view>
+  <view wx:else class="emotion-swiper-wrap">
+    <swiper
+      class="emotion-swiper"
+      current="{{activeCardIndex}}"
+      duration="220"
+      indicator-dots="{{cards.length > 1}}"
+      indicator-color="rgba(95,125,149,.26)"
+      indicator-active-color="rgba(95,125,149,.62)"
+      bindchange="onCardSwiperChange"
+    >
+      <swiper-item wx:for="{{cards}}" wx:key="id">
+        <view class="emotion card emotion-item" bindtap="openEmotion" hover-class="tap-down" hover-stay-time="80">
+          <view class="emotion-time">{{item.timeText}}</view>
 
-            <view wx:if="{{item.coverImage}}" class="emotion-media" aria-label="emotion image">
-              <image class="emotion-img" src="{{item.coverImage}}" mode="aspectFill" lazy-load="true" />
-            </view>
-
-            <view class="emotion-text">{{item.text}}</view>
-            <view class="emotion-from">{{emotionFromText}}</view>
+          <view wx:if="{{item.images && item.images.length}}" class="emotion-images" aria-label="emotion images">
+            <image
+              class="emotion-image"
+              wx:for="{{item.images}}"
+              wx:for-item="img"
+              wx:key="*this"
+              src="{{img}}"
+              mode="aspectFill"
+              lazy-load="true"
+            />
           </view>
-        </swiper-item>
-      </swiper>
-    </view>
+
+          <view class="emotion-text">{{item.text}}</view>
+          <view class="emotion-from">{{emotionFromText}}</view>
+        </view>
+      </swiper-item>
+    </swiper>
   </view>
 
   <view class="fab" bindtap="goPublish" hover-class="tap-down" hover-stay-time="80" aria-label="{{fabAriaLabel}}">
