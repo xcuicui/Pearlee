@@ -120,6 +120,17 @@ Page({
   },
 
   onLoad() {
+    // Ensure week strip renders immediately (placeholder) even before any network requests.
+    const weekStart = this.data.weekStart || weekStartOfToday()
+    const current = Number(this.data.swiperCurrent || 1)
+    const weekDays = this._getWeekDaysFor(weekStart)
+    this.setData({
+      weekStart,
+      weekTitle: weekTitle(weekStart),
+      weekDays,
+      weekPages: this._buildPagesForCurrent(current, weekStart)
+    })
+
     this.applyNamingCopies()
     this.fetchCardFeed()
   },
