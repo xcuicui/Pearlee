@@ -6,7 +6,7 @@
 #### Scenario: Existing relationship
 - **GIVEN** 用户已加入未封存关系
 - **WHEN** 打开首页或下拉刷新
-- **THEN** 页面调用 `home_emotion_cards()` 获取 `cards` 并更新情绪卡片区域
+- **THEN** 页面默认调用 `home_emotion_cards({ limit: 10 })` 获取 `cards` 并更新情绪卡片区域（无加载更多）
 - **AND** 该刷新流程 MUST 不触发 `home_feed` 请求
 
 #### Scenario: Header hydration via ctx_get (best-effort)
@@ -59,7 +59,7 @@
 - **GIVEN** `cards.length > 1`
 - **WHEN** 渲染情绪卡片区域
 - **THEN** 支持左右分页滑动，一次一页，且每个 `swiper-item` 都独立承载整张卡片容器
-- **AND** 在卡片下方居中显示 indicator-dots
+- **AND** 在卡片下方居中显示 indicator-dots，最多展示 10 个 dots（对应最多 10 张卡片）
 
 #### Scenario: Carousel order follows recency
 - **GIVEN** `home_emotion_cards` 返回的 `cards` 已按时间倒序

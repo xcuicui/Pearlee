@@ -235,7 +235,7 @@ Page({
     if (this.data.cardLoading) return
     this.setData({ cardLoading: true })
     try {
-      const res = await api.call('home_emotion_cards', { limit: 3 })
+      const res = await api.call('home_emotion_cards', { limit: 10 })
       if (!res || !res.relationshipId) {
         wx.redirectTo({ url: '/pages/relationship/create' })
         return
