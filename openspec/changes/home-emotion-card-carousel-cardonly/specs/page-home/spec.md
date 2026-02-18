@@ -82,10 +82,11 @@
 - **WHEN** 渲染该卡片
 - **THEN** 页面不渲染图片网格区域
 
-### Requirement: Indicator style
-情绪卡片指示器 MUST 克制（不抢主视觉），使用次级文字色/淡蓝灰 token。
+### Requirement: Emotion card text clamp
+情绪卡片正文 MUST 限制展示行数，避免因为长文本导致卡片高度被撑大与出现大面积空白。
 
-#### Scenario: Indicator color uses token
-- **GIVEN** `cards.length > 1`
-- **WHEN** 渲染 indicator-dots
-- **THEN** dots 颜色使用项目 token（次级文字色/淡蓝灰）
+#### Scenario: Clamp to 3 lines
+- **GIVEN** 某卡片 `text` 较长
+- **WHEN** 渲染情绪卡片正文
+- **THEN** 最多展示 3 行
+- **AND** 超出部分以省略形式截断（不扩展卡片高度）

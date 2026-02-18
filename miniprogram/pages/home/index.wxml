@@ -86,7 +86,7 @@
             <image class="emotion-img" src="{{item.coverImage}}" mode="aspectFill" lazy-load="true" />
           </view>
 
-          <view class="emotion-text">{{item.text}}</view>
+          <text class="emotion-text">{{item.text}}</text>
           <view class="emotion-from">{{emotionFromText}}</view>
         </view>
       </swiper-item>

@@ -28,14 +28,14 @@
 .dot.ghost{opacity:.9}
 .emotion{position:relative;z-index:1;padding:44rpx 40rpx;margin-bottom:28rpx}
 .emotion-swiper-wrap{position:relative;z-index:1;margin-bottom:28rpx}
-.emotion-swiper{height:640rpx}
+.emotion-swiper{height:560rpx}
 .emotion-item{height:100%;margin-bottom:0;box-sizing:border-box;transform:scale(.98);transform-origin:center}
 .emotion-time{font-size:22rpx;color:rgba(38,35,31,.45)}
 .emotion-media{margin-top:22rpx;border-radius:20rpx;overflow:hidden;background:rgba(255,255,255,.6)}
 .emotion-img{width:100%;height:320rpx;display:block}
 .emotion-images{margin-top:22rpx;display:flex;gap:12rpx;flex-wrap:wrap}
 .emotion-image{width:calc((100% - 24rpx)/3);height:170rpx;border-radius:16rpx;background:rgba(245,247,251,.92)}
-.emotion-text{margin-top:18rpx;font-size:32rpx;line-height:1.85;white-space:pre-wrap}
+.emotion-text{margin-top:18rpx;font-size:32rpx;line-height:1.85;word-break:break-word;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3}
 .emotion-from{margin-top:20rpx;font-size:22rpx;color:rgba(38,35,31,.55)}
 .emotion-swiper-wrap .wx-swiper-dot{width:10rpx;height:10rpx;border-radius:999rpx;background:rgba(95,125,149,.24)}
 .emotion-swiper-wrap .wx-swiper-dot-active{background:rgba(95,125,149,.58)}
