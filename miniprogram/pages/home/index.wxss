@@ -29,7 +29,7 @@
 .emotion{position:relative;z-index:1;padding:44rpx 40rpx;margin-bottom:28rpx}
 .emotion-swiper-wrap{position:relative;z-index:1;margin-bottom:28rpx}
 .emotion-swiper{height:760rpx}
-.emotion-item{height:100%;margin-bottom:0;box-sizing:border-box}
+.emotion-item{height:100%;margin-bottom:0;box-sizing:border-box;transform:scale(.98);transform-origin:center}
 .emotion-time{font-size:22rpx;color:rgba(38,35,31,.45)}
 .emotion-media{margin-top:22rpx;border-radius:20rpx;overflow:hidden;background:rgba(255,255,255,.6)}
 .emotion-img{width:100%;height:320rpx;display:block}

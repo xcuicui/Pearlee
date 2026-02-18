@@ -61,9 +61,9 @@
       class="emotion-swiper"
       current="{{activeCardIndex}}"
       duration="220"
-      indicator-dots="{{cards.length > 1}}"
-      indicator-color="rgba(95,125,149,.26)"
-      indicator-active-color="rgba(95,125,149,.62)"
+      indicator-dots="false"
+      previous-margin="24rpx"
+      next-margin="24rpx"
       bindchange="onCardSwiperChange"
     >
       <swiper-item wx:for="{{cards}}" wx:key="id">

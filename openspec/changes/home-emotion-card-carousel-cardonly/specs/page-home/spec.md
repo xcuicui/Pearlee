@@ -59,7 +59,7 @@
 - **GIVEN** `cards.length > 1`
 - **WHEN** 渲染情绪卡片区域
 - **THEN** 支持左右分页滑动，一次一页，且每个 `swiper-item` 都独立承载整张卡片容器
-- **AND** 在卡片下方居中显示 indicator-dots，最多展示 10 个 dots（对应最多 10 张卡片）
+- **AND** 通过“半露出下一张卡片（peek）”提示用户可左右滑动（不使用 indicator-dots）
 
 #### Scenario: Carousel order follows recency
 - **GIVEN** `home_emotion_cards` 返回的 `cards` 已按时间倒序
