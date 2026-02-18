@@ -176,7 +176,9 @@ Page({
       const x = item && typeof item === 'object' ? item : {}
       const id = String(x.id || x.entryId || '')
       const entryId = String(x.entryId || id)
-      const images = normalizeImages(x.images)
+      const images0 = normalizeImages(x.images)
+      const coverImage0 = String(x.coverImage || images0[0] || '')
+      const images = images0.length ? images0 : (coverImage0 ? [coverImage0] : [])
       return {
         id: id || entryId,
         entryId,
@@ -185,7 +187,7 @@ Page({
         text: String(x.text || ''),
         from: String(x.from || ''),
         images,
-        coverImage: String(x.coverImage || images[0] || '')
+        coverImage: coverImage0
       }
     }).filter((x) => x.id)
   },

@@ -82,6 +82,10 @@
             />
           </view>
 
+          <view wx:elif="{{item.coverImage}}" class="emotion-media" aria-label="emotion image">
+            <image class="emotion-img" src="{{item.coverImage}}" mode="aspectFill" lazy-load="true" />
+          </view>
+
           <view class="emotion-text">{{item.text}}</view>
           <view class="emotion-from">{{emotionFromText}}</view>
         </view>
