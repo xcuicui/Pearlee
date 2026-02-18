@@ -2,6 +2,15 @@ const api = require('../../utils/api')
 const { t } = require('../../utils/strings')
 const { fallbackTa } = require('../../utils/naming')
 
+function calcDaysSinceStart(startDateYmd) {
+  const d = parseYmd(startDateYmd)
+  if (!d) return 1
+  const s = d.setHours(0, 0, 0, 0)
+  const now = new Date()
+  const n = now.setHours(0, 0, 0, 0)
+  return Math.floor((n - s) / 86400000) + 1
+}
+
 function pad2(n) { return String(n).padStart(2, '0') }
 function ymdDate(d) { return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}` }
 function parseYmd(s) {
@@ -130,6 +139,25 @@ Page({
       weekDays,
       weekPages: this._buildPagesForCurrent(current, weekStart)
     })
+
+    // Best-effort hydrate relationship header (nickname/days) without pulling full home_feed.
+    api.call('ctx_get')
+      .then((ctx) => {
+        const rel = ctx && ctx.relationship
+        if (!rel || !rel.partner) return
+        const partnerNickname = String(rel.partner.nickname || '').trim()
+        const startDate = String(rel.startDate || '').trim()
+        this.setData({
+          relName: rel.name || '我们',
+          nickname: partnerNickname || this.data.nickname,
+          startDate,
+          days: startDate ? calcDaysSinceStart(startDate) : this.data.days
+        })
+        this.applyNamingCopies()
+      })
+      .catch(() => {
+        // best-effort
+      })
 
     this.applyNamingCopies()
     this.fetchCardFeed()

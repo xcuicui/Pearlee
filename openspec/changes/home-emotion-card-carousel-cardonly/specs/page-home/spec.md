@@ -9,6 +9,12 @@
 - **THEN** 页面调用 `home_emotion_cards()` 获取 `cards` 并更新情绪卡片区域
 - **AND** 该刷新流程 MUST 不触发 `home_feed` 请求
 
+#### Scenario: Header hydration via ctx_get (best-effort)
+- **GIVEN** 首页关系标题需要展示对方昵称与天数
+- **WHEN** 进入首页
+- **THEN** 页面 MAY 调用 `ctx_get()` 以补全 `nickname/startDate/days`（best-effort）
+- **AND** `ctx_get` 失败时首页仍可使用（不白屏）
+
 #### Scenario: No relationship
 - **GIVEN** 用户没有未封存关系
 - **WHEN** `home_emotion_cards` 返回 `relationshipId=''`
