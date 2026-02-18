@@ -75,6 +75,13 @@
 - **WHEN** 渲染发布页
 - **THEN** 主按钮文案为“说完了”
 
+### Requirement: Primary action alignment
+发布页 actions 行内的主按钮 MUST 右对齐。
+
+#### Scenario: Primary button right-aligned
+- **WHEN** 渲染发布页 actions 行
+- **THEN** 主按钮出现在右侧（右对齐）
+
 ### Requirement: Primary button enabled rule
 主按钮 MUST 仅在 `trim(text).length > 0 OR images.length > 0` 时可点击。
 
@@ -120,6 +127,27 @@
 #### Scenario: Subtitle shows murmur box name
 - **WHEN** 渲染发布页
 - **THEN** 页面在标题下方展示副标题：`{MyNickname} 的碎碎念收纳处`
+
+### Requirement: First paint local static copy
+发布页静态文案 MUST 在首屏首次渲染即就绪，不可等待 `ctx_get` 返回后再显示。
+
+#### Scenario: Static copy renders immediately
+- **WHEN** 进入发布页
+- **THEN** 标题/副标题/提示语/placeholder/加图文案/主按钮“收好”在首次渲染即显示
+- **AND** 不依赖 `ctx_get` 完成
+
+### Requirement: Nickname refine is best-effort
+`ctx_get` MUST 作为背景补全，仅用于细化副标题昵称，不得阻塞页面静态文案渲染。
+
+#### Scenario: ctx_get refines subtitle only
+- **GIVEN** 页面已完成首屏静态文案渲染
+- **WHEN** `ctx_get` 成功且存在可用昵称
+- **THEN** 仅更新副标题中的昵称
+- **AND** 其他静态文案保持不变
+
+#### Scenario: ctx_get unavailable
+- **WHEN** `ctx_get` 失败、超时或无可用昵称
+- **THEN** 页面继续使用首屏本地副标题，不出现空白或阻塞
 
 ### Requirement: Murmur hint line
 发布页 MUST 展示一行克制提示语（非说明书）。

@@ -1,7 +1,7 @@
 const api = require('../../utils/api')
 const { t } = require('../../utils/strings')
 const { formatMonthDay } = require('../../utils/format')
-const { fallbackMe, fallbackTa } = require('../../utils/naming')
+const { fallbackMe } = require('../../utils/naming')
 
 const MAX_IMAGES = 9
 
@@ -71,26 +71,14 @@ Page({
     submitText: ''
   },
 
-  async onLoad() {
+  onLoad() {
     const title = titleForToday()
     wx.setNavigationBarTitle({ title })
 
-    // load relationship context for nicknames
-    let me = '我'
-    let ta = 'TA'
-    try {
-      const ctx = await api.call('ctx_get')
-      if (ctx && ctx.relationship) {
-        me = fallbackMe(ctx.relationship.me && ctx.relationship.me.nickname)
-        ta = fallbackTa(ctx.relationship.partner && ctx.relationship.partner.nickname)
-      }
-    } catch (e) {
-      // best-effort
-    }
-
+    // Render static copy immediately on first paint.
     this.setData({
       titleText: title,
-      subtitleText: t('COMPOSER_SUBTITLE_BOX', { MyNickname: me }),
+      subtitleText: t('COMPOSER_SUBTITLE_BOX', { MyNickname: '我' }),
       hintText: t('COMPOSER_HINT_LINE'),
       placeholderText: t('COMPOSER_PLACEHOLDER'),
       addPhotoText: t('COMPOSER_ADD_PHOTO'),
@@ -98,6 +86,20 @@ Page({
     })
 
     this.recompute()
+
+    // Best-effort nickname refine in background; never block initial render.
+    api.call('ctx_get')
+      .then((ctx) => {
+        const relationship = ctx && ctx.relationship
+        const meNickname = relationship && relationship.me && String(relationship.me.nickname || '').trim()
+        if (!meNickname) return
+        this.setData({
+          subtitleText: t('COMPOSER_SUBTITLE_BOX', { MyNickname: fallbackMe(meNickname) })
+        })
+      })
+      .catch(() => {
+        // best-effort
+      })
   },
 
   recompute() {

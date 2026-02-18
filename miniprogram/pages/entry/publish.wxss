@@ -11,6 +11,6 @@
 .img-item{width:170rpx}
 .img{width:170rpx;height:170rpx;border-radius:16rpx;background:rgba(245,247,251,.92)}
 .img-remove{margin-top:8rpx;text-align:center;font-size:20rpx;color:rgba(178,74,74,.92)}
-.actions{margin-top:22rpx;display:flex}
+.actions{margin-top:22rpx;display:flex;justify-content:flex-end}
 .btn-primary--disabled{opacity:.45;pointer-events:none}
 .err{margin-top:22rpx;color:#b24a4a;font-size:24rpx}
