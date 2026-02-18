@@ -37,8 +37,8 @@
 .emotion-image{width:calc((100% - 24rpx)/3);height:170rpx;border-radius:16rpx;background:rgba(245,247,251,.92)}
 .emotion-text{margin-top:18rpx;font-size:32rpx;line-height:1.85;word-break:break-word;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3}
 .emotion-from{margin-top:20rpx;font-size:22rpx;color:rgba(38,35,31,.55)}
-.emotion-swiper-wrap .wx-swiper-dot{width:10rpx;height:10rpx;border-radius:999rpx;background:rgba(95,125,149,.24)}
-.emotion-swiper-wrap .wx-swiper-dot-active{background:rgba(95,125,149,.58)}
+.emotion-swiper-wrap .wx-swiper-dot{display:none}
+.emotion-swiper-wrap .wx-swiper-dot-active{display:none}
 .today{position:relative;z-index:1;padding:34rpx 32rpx}
 .today-text{font-size:26rpx;color:rgba(38,35,31,.72)}
 .today-actions{margin-top:22rpx;display:flex;justify-content:flex-start}
