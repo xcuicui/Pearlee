@@ -1,5 +1,10 @@
 const cloud = require('wx-server-sdk')
-const { dayKey } = require('../home_feed/_shared')
+
+function pad2(n) { return String(n).padStart(2, '0') }
+function dayKey(ts) {
+  const d = new Date(ts)
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`
+}
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
