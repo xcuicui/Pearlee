@@ -1,4 +1,5 @@
 {
   "navigationBarTitleText": "贝忆",
+  "enablePullDownRefresh": true,
   "usingComponents": {}
 }

@@ -102,8 +102,11 @@ Page({
 
     loading: false,
     error: '',
+    cardLoading: false,
 
     emotion: { empty: true },
+    cards: [],
+    activeCardIndex: 0,
     today: { key: ymdDate(new Date()), hasAny: false },
 
     // week strip
@@ -116,8 +119,13 @@ Page({
     weekPages: [[], [], []]
   },
 
+  onLoad() {
+    this.applyNamingCopies()
+    this.fetchCardFeed()
+  },
+
   onShow() {
-    this.refreshAll()
+    this.fetchCardFeed()
   },
 
   applyNamingCopies() {
@@ -125,14 +133,16 @@ Page({
     const streakN = this.data.streak && this.data.streak.current ? Number(this.data.streak.current) : 0
 
     // emotion from
-    const e = this.data.emotion || {}
+    const e = this.getActiveCard()
     let emotionFromText = ''
-    if (e.empty) {
+    if (!e) {
       emotionFromText = t('HOME_EMOTION_FROM_US')
     } else {
       const from = String(e.from || '').trim()
-      if (from === '我') emotionFromText = t('HOME_EMOTION_FROM_ME_MURMUR', { TaNickname: ta })
-      else emotionFromText = t('HOME_EMOTION_FROM_PARTNER_MURMUR', { TaNickname: ta })
+      const isSelf = from === '我' || from === '你'
+      emotionFromText = isSelf
+        ? t('HOME_EMOTION_FROM_ME_MURMUR', { TaNickname: ta })
+        : t('HOME_EMOTION_FROM_PARTNER_MURMUR', { TaNickname: ta })
     }
 
     this.setData({
@@ -143,6 +153,66 @@ Page({
       fabAriaLabel: t('FAB_MURMUR_ENTRY_NAME'),
       fabBubbleText: t('FAB_MURMUR_ENTRY_NAME'),
       emotionFromText
+    })
+  },
+
+  getActiveCard() {
+    const cards = Array.isArray(this.data.cards) ? this.data.cards : []
+    if (!cards.length) return null
+    const idx = Math.max(0, Math.min(Number(this.data.activeCardIndex || 0), cards.length - 1))
+    return cards[idx] || null
+  },
+
+  normalizeCards(cards) {
+    const list = Array.isArray(cards) ? cards : []
+    return list.map((item) => {
+      const x = item && typeof item === 'object' ? item : {}
+      const id = String(x.id || x.entryId || '')
+      const entryId = String(x.entryId || id)
+      return {
+        id: id || entryId,
+        entryId,
+        date: String(x.date || ''),
+        timeText: String(x.timeText || ''),
+        text: String(x.text || ''),
+        from: String(x.from || ''),
+        coverImage: String(x.coverImage || '')
+      }
+    }).filter((x) => x.id)
+  },
+
+  async fetchCardFeed() {
+    if (this.data.cardLoading) return
+    this.setData({ cardLoading: true })
+    try {
+      const res = await api.call('home_emotion_cards', { limit: 3 })
+      if (!res || !res.relationshipId) {
+        wx.redirectTo({ url: '/pages/relationship/create' })
+        return
+      }
+
+      const cards = this.normalizeCards(res.cards)
+      const nextIndex = cards.length
+        ? Math.max(0, Math.min(Number(this.data.activeCardIndex || 0), cards.length - 1))
+        : 0
+      const active = cards[nextIndex] || null
+      this.setData({
+        relationshipId: String(res.relationshipId || ''),
+        cards,
+        activeCardIndex: nextIndex,
+        emotion: active ? { ...active, empty: false } : { empty: true }
+      })
+      this.applyNamingCopies()
+    } catch (e) {
+      wx.showToast({ title: e.message || '加载失败', icon: 'none' })
+    } finally {
+      this.setData({ cardLoading: false })
+    }
+  },
+
+  onPullDownRefresh() {
+    this.fetchCardFeed().finally(() => {
+      wx.stopPullDownRefresh()
     })
   },
 
@@ -352,8 +422,9 @@ Page({
   },
 
   openEmotion() {
-    const id = this.data.emotion && this.data.emotion.entryId ? this.data.emotion.entryId : ''
-    const date = this.data.emotion && this.data.emotion.date ? this.data.emotion.date : ''
+    const active = this.getActiveCard()
+    const id = active && active.entryId ? active.entryId : ''
+    const date = active && active.date ? active.date : ''
     if (id && date) {
       wx.navigateTo({ url: `/pages/day/detail?date=${date}&focus=${id}` })
       return
@@ -363,5 +434,18 @@ Page({
 
   goPublish() {
     wx.navigateTo({ url: '/pages/entry/publish' })
+  },
+
+  onCardSwiperChange(e) {
+    const detail = e && e.detail ? e.detail : {}
+    const idx = Number(detail.current || 0)
+    const cards = Array.isArray(this.data.cards) ? this.data.cards : []
+    if (!cards.length) return
+    const next = Math.max(0, Math.min(idx, cards.length - 1))
+    this.setData({
+      activeCardIndex: next,
+      emotion: { ...cards[next], empty: false }
+    })
+    this.applyNamingCopies()
   }
 })

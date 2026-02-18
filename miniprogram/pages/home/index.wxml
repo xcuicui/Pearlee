@@ -49,21 +49,35 @@
   </view>
 
   <view class="emotion card" bindtap="openEmotion" hover-class="tap-down" hover-stay-time="80">
-    <view wx:if="{{emotion.empty}}" class="emotion-empty">
+    <view wx:if="{{!cards.length}}" class="emotion-empty">
       <view class="emotion-time">{{emotionEmptyTimeText}}</view>
       <view class="emotion-text">{{emotionEmptyText}}</view>
       <view class="emotion-from">{{emotionFromText}}</view>
     </view>
 
     <view wx:else>
-      <view class="emotion-time">{{emotion.timeText}}</view>
+      <swiper
+        class="emotion-swiper"
+        current="{{activeCardIndex}}"
+        duration="220"
+        indicator-dots="{{cards.length > 1}}"
+        indicator-color="rgba(95,125,149,.26)"
+        indicator-active-color="rgba(95,125,149,.62)"
+        bindchange="onCardSwiperChange"
+      >
+        <swiper-item wx:for="{{cards}}" wx:key="id">
+          <view class="emotion-item">
+            <view class="emotion-time">{{item.timeText}}</view>
 
-      <view wx:if="{{emotion.coverImage}}" class="emotion-media" aria-label="emotion image">
-        <image class="emotion-img" src="{{emotion.coverImage}}" mode="aspectFill" lazy-load="true" />
-      </view>
+            <view wx:if="{{item.coverImage}}" class="emotion-media" aria-label="emotion image">
+              <image class="emotion-img" src="{{item.coverImage}}" mode="aspectFill" lazy-load="true" />
+            </view>
 
-      <view class="emotion-text">{{emotion.text}}</view>
-      <view class="emotion-from">{{emotionFromText}}</view>
+            <view class="emotion-text">{{item.text}}</view>
+            <view class="emotion-from">{{emotionFromText}}</view>
+          </view>
+        </swiper-item>
+      </swiper>
     </view>
   </view>
 
