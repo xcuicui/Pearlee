@@ -14,6 +14,15 @@
 - **WHEN** 调用 `home_emotion_cards()`
 - **THEN** 返回 `{ ok: true, relationshipId: '' , cards: [] }`
 
+### Requirement: Card ordering by recency
+`home_emotion_cards` MUST 在同一关系内按 `createdAt` 倒序返回卡片（最新在前），并受 `limit` 限制。
+
+#### Scenario: Return cards sorted by createdAt DESC
+- **GIVEN** 关系下存在多条 `isDeleted=false` 的 entries
+- **WHEN** 调用 `home_emotion_cards({ limit })`
+- **THEN** `cards` 按 `createdAt DESC` 排序（index 越小越新）
+- **AND** 返回条数 `<= limit`
+
 ### Requirement: CardItem minimal fields
 `home_emotion_cards` 返回的 `cards` MUST 遵守最小字段契约。
 

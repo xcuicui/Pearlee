@@ -61,6 +61,12 @@
 - **THEN** 支持左右分页滑动，一次一页，且每个 `swiper-item` 都独立承载整张卡片容器
 - **AND** 在卡片下方居中显示 indicator-dots
 
+#### Scenario: Carousel order follows recency
+- **GIVEN** `home_emotion_cards` 返回的 `cards` 已按时间倒序
+- **WHEN** 用户在首页左右滑动卡片
+- **THEN** index 0 为最新卡片，后续 index 依次更旧
+- **AND** 左侧卡片更新于右侧卡片（从最新到更旧）
+
 ### Requirement: Emotion card image grid
 情绪卡片在有图片时 MUST 展示 1-9 张缩略图网格（3 列）。
 
