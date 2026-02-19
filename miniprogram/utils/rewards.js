@@ -55,6 +55,30 @@ function useCoupon(id) {
   return api.call('coupons_use', { id: String(id || '').trim() })
 }
 
+function listGiftDefinitions(view, includeInactive = false) {
+  return api.call('gift_definitions_list', {
+    view: String(view || '').trim(),
+    includeInactive: !!includeInactive
+  })
+}
+
+function upsertGiftDefinition(payload = {}) {
+  const p = payload && typeof payload === 'object' ? payload : {}
+  const data = {
+    title: String(p.title || '').trim(),
+    description: String(p.description || '').trim(),
+    rarity: String(p.rarity || '').trim(),
+    recipient_user_id: String(p.recipient_user_id || '').trim()
+  }
+  if (p.id) data.id = String(p.id).trim()
+  if (typeof p.is_active === 'boolean') data.is_active = p.is_active
+  return api.call('gift_definitions_upsert', data)
+}
+
+function deleteGiftDefinition(id) {
+  return api.call('gift_definitions_delete', { id: String(id || '').trim() })
+}
+
 module.exports = {
   refreshAssets,
   checkin,
@@ -62,5 +86,8 @@ module.exports = {
   exchangeTicket,
   drawLottery,
   listCoupons,
-  useCoupon
+  useCoupon,
+  listGiftDefinitions,
+  upsertGiftDefinition,
+  deleteGiftDefinition
 }

@@ -3,7 +3,9 @@
 .hero-title{font-size:44rpx;font-weight:600;color:rgba(38,35,31,.92)}
 .hero-subtitle{margin-top:10rpx;font-size:24rpx;color:rgba(38,35,31,.58)}
 .section{padding:34rpx 30rpx;margin-bottom:24rpx}
+.assets-row{display:flex;align-items:baseline;justify-content:space-between;gap:20rpx}
 .assets-line{font-size:28rpx;color:rgba(38,35,31,.78)}
+.assets-help-link{flex-shrink:0;font-size:24rpx;color:rgba(95,125,149,.92);padding-left:12rpx}
 .draw-btn{width:100%;box-sizing:border-box}
 .btn-primary--disabled{opacity:.45;pointer-events:none}
 .draw-under-text{margin-top:14rpx;font-size:23rpx;color:rgba(38,35,31,.5);text-align:center}
@@ -13,8 +15,11 @@
 .pocket-link{font-size:24rpx;color:rgba(95,125,149,.92);padding-left:12rpx}
 .pocket-list{display:flex;flex-direction:column;gap:16rpx}
 .pocket-item{padding:18rpx;border-radius:18rpx;background:rgba(255,255,255,.7);border:1rpx solid rgba(95,125,149,.12)}
+.pocket-head{display:flex;justify-content:space-between;align-items:center;gap:12rpx}
 .pocket-name{font-size:26rpx;font-weight:500;color:rgba(38,35,31,.82)}
+.pocket-rarity{font-size:20rpx;padding:6rpx 12rpx;border-radius:999rpx;color:rgba(95,125,149,.88);background:rgba(95,125,149,.1)}
 .pocket-desc{margin-top:8rpx;font-size:23rpx;line-height:1.6;color:rgba(38,35,31,.62)}
+.pocket-secondary{margin-top:8rpx;font-size:22rpx;color:rgba(169,109,109,.86)}
 .pocket-time{margin-top:8rpx;font-size:21rpx;color:rgba(38,35,31,.46)}
 .pocket-empty{font-size:24rpx;color:rgba(38,35,31,.5)}
 .window-entry-wrap{padding:12rpx 0 2rpx}

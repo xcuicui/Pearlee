@@ -5,17 +5,20 @@
   </view>
 
   <view class="card section">
-    <view class="assets-line">{{assetsRuleText}}</view>
+    <view class="assets-row">
+      <view class="assets-line">{{assetsRuleText}}</view>
+      <view class="assets-help-link" bindtap="goPointsHelp" hover-class="tap-down" hover-stay-time="80">{{pointsHelpLinkText}}</view>
+    </view>
   </view>
 
   <view class="card section">
     <view
-      class="btn-primary draw-btn {{assets.points_balance < 1 ? 'btn-primary--disabled' : ''}} {{ceremonyState === 'drawing' ? 'btn-primary--disabled' : ''}}"
+      class="btn-primary draw-btn {{assets.points_balance < 1 || isPoolEmpty ? 'btn-primary--disabled' : ''}} {{ceremonyState === 'drawing' ? 'btn-primary--disabled' : ''}}"
       bindtap="onDraw"
       hover-class="tap-down"
       hover-stay-time="80"
     >{{drawButtonText}}</view>
-    <view class="draw-under-text">{{assets.points_balance < 1 ? drawInsufficientText : drawUnderCostText}}</view>
+    <view class="draw-under-text">{{isPoolEmpty ? drawPoolEmptyTipText : (assets.points_balance < 1 ? drawInsufficientText : drawUnderCostText)}}</view>
   </view>
 
   <view class="card section">
@@ -26,8 +29,12 @@
 
     <view wx:if="{{pocketGifts.length}}" class="pocket-list">
       <view class="pocket-item" wx:for="{{pocketGifts}}" wx:key="id">
-        <view class="pocket-name">{{item.title}}</view>
+        <view class="pocket-head">
+          <view class="pocket-name">{{item.title}}</view>
+          <view wx:if="{{item.rarityText}}" class="pocket-rarity">{{item.rarityText}}</view>
+        </view>
         <view class="pocket-desc">{{item.desc}}</view>
+        <view wx:if="{{item.hasSecondaryText}}" class="pocket-secondary">{{item.secondaryText}}</view>
         <view class="pocket-time">{{item.obtainedText}}</view>
       </view>
     </view>

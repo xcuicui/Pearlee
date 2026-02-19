@@ -1,5 +1,6 @@
 const rewards = require('../../utils/rewards')
 const { t } = require('../../utils/strings')
+const { POINTS_HELP_PATH, getPointsHelpCopy } = require('../../utils/pointsHelpCopy')
 
 function pad2(n) {
   return String(n).padStart(2, '0')
@@ -25,14 +26,21 @@ function normalizePocketCoupons(list) {
       id: String((c && c.id) || '').trim(),
       title: String((c && c.title) || ''),
       desc: String((c && c.desc) || ''),
-      obtained_at: Number((c && c.obtained_at) || 0)
+      obtained_at: Number((c && c.obtained_at) || 0),
+      rarity_snapshot: String((c && c.rarity_snapshot) || ''),
+      secondary_text: String((c && c.secondary_text) || '')
     }))
     .filter(x => !!x.id)
     .sort((a, b) => b.obtained_at - a.obtained_at)
     .slice(0, 3)
     .map(x => ({
       ...x,
-      obtainedText: formatDateTime(x.obtained_at)
+      obtainedText: formatDateTime(x.obtained_at),
+      rarityText: x.rarity_snapshot === 'common'
+        ? t('REWARDS_RARITY_COMMON')
+        : (x.rarity_snapshot === 'rare' ? t('REWARDS_RARITY_RARE') : (x.rarity_snapshot === 'occasional' ? t('REWARDS_RARITY_OCCASIONAL') : '')),
+      secondaryText: x.secondary_text || '',
+      hasSecondaryText: !!x.secondary_text
     }))
 }
 
@@ -45,13 +53,16 @@ Page({
     overlayVisible: false,
     resultCoupon: null,
     pocketGifts: [],
+    isPoolEmpty: false,
 
     titleText: '',
     subtitleText: '',
     assetsRuleText: '',
+    pointsHelpLinkText: '',
     drawButtonText: '',
     drawUnderCostText: '',
     drawInsufficientText: '',
+    drawPoolEmptyTipText: '',
     pocketTitleText: '',
     pocketViewAllText: '',
     pocketEmptyText: '',
@@ -62,12 +73,15 @@ Page({
   },
 
   onLoad() {
+    const pointsHelpCopy = getPointsHelpCopy()
     this.setData({
       titleText: t('REWARDS_LOTTERY_TITLE'),
       subtitleText: t('REWARDS_LOTTERY_SUBTITLE'),
+      pointsHelpLinkText: pointsHelpCopy.linkText,
       drawButtonText: t('REWARDS_DRAW_PRIMARY_CTA'),
       drawUnderCostText: t('REWARDS_DRAW_UNDER_COST'),
       drawInsufficientText: t('REWARDS_DRAW_UNDER_INSUFFICIENT'),
+      drawPoolEmptyTipText: t('REWARDS_DRAW_POOL_EMPTY_TIP'),
       pocketTitleText: t('REWARDS_DRAW_POCKET_TITLE'),
       pocketViewAllText: t('REWARDS_DRAW_POCKET_VIEW_ALL'),
       pocketEmptyText: t('REWARDS_DRAW_POCKET_EMPTY'),
@@ -92,7 +106,7 @@ Page({
   },
 
   refreshAll() {
-    return Promise.all([this.refreshAssets(), this.loadPocketGifts()])
+    return Promise.all([this.refreshAssets(), this.loadPocketGifts(), this.refreshGiftPoolStatus()])
   },
 
   refreshAssets() {
@@ -129,7 +143,23 @@ Page({
       })
   },
 
+  refreshGiftPoolStatus() {
+    return rewards.listGiftDefinitions('toMe')
+      .then((res) => {
+        const gifts = Array.isArray(res && res.gifts) ? res.gifts : []
+        this.setData({ isPoolEmpty: gifts.length === 0 })
+      })
+      .catch(() => {
+        this.setData({ isPoolEmpty: false })
+      })
+  },
+
   onDraw() {
+    if (this.data.isPoolEmpty) {
+      wx.showToast({ title: t('REWARDS_DRAW_POOL_EMPTY_TIP'), icon: 'none' })
+      return
+    }
+
     const points = Number((this.data.assets && this.data.assets.points_balance) || 0)
     if (points < 1) {
       wx.showToast({ title: t('REWARDS_DRAW_UNDER_INSUFFICIENT'), icon: 'none' })
@@ -155,6 +185,9 @@ Page({
       })
       .catch((e) => {
         wx.showToast({ title: (e && e.message) || '抽取失败', icon: 'none' })
+        if ((e && e.message) === t('REWARDS_DRAW_POOL_EMPTY_TIP')) {
+          this.setData({ isPoolEmpty: true })
+        }
         this.setData({
           ceremonyState: 'idle',
           overlayVisible: false,
@@ -184,5 +217,9 @@ Page({
 
   goWindowDetail() {
     wx.navigateTo({ url: '/pages/lottery/window/index' })
+  },
+
+  goPointsHelp() {
+    wx.navigateTo({ url: POINTS_HELP_PATH })
   }
 })

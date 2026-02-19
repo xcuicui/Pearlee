@@ -4,15 +4,50 @@
     <view class="hero-subtitle">{{subtitleText}}</view>
   </view>
 
-  <view class="card section">
-    <view class="gift-list">
-      <view class="gift-item" wx:for="{{gifts}}" wx:key="prize_key">
-        <view class="gift-head">
-          <view class="gift-name">{{item.title}}</view>
-          <view class="gift-rarity">{{item.rarityText}}</view>
-        </view>
-        <view class="gift-desc">{{item.desc}}</view>
+  <view class="segmented card">
+    <view
+      class="seg-item {{currentView === 'toMe' ? 'is-active' : ''}}"
+      data-view="toMe"
+      bindtap="onSwitchView"
+      hover-class="tap-down"
+      hover-stay-time="80"
+    >{{segToMeText}}</view>
+    <view
+      class="seg-item {{currentView === 'sentByMe' ? 'is-active' : ''}}"
+      data-view="sentByMe"
+      bindtap="onSwitchView"
+      hover-class="tap-down"
+      hover-stay-time="80"
+    >{{segSentByMeText}}</view>
+  </view>
+
+  <view class="add-wrap">
+    <view
+      class="add-btn"
+      bindtap="onGoAdd"
+      hover-class="tap-down"
+      hover-stay-time="80"
+    >{{addGiftText}}</view>
+  </view>
+
+  <view wx:if="{{gifts.length}}" class="gift-list">
+    <view class="card gift-item" wx:for="{{gifts}}" wx:key="id">
+      <view class="gift-head">
+        <view class="gift-name">{{item.title}}</view>
+        <view class="gift-rarity">{{item.rarityText}}</view>
+      </view>
+      <view class="gift-desc">{{item.description}}</view>
+      <view class="gift-source">{{item.sourceText}}</view>
+      <view wx:if="{{item.canDelete}}" class="gift-actions">
+        <view
+          class="gift-delete {{deletingId === item.id ? 'is-disabled' : ''}}"
+          data-id="{{item.id}}"
+          bindtap="onDeleteGift"
+          hover-class="tap-down"
+          hover-stay-time="80"
+        >{{deletingId === item.id ? deletingText : deleteActionText}}</view>
       </view>
     </view>
   </view>
+  <view wx:else class="card empty">{{emptyText}}</view>
 </view>

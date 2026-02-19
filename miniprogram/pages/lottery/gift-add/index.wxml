@@ -1,0 +1,63 @@
+<view class="page">
+  <view class="card form-item">
+    <view class="label">{{nameLabelText}}</view>
+    <input
+      class="input"
+      maxlength="12"
+      placeholder="{{namePlaceholderText}}"
+      value="{{title}}"
+      bindinput="onTitleInput"
+    />
+  </view>
+
+  <view class="card form-item">
+    <view class="label">{{descLabelText}}</view>
+    <textarea
+      class="textarea"
+      maxlength="40"
+      placeholder="{{descPlaceholderText}}"
+      value="{{description}}"
+      bindinput="onDescInput"
+    />
+  </view>
+
+  <view class="card form-item">
+    <view class="label">{{rarityLabelText}}</view>
+    <view class="option-list">
+      <view
+        wx:for="{{rarityOptions}}"
+        wx:key="value"
+        class="option {{rarity === item.value ? 'is-active' : ''}}"
+        data-value="{{item.value}}"
+        bindtap="onPickRarity"
+        hover-class="tap-down"
+        hover-stay-time="80"
+      >
+        <view class="option-title">{{item.label}}</view>
+        <view class="option-desc">{{item.desc}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card form-item">
+    <view class="label">{{recipientLabelText}}</view>
+    <view class="recipient-row">
+      <view
+        wx:for="{{recipientOptions}}"
+        wx:key="value"
+        class="recipient-item {{recipient_user_id === item.value ? 'is-active' : ''}}"
+        data-value="{{item.value}}"
+        bindtap="onPickRecipient"
+        hover-class="tap-down"
+        hover-stay-time="80"
+      >{{item.label}}</view>
+    </view>
+  </view>
+
+  <view
+    class="btn-primary submit {{submitting ? 'is-disabled' : ''}}"
+    bindtap="onSubmit"
+    hover-class="tap-down"
+    hover-stay-time="80"
+  >{{submitting ? submittingText : submitText}}</view>
+</view>

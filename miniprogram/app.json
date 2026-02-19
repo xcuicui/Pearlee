@@ -2,12 +2,15 @@
   "pages": [
     "pages/home/index",
     "pages/lottery/index",
+    "pages/lottery/points-help/index",
     "pages/lottery/window/index",
+    "pages/lottery/gift-add/index",
     "pages/settings/index",
     "pages/coupons/wallet/index",
     "pages/relationship/create",
     "pages/relationship/join",
     "pages/entry/publish",
+    "pages/murmur/timeline/index",
     "pages/day/detail"
   ],
   "window": {
