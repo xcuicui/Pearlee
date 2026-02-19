@@ -12,6 +12,9 @@
 .week-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14rpx}
 .week-range{font-size:26rpx;font-weight:600}
 .week-actions{display:flex;gap:8rpx;align-items:center}
+.checkin-pill{padding:10rpx 16rpx;border-radius:999rpx;font-size:22rpx;color:rgba(95,125,149,.92);background:rgba(95,125,149,.08);border:2rpx solid rgba(95,125,149,.18)}
+.checkin-pill.done{color:rgba(38,35,31,.48);background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.22)}
+.checkin-pill.loading{opacity:.6}
 .week-today{padding:10rpx 16rpx;border-radius:999rpx;font-size:22rpx;color:rgba(38,35,31,.38);background:rgba(255,255,255,.18)}
 .week-arrow{width:44rpx;height:44rpx;display:flex;align-items:center;justify-content:center;border-radius:999rpx;color:rgba(38,35,31,.32);background:rgba(255,255,255,.28);font-size:30rpx;line-height:1}
 .week-swiper{height:138rpx}

@@ -10,6 +10,12 @@
     <view class="week-head">
       <view class="week-range">{{weekTitle}}</view>
       <view class="week-actions" aria-hidden="true">
+        <view
+          class="checkin-pill {{checkinDone ? 'done' : ''}} {{checkinLoading ? 'loading' : ''}}"
+          bindtap="onCheckin"
+          hover-class="tap-down"
+          hover-stay-time="60"
+        >{{checkinText}}</view>
         <view class="week-today" bindtap="goTodayWeek" hover-class="tap-down" hover-stay-time="60">{{weekTodayText}}</view>
         <view class="week-arrow" bindtap="tapPrevWeek" hover-class="tap-down" hover-stay-time="60">‹</view>
         <view class="week-arrow" bindtap="tapNextWeek" hover-class="tap-down" hover-stay-time="60">›</view>

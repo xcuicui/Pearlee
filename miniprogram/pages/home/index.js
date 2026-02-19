@@ -1,4 +1,5 @@
 const api = require('../../utils/api')
+const rewards = require('../../utils/rewards')
 const { t } = require('../../utils/strings')
 const { fallbackTa } = require('../../utils/naming')
 
@@ -109,6 +110,12 @@ Page({
     days: 1,
     streak: { current: 0, visible: false },
 
+    // rewards
+    checkinText: '',
+    checkinDone: false,
+    checkinLoading: false,
+    assets: { points_balance: 0, ticket_balance: 0, last_checkin_date: '', coupon_counts: { unused: 0, used: 0 } },
+
     loading: false,
     error: '',
     cardLoading: false,
@@ -160,10 +167,12 @@ Page({
       })
 
     this.applyNamingCopies()
+    this.loadRewardsBestEffort()
     this.fetchCardFeed()
   },
 
   onShow() {
+    this.loadRewardsBestEffort()
     this.fetchCardFeed()
   },
 
@@ -191,7 +200,8 @@ Page({
       emotionEmptyText: t('HOME_EMOTION_EMPTY_TEXT'),
       fabAriaLabel: t('FAB_MURMUR_ENTRY_NAME'),
       fabBubbleText: t('FAB_MURMUR_ENTRY_NAME'),
-      emotionFromText
+      emotionFromText,
+      checkinText: this.data.checkinDone ? t('REWARDS_CHECKIN_DONE') : t('REWARDS_CHECKIN_CTA')
     })
   },
 
@@ -229,6 +239,54 @@ Page({
         coverImage: coverImage0
       }
     }).filter((x) => x.id)
+  },
+
+  todayKeyLocal() {
+    return ymdDate(new Date())
+  },
+
+  loadRewardsBestEffort() {
+    rewards.refreshAssets()
+      .then((assets) => {
+        const last = assets && assets.last_checkin_date ? String(assets.last_checkin_date) : ''
+        const done = last && last === this.todayKeyLocal()
+        this.setData({
+          assets,
+          checkinDone: !!done
+        })
+        this.applyNamingCopies()
+      })
+      .catch(() => {
+        // best-effort
+      })
+  },
+
+  onCheckin() {
+    if (this.data.checkinLoading) return
+    if (this.data.checkinDone) {
+      wx.showToast({ title: t('REWARDS_CHECKIN_DONE'), icon: 'none' })
+      return
+    }
+
+    this.setData({ checkinLoading: true })
+    rewards.checkin()
+      .then((res) => {
+        const earned = res && res.earned_points ? Number(res.earned_points || 0) : 0
+        if (earned > 0) {
+          wx.showToast({ title: t('REWARDS_CHECKIN_TOAST_OK'), icon: 'none' })
+        } else {
+          wx.showToast({ title: t('REWARDS_CHECKIN_DONE'), icon: 'none' })
+        }
+        this.setData({ checkinDone: true })
+        this.applyNamingCopies()
+        this.loadRewardsBestEffort()
+      })
+      .catch((e) => {
+        wx.showToast({ title: (e && e.message) || '打卡失败', icon: 'none' })
+      })
+      .finally(() => {
+        this.setData({ checkinLoading: false })
+      })
   },
 
   async fetchCardFeed() {

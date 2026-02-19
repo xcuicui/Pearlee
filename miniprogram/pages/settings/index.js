@@ -20,7 +20,8 @@ Page({
     inviteDesc: '',
     copyCodeText: '',
     goJoinText: '',
-    archiveText: ''
+    archiveText: '',
+    walletText: ''
   },
 
   onShow() {
@@ -35,7 +36,8 @@ Page({
       inviteDesc: t('SETTINGS_INVITE_DESC'),
       copyCodeText: t('SETTINGS_COPY_CODE'),
       goJoinText: t('SETTINGS_GO_JOIN'),
-      archiveText: t('SETTINGS_ARCHIVE')
+      archiveText: t('SETTINGS_ARCHIVE'),
+      walletText: t('REWARDS_WALLET')
     })
     this.load()
   },
@@ -91,6 +93,10 @@ Page({
 
   goJoin() {
     wx.navigateTo({ url: '/pages/relationship/join' })
+  },
+
+  goWallet() {
+    wx.navigateTo({ url: '/pages/coupons/wallet/index' })
   },
 
   archive() {

@@ -30,6 +30,13 @@
     </view>
   </view>
 
+  <view class="card section">
+    <view class="title">{{walletText}}</view>
+    <view class="actions">
+      <view class="btn-ghost" bindtap="goWallet" hover-class="tap-down" hover-stay-time="80">{{walletText}}</view>
+    </view>
+  </view>
+
   <view class="danger">
     <view class="btn-ghost danger-btn" bindtap="archive" hover-class="tap-down" hover-stay-time="80">{{archiveText}}</view>
   </view>

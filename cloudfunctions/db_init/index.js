@@ -6,7 +6,18 @@ const db = cloud.database()
 
 const INIT_VERSION = '2026-02-15'
 
-const REQUIRED_COLLECTIONS = ['users', 'relationships', 'relationship_members', 'entries', 'likes', 'comments', 'relationship_stats']
+const REQUIRED_COLLECTIONS = [
+  'users',
+  'relationships',
+  'relationship_members',
+  'entries',
+  'likes',
+  'comments',
+  'relationship_stats',
+  'user_assets',
+  'point_ledger',
+  'coupons'
+]
 
 const REQUIRED_INDEXES = {
   relationships: [
@@ -32,6 +43,19 @@ const REQUIRED_INDEXES = {
     { name: 'idx_entryId_createdAt', keys: { entryId: 1, createdAt: -1 } },
     // For multi-comment list (createdAt asc + cursor)
     { name: 'idx_entryId_createdAt_asc', keys: { entryId: 1, createdAt: 1 } }
+  ],
+  user_assets: [
+    { name: 'idx_relationshipId_userOpenid', keys: { relationshipId: 1, userOpenid: 1 }, unique: true }
+  ],
+  point_ledger: [
+    {
+      name: 'idx_relationshipId_userOpenid_type_refId',
+      keys: { relationshipId: 1, userOpenid: 1, type: 1, ref_id: 1 },
+      unique: true
+    }
+  ],
+  coupons: [
+    { name: 'idx_relationshipId_userOpenid_obtainedAt', keys: { relationshipId: 1, userOpenid: 1, obtained_at: -1 } }
   ]
 }
 

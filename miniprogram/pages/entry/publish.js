@@ -1,4 +1,5 @@
 const api = require('../../utils/api')
+const rewards = require('../../utils/rewards')
 const { t } = require('../../utils/strings')
 const { formatMonthDay } = require('../../utils/format')
 const { fallbackMe } = require('../../utils/naming')
@@ -179,13 +180,48 @@ Page({
     if (!this.data.canSubmit) return
 
     const text = String(this.data.text || '').trim()
+    const content_len = text.length
+    const image_count = Array.isArray(this.data.images) ? this.data.images.length : 0
+
+    function withTimeout(promise, ms) {
+      if (!ms) return promise
+      let timer
+      const timeout = new Promise((_, reject) => {
+        timer = setTimeout(() => {
+          const err = new Error('timeout')
+          err.code = 'TIMEOUT'
+          reject(err)
+        }, ms)
+      })
+      return Promise.race([promise, timeout]).finally(() => clearTimeout(timer))
+    }
 
     try {
       wx.showLoading({ title: '发布中' })
       const images = await this.uploadSelectedImages()
-      await api.call('entry_create', { text, images })
+      const created = await api.call('entry_create', { text, images })
+
+      // Best-effort: earn shells after publish; never block success flow.
+      const entryId = created && created.id ? String(created.id) : ''
+      let earned = 0
+      if (entryId) {
+        try {
+          const earnRes = await withTimeout(
+            rewards.earnMurmurPoints({ entryId, content_len, image_count }),
+            1200
+          )
+          earned = earnRes && earnRes.earned_points ? Number(earnRes.earned_points || 0) : 0
+        } catch (e) {
+          // best-effort
+        }
+      }
+
       wx.hideLoading()
-      wx.showToast({ title: '已点亮今天', icon: 'none' })
+      if (earned > 0) {
+        wx.showToast({ title: t('REWARDS_EARN_TOAST_OK', { N: earned }), icon: 'none' })
+      } else {
+        wx.showToast({ title: '已点亮今天', icon: 'none' })
+      }
       wx.navigateBack({ delta: 1 })
     } catch (e) {
       wx.hideLoading()
