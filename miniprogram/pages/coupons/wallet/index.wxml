@@ -10,6 +10,7 @@
       <view class="coupon-status {{item.hasUnused ? 'unused' : 'used'}}">{{item.statusText}}</view>
     </view>
     <view class="coupon-desc">{{item.desc}}</view>
+    <view class="coupon-counts">已获得 {{item.totalCount}} 张 · 已使用 {{item.usedCount}} 张 · 还剩 {{item.unusedCount}} 张</view>
     <view class="coupon-time">{{item.obtainedText}}</view>
 
     <view wx:if="{{item.hasUnused}}" class="coupon-actions">

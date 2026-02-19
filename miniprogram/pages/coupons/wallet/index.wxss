@@ -9,6 +9,7 @@
 .coupon-status.unused{color:rgba(95,125,149,.9);background:rgba(95,125,149,.1)}
 .coupon-status.used{color:rgba(38,35,31,.46);background:rgba(38,35,31,.08)}
 .coupon-desc{margin-top:12rpx;font-size:24rpx;line-height:1.65;color:rgba(38,35,31,.62)}
+.coupon-counts{margin-top:10rpx;font-size:22rpx;line-height:1.6;color:rgba(38,35,31,.52)}
 .coupon-time{margin-top:14rpx;font-size:22rpx;color:rgba(38,35,31,.45)}
 .coupon-actions{margin-top:18rpx;display:flex;justify-content:flex-start}
 .btn-disabled{opacity:.45;pointer-events:none}

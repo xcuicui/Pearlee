@@ -53,10 +53,15 @@ function groupCoupons(list) {
     let nextUseId = ''
     let oldestUnusedObtainedAt = Number.POSITIVE_INFINITY
     let hasUnused = false
+    let usedCount = 0
+    let unusedCount = 0
 
     coupons.forEach((coupon) => {
       if (coupon.obtained_at > latestObtainedAt) latestObtainedAt = coupon.obtained_at
-      if (coupon.status !== 'used') {
+      if (coupon.status === 'used') {
+        usedCount += 1
+      } else {
+        unusedCount += 1
         hasUnused = true
         if (coupon.obtained_at < oldestUnusedObtainedAt) {
           oldestUnusedObtainedAt = coupon.obtained_at
@@ -70,6 +75,9 @@ function groupCoupons(list) {
       title: group.title,
       desc: group.desc,
       count: coupons.length,
+      totalCount: coupons.length,
+      usedCount,
+      unusedCount,
       hasUnused,
       statusText: hasUnused ? t('REWARDS_UNUSED') : t('REWARDS_USED'),
       latestObtainedAt,
