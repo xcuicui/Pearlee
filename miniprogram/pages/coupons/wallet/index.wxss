@@ -12,4 +12,6 @@
 .coupon-counts{margin-top:10rpx;font-size:22rpx;line-height:1.6;color:rgba(38,35,31,.52)}
 .coupon-time{margin-top:14rpx;font-size:22rpx;color:rgba(38,35,31,.45)}
 .coupon-actions{margin-top:18rpx;display:flex;justify-content:flex-start}
+/* Wallet page local fix: ensure button label is vertically centered */
+.coupon-actions .btn-ghost{display:flex;align-items:center;justify-content:center;line-height:1}
 .btn-disabled{opacity:.45;pointer-events:none}
