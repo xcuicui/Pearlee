@@ -55,7 +55,7 @@ exports.main = async () => {
     recipient_user_id: String(c.recipient_user_id || OPENID),
     rarity_snapshot: c.rarity_snapshot ? String(c.rarity_snapshot) : null,
     gift_deleted: giftDeleted,
-    secondary_text: giftDeleted ? '已从橱窗移出' : ''
+    secondary_text: String(c.secondary_text || '')
     }
   })
 

@@ -28,6 +28,7 @@ function normalizePocketCoupons(list) {
       desc: String((c && c.desc) || ''),
       obtained_at: Number((c && c.obtained_at) || 0),
       rarity_snapshot: String((c && c.rarity_snapshot) || ''),
+      gift_deleted: !!(c && c.gift_deleted),
       secondary_text: String((c && c.secondary_text) || '')
     }))
     .filter(x => !!x.id)
@@ -39,8 +40,8 @@ function normalizePocketCoupons(list) {
       rarityText: x.rarity_snapshot === 'common'
         ? t('REWARDS_RARITY_COMMON')
         : (x.rarity_snapshot === 'rare' ? t('REWARDS_RARITY_RARE') : (x.rarity_snapshot === 'occasional' ? t('REWARDS_RARITY_OCCASIONAL') : '')),
-      secondaryText: x.secondary_text || '',
-      hasSecondaryText: !!x.secondary_text
+      secondaryText: x.secondary_text || (x.gift_deleted ? t('REWARDS_POCKET_REMOVED') : ''),
+      hasSecondaryText: !!(x.secondary_text || (x.gift_deleted ? t('REWARDS_POCKET_REMOVED') : ''))
     }))
 }
 
