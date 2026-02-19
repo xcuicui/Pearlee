@@ -281,11 +281,16 @@ Page({
     this._weekCache[startYmd] = { weekDays }
   },
 
-  _getWeekDaysFor(startYmd) {
+  _getWeekDaysFor(startYmd, todayKeyOverride) {
     const cached = this._getCachedWeek(startYmd)
-    if (cached && Array.isArray(cached.weekDays) && cached.weekDays.length) return cached.weekDays
+    const todayKey = todayKeyOverride || (this.data.today && this.data.today.key ? this.data.today.key : ymdDate(new Date()))
+    if (cached && Array.isArray(cached.weekDays) && cached.weekDays.length) {
+      return cached.weekDays.map((d) => ({
+        ...d,
+        isToday: d.date === todayKey
+      }))
+    }
 
-    const todayKey = this.data.today && this.data.today.key ? this.data.today.key : ymdDate(new Date())
     return buildPlaceholderWeekDays(startYmd, todayKey)
   },
 
@@ -381,7 +386,8 @@ Page({
 
   goTodayWeek() {
     const start = weekStartOfToday()
-    this._switchWeekTo(start)
+    const todayKey = this.todayKeyLocal()
+    this._switchWeekTo(start, { forceCenter: true, todayKey })
   },
 
   _switchWeekBy(delta) {
@@ -389,18 +395,29 @@ Page({
     this._switchWeekTo(targetStart)
   },
 
-  _switchWeekTo(targetStart) {
+  _switchWeekTo(targetStart, options = {}) {
     if (!targetStart) return
 
-    const current = Number(this.data.swiperCurrent || 1)
-    const weekDays = this._getWeekDaysFor(targetStart)
+    const forceCenter = !!options.forceCenter
+    const current = forceCenter ? 1 : Number(this.data.swiperCurrent || 1)
+    const todayKey = options.todayKey || ''
+    const weekDays = this._getWeekDaysFor(targetStart, todayKey)
 
-    this.setData({
+    const nextData = {
       weekStart: targetStart,
       weekTitle: weekTitle(targetStart),
       weekDays,
       weekPages: this._buildPagesForCurrent(current, targetStart)
-    })
+    }
+    if (forceCenter) nextData.swiperCurrent = 1
+    if (todayKey) {
+      nextData.today = {
+        ...(this.data.today || {}),
+        key: todayKey
+      }
+    }
+
+    this.setData(nextData)
 
     this._loadWeek(targetStart)
   },
