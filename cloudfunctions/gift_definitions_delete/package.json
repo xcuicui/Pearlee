@@ -1,0 +1,8 @@
+{
+  "name": "gift_definitions_delete",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

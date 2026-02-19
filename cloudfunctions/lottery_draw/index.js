@@ -4,6 +4,7 @@ const { BizError, now, rid } = require('./_shared')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
+const _ = db.command
 
 async function getRel(OPENID) {
   const q = await db.collection('relationships').where({ memberOpenids: OPENID, archived: false }).limit(1).get()
@@ -34,15 +35,42 @@ function clampInt(n, min, max) {
   return Math.min(max, Math.max(min, x))
 }
 
-const PRIZE_POOL = [
-  { prize_key: 'coffee', title: '咖啡券', desc: '想你时，给你买一杯咖啡。', weight: 20 },
-  { prize_key: 'milk_tea', title: '奶茶券', desc: '把甜甜的那口，也收纳给你。', weight: 20 },
-  { prize_key: 'hangout', title: '陪逛街券', desc: '一起慢慢走，什么都不急。', weight: 15 },
-  { prize_key: 'play', title: '陪玩券', desc: '陪你玩一局（或你想玩的任何事）。', weight: 15 },
-  { prize_key: 'sing', title: '唱歌券', desc: '给你唱一首歌，唱到你开心。', weight: 10 },
-  { prize_key: 'wish', title: '小愿望满足券', desc: '一个小愿望，我来认真听。', weight: 5 },
-  { prize_key: 'hug', title: '抱抱券', desc: '给你一个抱抱（可随时兑换）。', weight: 15 }
-]
+const RARITY_WEIGHT_MAP = {
+  common: 15,
+  occasional: 8,
+  rare: 3
+}
+
+function rarityToWeight(rarity) {
+  return Number(RARITY_WEIGHT_MAP[String(rarity || '')] || 0)
+}
+
+async function listGiftPool(relationshipId, userOpenid) {
+  const pageSize = 100
+  let skip = 0
+  const all = []
+
+  while (true) {
+    const q = await db.collection('gift_definitions')
+      .where({
+        space_id: relationshipId,
+        recipient_user_id: userOpenid,
+        is_active: true,
+        is_deleted: _.neq(true)
+      })
+      .orderBy('updated_at', 'desc')
+      .skip(skip)
+      .limit(pageSize)
+      .get()
+
+    const rows = q.data || []
+    all.push(...rows)
+    if (rows.length < pageSize) break
+    skip += rows.length
+  }
+
+  return all
+}
 
 function getValidPool(pool) {
   return (Array.isArray(pool) ? pool : []).filter(x => x && Number(x.weight || 0) > 0)
@@ -89,19 +117,34 @@ exports.main = async (event = {}) => {
   const points = Number(assetsDoc.points_balance || 0)
   if (points <= 0) throw new BizError('贝壳不够啦，先去收纳一点想念。', 'INSUFFICIENT_POINTS')
 
-  const totalWeight = getTotalWeight(PRIZE_POOL)
-  if (totalWeight <= 0) throw new BizError('奖池暂时空着，稍后再来。', 'POOL_EMPTY')
+  const giftPool = (await listGiftPool(relationshipId, OPENID))
+    .map(g => ({
+      gift_id: String(g._id || ''),
+      rarity: String(g.rarity || 'occasional'),
+      title: String(g.title || ''),
+      desc: String(g.description || ''),
+      weight: rarityToWeight(g.rarity)
+    }))
+    .filter(g => g.gift_id && g.title)
+
+  const totalWeight = getTotalWeight(giftPool)
+  if (totalWeight <= 0) throw new BizError('橱窗里还没有给你的小礼物。', 'POOL_EMPTY')
   const r = randomWeight(totalWeight)
-  const prize = drawPrize(PRIZE_POOL, r)
-  if (!prize) throw new BizError('奖池暂时空着，稍后再来。', 'POOL_EMPTY')
+  const prize = drawPrize(giftPool, r)
+  if (!prize) throw new BizError('橱窗里还没有给你的小礼物。', 'POOL_EMPTY')
 
   const couponDoc = {
     relationshipId,
     userOpenid: OPENID,
-    prize_key: String(prize.prize_key),
+    gift_id: String(prize.gift_id),
+    recipient_user_id: OPENID,
+    gift_title_snapshot: String(prize.title),
+    gift_desc_snapshot: String(prize.desc),
+    rarity_snapshot: String(prize.rarity),
     title: String(prize.title),
     desc: String(prize.desc),
     status: 'unused',
+    created_at: ts,
     obtained_at: ts,
     used_at: null
   }
@@ -117,7 +160,7 @@ exports.main = async (event = {}) => {
       ref_id: ledgerRef,
       delta_points: -1,
       delta_tickets: 0,
-      meta: { prize_key: couponDoc.prize_key },
+      meta: { gift_id: couponDoc.gift_id, rarity: couponDoc.rarity_snapshot },
       created_at: ts
     }
   })
@@ -146,7 +189,8 @@ exports.main = async (event = {}) => {
       status: couponDoc.status,
       obtained_at: couponDoc.obtained_at,
       used_at: couponDoc.used_at,
-      prize_key: couponDoc.prize_key
+      gift_id: couponDoc.gift_id,
+      rarity_snapshot: couponDoc.rarity_snapshot
     }
   }
 }

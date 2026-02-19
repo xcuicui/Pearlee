@@ -4,7 +4,7 @@ const { now } = require('./_shared')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 
-const INIT_VERSION = '2026-02-15'
+const INIT_VERSION = '2026-02-19'
 
 const REQUIRED_COLLECTIONS = [
   'users',
@@ -16,7 +16,8 @@ const REQUIRED_COLLECTIONS = [
   'relationship_stats',
   'user_assets',
   'point_ledger',
-  'coupons'
+  'coupons',
+  'gift_definitions'
 ]
 
 const REQUIRED_INDEXES = {
@@ -56,6 +57,16 @@ const REQUIRED_INDEXES = {
   ],
   coupons: [
     { name: 'idx_relationshipId_userOpenid_obtainedAt', keys: { relationshipId: 1, userOpenid: 1, obtained_at: -1 } }
+  ],
+  gift_definitions: [
+    {
+      name: 'idx_space_recipient_active_deleted_updatedAt',
+      keys: { space_id: 1, recipient_user_id: 1, is_active: 1, is_deleted: 1, updated_at: -1 }
+    },
+    {
+      name: 'idx_space_creator_recipient_deleted_updatedAt',
+      keys: { space_id: 1, created_by_user_id: 1, recipient_user_id: 1, is_deleted: 1, updated_at: -1 }
+    }
   ]
 }
 
