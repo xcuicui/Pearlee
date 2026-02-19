@@ -1,18 +1,21 @@
 <view class="page">
-  <view wx:if="{{!coupons.length}}" class="empty">{{emptyText}}</view>
+  <view wx:if="{{!couponGroups.length}}" class="empty">{{emptyText}}</view>
 
-  <view wx:for="{{coupons}}" wx:key="id" class="card coupon">
+  <view wx:for="{{couponGroups}}" wx:key="key" class="card coupon">
     <view class="coupon-head">
-      <view class="coupon-title">{{item.title}}</view>
-      <view class="coupon-status {{item.status === 'used' ? 'used' : 'unused'}}">{{item.statusText}}</view>
+      <view class="coupon-title-wrap">
+        <view class="coupon-title">{{item.title}}</view>
+        <view wx:if="{{item.count > 1}}" class="coupon-count">×{{item.count}}</view>
+      </view>
+      <view class="coupon-status {{item.hasUnused ? 'unused' : 'used'}}">{{item.statusText}}</view>
     </view>
     <view class="coupon-desc">{{item.desc}}</view>
     <view class="coupon-time">{{item.obtainedText}}</view>
 
-    <view wx:if="{{item.canUse}}" class="coupon-actions">
+    <view wx:if="{{item.hasUnused}}" class="coupon-actions">
       <view
-        class="btn-ghost {{usingCouponId === item.id ? 'btn-disabled' : ''}}"
-        data-id="{{item.id}}"
+        class="btn-ghost {{usingGroupKey === item.key ? 'btn-disabled' : ''}}"
+        data-id="{{item.nextUseId}}"
         bindtap="onMarkUsed"
         hover-class="tap-down"
         hover-stay-time="80"

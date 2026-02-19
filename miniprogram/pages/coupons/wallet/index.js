@@ -30,11 +30,60 @@ function normalizeCoupons(list) {
   }).filter(x => !!x.id)
 }
 
+function groupCoupons(list) {
+  const groupedMap = new Map()
+  normalizeCoupons(list).forEach((coupon) => {
+    const title = String(coupon.title || '').trim()
+    const desc = String(coupon.desc || '').trim()
+    const key = `${title}__${desc}`
+    if (!groupedMap.has(key)) {
+      groupedMap.set(key, {
+        key,
+        title,
+        desc,
+        coupons: []
+      })
+    }
+    groupedMap.get(key).coupons.push(coupon)
+  })
+
+  return Array.from(groupedMap.values()).map((group) => {
+    const coupons = group.coupons
+    let latestObtainedAt = 0
+    let nextUseId = ''
+    let oldestUnusedObtainedAt = Number.POSITIVE_INFINITY
+    let hasUnused = false
+
+    coupons.forEach((coupon) => {
+      if (coupon.obtained_at > latestObtainedAt) latestObtainedAt = coupon.obtained_at
+      if (coupon.status !== 'used') {
+        hasUnused = true
+        if (coupon.obtained_at < oldestUnusedObtainedAt) {
+          oldestUnusedObtainedAt = coupon.obtained_at
+          nextUseId = coupon.id
+        }
+      }
+    })
+
+    return {
+      key: group.key,
+      title: group.title,
+      desc: group.desc,
+      count: coupons.length,
+      hasUnused,
+      statusText: hasUnused ? t('REWARDS_UNUSED') : t('REWARDS_USED'),
+      latestObtainedAt,
+      obtainedText: formatDateTime(latestObtainedAt),
+      nextUseId
+    }
+  }).sort((a, b) => b.latestObtainedAt - a.latestObtainedAt)
+}
+
 Page({
   data: {
-    coupons: [],
+    couponGroups: [],
     loading: false,
-    usingCouponId: '',
+    usingGroupKey: '',
 
     walletText: '',
     markUsedText: '',
@@ -58,7 +107,7 @@ Page({
     this.setData({ loading: true })
     rewards.listCoupons()
       .then((res) => {
-        this.setData({ coupons: normalizeCoupons(res && res.coupons) })
+        this.setData({ couponGroups: groupCoupons(res && res.coupons) })
       })
       .catch((e) => {
         wx.showToast({ title: (e && e.message) || '加载失败', icon: 'none' })
@@ -70,7 +119,11 @@ Page({
 
   onMarkUsed(e) {
     const id = String((e && e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.id) || '').trim()
-    if (!id || this.data.usingCouponId) return
+    if (!id || this.data.usingGroupKey) return
+    const group = (this.data.couponGroups || []).find((item) => item.nextUseId === id)
+    const groupKey = (group && group.key) || ''
+    if (!groupKey) return
+    if (!id) return
 
     wx.showModal({
       title: t('REWARDS_USE_CONFIRM_TITLE'),
@@ -79,7 +132,7 @@ Page({
       cancelText: t('REWARDS_USE_CONFIRM_CANCEL'),
       success: (res) => {
         if (!res || !res.confirm) return
-        this.setData({ usingCouponId: id })
+        this.setData({ usingGroupKey: groupKey })
         rewards.useCoupon(id)
           .then(() => {
             this.loadCoupons()
@@ -88,7 +141,7 @@ Page({
             wx.showToast({ title: (err && err.message) || '操作失败', icon: 'none' })
           })
           .finally(() => {
-            this.setData({ usingCouponId: '' })
+            this.setData({ usingGroupKey: '' })
           })
       }
     })

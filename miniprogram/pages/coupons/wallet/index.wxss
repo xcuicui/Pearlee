@@ -2,7 +2,9 @@
 .empty{padding:34rpx 28rpx;border-radius:24rpx;background:rgba(255,255,255,.82);font-size:26rpx;color:rgba(38,35,31,.5)}
 .coupon{padding:30rpx 28rpx;margin-bottom:20rpx}
 .coupon-head{display:flex;align-items:center;justify-content:space-between;gap:12rpx}
+.coupon-title-wrap{display:flex;align-items:center;gap:10rpx;min-width:0}
 .coupon-title{font-size:30rpx;font-weight:600;color:rgba(38,35,31,.84)}
+.coupon-count{font-size:24rpx;color:rgba(38,35,31,.56)}
 .coupon-status{padding:8rpx 14rpx;border-radius:999rpx;font-size:22rpx}
 .coupon-status.unused{color:rgba(95,125,149,.9);background:rgba(95,125,149,.1)}
 .coupon-status.used{color:rgba(38,35,31,.46);background:rgba(38,35,31,.08)}
