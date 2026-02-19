@@ -1,0 +1,61 @@
+<view class="page">
+  <view class="hero">
+    <view class="hero-title">{{titleText}}</view>
+    <view class="hero-subtitle">{{subtitleText}}</view>
+  </view>
+
+  <view class="card section">
+    <view class="assets-line">{{assetsRuleText}}</view>
+  </view>
+
+  <view class="card section">
+    <view
+      class="btn-primary draw-btn {{assets.points_balance < 1 ? 'btn-primary--disabled' : ''}} {{ceremonyState === 'drawing' ? 'btn-primary--disabled' : ''}}"
+      bindtap="onDraw"
+      hover-class="tap-down"
+      hover-stay-time="80"
+    >{{drawButtonText}}</view>
+    <view class="draw-under-text">{{assets.points_balance < 1 ? drawInsufficientText : drawUnderCostText}}</view>
+  </view>
+
+  <view class="card section">
+    <view class="pocket-head">
+      <view class="title">{{pocketTitleText}}</view>
+      <view class="pocket-link" bindtap="goWallet" hover-class="tap-down" hover-stay-time="80">{{pocketViewAllText}}</view>
+    </view>
+
+    <view wx:if="{{pocketGifts.length}}" class="pocket-list">
+      <view class="pocket-item" wx:for="{{pocketGifts}}" wx:key="id">
+        <view class="pocket-name">{{item.title}}</view>
+        <view class="pocket-desc">{{item.desc}}</view>
+        <view class="pocket-time">{{item.obtainedText}}</view>
+      </view>
+    </view>
+    <view wx:else class="pocket-empty">{{pocketEmptyText}}</view>
+  </view>
+
+  <view class="window-entry-wrap">
+    <view
+      class="window-entry"
+      bindtap="goWindowDetail"
+      hover-class="tap-down"
+      hover-stay-time="80"
+    >{{windowLinkText}}</view>
+  </view>
+
+  <view wx:if="{{overlayVisible}}" class="ceremony-overlay {{ceremonyState === 'confirmed' ? 'is-leaving' : 'is-visible'}}">
+    <view class="ceremony-card {{(ceremonyState === 'result' || ceremonyState === 'confirmed') ? 'is-result' : 'is-drawing'}}">
+      <block wx:if="{{resultCoupon}}">
+        <view class="ceremony-top">{{resultTitleText}}</view>
+        <view class="ceremony-title">{{resultCoupon.title}}</view>
+        <view class="ceremony-desc">{{resultCoupon.desc}}</view>
+        <view class="btn-primary ceremony-btn" bindtap="onConfirmResult" hover-class="tap-down" hover-stay-time="80">{{resultConfirmText}}</view>
+        <view class="ceremony-footer">{{resultFooterText}}</view>
+      </block>
+      <block wx:else>
+        <view class="ceremony-top">{{resultTitleText}}</view>
+        <view class="ceremony-loading">...</view>
+      </block>
+    </view>
+  </view>
+</view>
