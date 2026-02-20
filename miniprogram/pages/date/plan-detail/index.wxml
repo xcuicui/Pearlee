@@ -1,0 +1,82 @@
+<view class="page">
+  <block wx:if="{{!item && !loading}}">
+    <view class="empty">找不到这条清单项。</view>
+  </block>
+
+  <block wx:if="{{item}}">
+    <view class="card">
+      <view class="title">{{item.title}}</view>
+      <view class="notes" wx:if="{{item.notes}}">{{item.notes}}</view>
+
+      <view class="row">
+        <view class="sub">标签</view>
+        <view class="link" bindtap="openEditTags">编辑</view>
+      </view>
+      <view class="chips" wx:if="{{item.tags && item.tags.length}}">
+        <block wx:for="{{item.tags}}" wx:key="id">
+          <view class="chip">{{item2.name}}</view>
+        </block>
+      </view>
+      <view class="chips" wx:else>
+        <view class="hint">还没有标签</view>
+      </view>
+
+      <view class="row" style="margin-top:18rpx;">
+        <view class="sub">约会日记</view>
+        <view class="hint">（后续接入）</view>
+      </view>
+
+      <view class="actions">
+        <view class="btn {{item.status==='done'?'ghost':'primary'}}" bindtap="toggleDone">{{item.status==='done'?'取消完成':'标记已完成'}}</view>
+      </view>
+    </view>
+  </block>
+
+  <!-- edit tags modal -->
+  <view class="modal" wx:if="{{editingTags}}">
+    <view class="sheet">
+      <view class="sheet-title">编辑标签</view>
+      <block wx:for="{{tagTypes}}" wx:key="id">
+        <view class="type-line">
+          <view class="type-name">{{item.name}}</view>
+          <view class="mini" data-typeid="{{item.id}}" bindtap="openAddTag">+ 标签</view>
+        </view>
+        <view class="chips">
+          <block wx:for="{{tagsByType[item.id]}}" wx:key="id">
+            <view class="chip selectable {{editSelectedTagIds.indexOf(item2.id)>=0?'on':''}}" data-id="{{item2.id}}" bindtap="toggleEditTag">{{item2.name}}</view>
+          </block>
+        </view>
+      </block>
+      <view class="mini" bindtap="openAddType">+ 类型</view>
+
+      <view class="sheet-actions">
+        <view class="btn ghost" bindtap="closeEditTags">取消</view>
+        <view class="btn primary" bindtap="saveTags">保存</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- add type modal -->
+  <view class="modal" wx:if="{{showAddType}}">
+    <view class="sheet">
+      <view class="sheet-title">新增标签类型</view>
+      <input class="input" placeholder="例如：约束/类型" value="{{newTypeName}}" bindinput="onNewTypeName" />
+      <view class="sheet-actions">
+        <view class="btn ghost" bindtap="closeAddType">取消</view>
+        <view class="btn primary" bindtap="submitAddType">新增</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- add tag modal -->
+  <view class="modal" wx:if="{{showAddTag}}">
+    <view class="sheet">
+      <view class="sheet-title">新增标签</view>
+      <input class="input" placeholder="例如：深圳/夜生活" value="{{newTagName}}" bindinput="onNewTagName" />
+      <view class="sheet-actions">
+        <view class="btn ghost" bindtap="closeAddTag">取消</view>
+        <view class="btn primary" bindtap="submitAddTag">新增</view>
+      </view>
+    </view>
+  </view>
+</view>

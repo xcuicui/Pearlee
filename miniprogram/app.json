@@ -11,6 +11,8 @@
     "pages/relationship/join",
     "pages/entry/publish",
     "pages/murmur/timeline/index",
+    "pages/date/plan-list/index",
+    "pages/date/plan-detail/index",
     "pages/day/detail"
   ],
   "window": {
