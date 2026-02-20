@@ -10,24 +10,34 @@
   </view>
 
   <view class="filter">
-    <scroll-view scroll-x class="tag-row">
-      <view class="tag {{selectedTagId===''?'on':''}}" bindtap="onSelectTag" data-id="">全部</view>
-      <block wx:for="{{tagTypes}}" wx:for-item="type" wx:key="id">
-        <block wx:for="{{tagsByType[type.id]}}" wx:for-item="tag" wx:key="id">
-          <view
-            class="tag {{selectedTagId===tag.id?'on':''}}"
-            data-id="{{tag.id}}"
-            data-name="{{tag.name}}"
-            bindtap="onSelectTag"
-            bindlongpress="onLongPressTag"
-          >{{tag.name}}</view>
-        </block>
-      </block>
-    </scroll-view>
+    <view class="filter-all">
+      <view class="tag all {{selectedTagId===''?'on':''}}" bindtap="onSelectTag" data-id="">全部</view>
+    </view>
+
     <view wx:if="{{!tagTypes.length}}" class="tag-empty">
       <view class="tag-empty-title">还没有标签类型</view>
       <view class="tag-empty-sub">你可以先从「地点」「氛围」开始</view>
     </view>
+
+    <block wx:else>
+      <block wx:for="{{tagTypes}}" wx:for-item="type" wx:key="id">
+        <view class="filter-type-row">
+          <view class="filter-type-name">{{type.name}}</view>
+          <scroll-view scroll-x class="tag-row">
+            <block wx:for="{{tagsByType[type.id]}}" wx:for-item="tag" wx:key="id">
+              <view
+                class="tag {{selectedTagId===tag.id?'on':''}}"
+                style="{{typeColorStyleById[tag.typeId]}}"
+                data-id="{{tag.id}}"
+                data-name="{{tag.name}}"
+                bindtap="onSelectTag"
+                bindlongpress="onLongPressTag"
+              >{{tag.name}}</view>
+            </block>
+          </scroll-view>
+        </view>
+      </block>
+    </block>
   </view>
 
   <view class="list">
@@ -39,7 +49,7 @@
         <view class="title">{{plan.title}}</view>
         <view class="chips" wx:if="{{plan.tags && plan.tags.length}}">
           <block wx:for="{{plan.tags}}" wx:for-item="tag" wx:key="id">
-            <view class="chip">{{tag.name}}</view>
+            <view class="chip" style="{{typeColorStyleById[tag.typeId]}}">{{tag.name}}</view>
           </block>
         </view>
       </view>
@@ -77,6 +87,7 @@
               <block wx:for="{{tagsByType[type.id]}}" wx:for-item="tag" wx:key="id">
                 <view
                   class="chip selectable {{newSelectedTagIds.indexOf(tag.id)>=0?'on':''}}"
+                  style="{{typeColorStyleById[tag.typeId]}}"
                   data-id="{{tag.id}}"
                   data-name="{{tag.name}}"
                   bindtap="toggleNewTag"

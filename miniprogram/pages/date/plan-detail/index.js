@@ -8,6 +8,7 @@ Page({
     tagTypes: [],
     tagsByType: {},
     hintByTypeName: {},
+    typeColorStyleById: {},
     editingTags: false,
     editSelectedTagIds: [],
     editSelectedTagMap: {},
@@ -64,7 +65,20 @@ Page({
       '氛围': '比如：松弛 / 浪漫 / 热闹'
     }
 
-    this.setData({ tagTypes, tagsByType, hintByTypeName })
+    const palette = [
+      { bg: 'rgba(95,125,149,.14)', bd: 'rgba(95,125,149,.28)', fg: 'rgba(31,59,82,.95)' },
+      { bg: 'rgba(255,170,190,.18)', bd: 'rgba(255,170,190,.40)', fg: 'rgba(120,43,63,.92)' },
+      { bg: 'rgba(121,199,146,.18)', bd: 'rgba(121,199,146,.40)', fg: 'rgba(22,80,44,.92)' },
+      { bg: 'rgba(180,160,255,.16)', bd: 'rgba(180,160,255,.36)', fg: 'rgba(54,40,120,.92)' },
+      { bg: 'rgba(255,208,112,.18)', bd: 'rgba(255,208,112,.42)', fg: 'rgba(120,80,10,.92)' }
+    ]
+    const typeColorStyleById = {}
+    tagTypes.forEach((t, idx) => {
+      const c = palette[idx % palette.length]
+      typeColorStyleById[t.id] = `background:${c.bg};border:2rpx solid ${c.bd};color:${c.fg};`
+    })
+
+    this.setData({ tagTypes, tagsByType, hintByTypeName, typeColorStyleById })
   },
 
   async loadItem() {

@@ -6,16 +6,21 @@
 .actions .btn{padding:12rpx 18rpx;background:#5F7D95;color:#fff;border-radius:999rpx;font-size:28rpx;}
 
 .filter{margin-bottom:12rpx;}
+.filter-all{margin-bottom:10rpx;}
+.filter-type-row{margin-top:10rpx;}
+.filter-type-name{font-size:22rpx;color:rgba(38,35,31,.55);margin-bottom:8rpx;}
 .tag-row{white-space:nowrap;}
-.tag{display:inline-block;padding:10rpx 18rpx;margin-right:12rpx;border-radius:999rpx;background:#f3f4f6;color:#556;font-size:26rpx;}
-.tag.on{background:#5F7D95;color:#fff;}
+.tag{display:inline-block;padding:10rpx 18rpx;margin-right:12rpx;border-radius:999rpx;background:#f3f4f6;color:#556;font-size:26rpx;border:2rpx solid rgba(0,0,0,0);}
+.tag.on{box-shadow:0 0 0 2rpx rgba(95,125,149,.22) inset;}
+.tag.all{background:#f3f4f6;color:#556;}
+.tag.all.on{background:#5F7D95;color:#fff;box-shadow:none;}
 
 .list .card{background:#fff;border-radius:24rpx;padding:20rpx 22rpx;margin-bottom:16rpx;box-shadow:0 6rpx 24rpx rgba(0,0,0,0.04);}
 .title{font-size:32rpx;color:#223;}
 .chips{margin-top:12rpx;display:flex;flex-wrap:wrap;gap:10rpx;}
-.chip{padding:6rpx 14rpx;border-radius:999rpx;background:#eef2f7;color:#456;font-size:24rpx;}
+.chip{padding:6rpx 14rpx;border-radius:999rpx;background:#eef2f7;color:#456;font-size:24rpx;border:2rpx solid rgba(0,0,0,0);}
 .chip.selectable{background:#f3f4f6;color:#445;}
-.chip.selectable.on{background:#dbe7f1;color:#1f3b52;}
+.chip.selectable.on{box-shadow:0 0 0 2rpx rgba(95,125,149,.22) inset;}
 .empty{padding:60rpx 0;color:#889;text-align:center;}
 .tag-empty{padding:18rpx 0;color:#667;}
 .tag-empty-title{font-size:26rpx;color:#334;}

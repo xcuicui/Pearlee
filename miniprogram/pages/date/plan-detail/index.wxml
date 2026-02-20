@@ -14,7 +14,7 @@
       </view>
       <view class="chips" wx:if="{{item.tags && item.tags.length}}">
         <block wx:for="{{item.tags}}" wx:for-item="tag" wx:key="id">
-          <view class="chip">{{tag.name}}</view>
+          <view class="chip" style="{{typeColorStyleById[tag.typeId]}}">{{tag.name}}</view>
         </block>
       </view>
       <view class="chips" wx:else>
@@ -61,6 +61,7 @@
               <block wx:for="{{tagsByType[type.id]}}" wx:for-item="tag" wx:key="id">
                 <view
                   class="chip selectable {{editSelectedTagMap[tag.id]?'on':''}}"
+                  style="{{typeColorStyleById[tag.typeId]}}"
                   data-id="{{tag.id}}"
                   data-name="{{tag.name}}"
                   catchtap="toggleEditTag"
