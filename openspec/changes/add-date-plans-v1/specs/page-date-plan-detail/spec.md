@@ -8,6 +8,14 @@
 - **WHEN** 页面加载完成
 - **THEN** 页面展示该清单项的标题与备注（若为空则不渲染备注区域）
 
+### Requirement: Plan tags visible
+清单项详情页 MUST 展示该清单项已选择的 tags。
+
+#### Scenario: Show tags
+- **GIVEN** 该清单项存在 tagIds
+- **WHEN** 渲染清单项详情页
+- **THEN** 页面以 chips 形式展示 tags（按 tag 类型分组或混排均可）
+
 ### Requirement: Plan completion toggle
 清单项详情页 MUST 支持标记完成与取消完成。
 

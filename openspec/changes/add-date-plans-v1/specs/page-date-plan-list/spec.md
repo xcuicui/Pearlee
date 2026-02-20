@@ -13,11 +13,38 @@
 - **WHEN** 用户切换到已完成分组
 - **THEN** 页面调用 `date_plan_list({ status: 'done' })` 并展示已完成清单项列表
 
-### Requirement: Create date plan
-页面 MUST 提供创建入口以新增清单项（至少包含标题）。
+### Requirement: Create date plan with tags
+页面 MUST 提供创建入口以新增清单项（至少包含标题），并支持为清单项选择 tags。
 
 #### Scenario: Create success
-- **GIVEN** 用户输入标题
+- **GIVEN** 用户输入标题并选择若干 tags
 - **WHEN** 用户提交创建
-- **THEN** 页面调用 `date_plan_create({ title, notes? })`
+- **THEN** 页面调用 `date_plan_create({ title, notes?, tags? })`
 - **AND** 成功后清单列表刷新，新的清单项出现在 open 列表
+
+### Requirement: Tag filter in list
+清单列表页 MUST 支持按 tag 进行筛选展示。
+
+#### Scenario: Filter by a tag
+- **GIVEN** 列表页已加载 open 清单项
+- **WHEN** 用户选择一个 tag 作为筛选条件
+- **THEN** 页面调用 `date_plan_list({ status: 'open', tagIds: [tagId] })` 或在本地对同等数据进行筛选
+- **AND** 列表仅展示匹配该 tag 的清单项
+
+#### Scenario: Clear filter
+- **GIVEN** 当前存在 tag 筛选条件
+- **WHEN** 用户清除筛选
+- **THEN** 列表恢复展示全部（open 或 done）清单项
+
+### Requirement: Tag taxonomy management entry
+列表页 MUST 提供一个轻量入口用于新增 tag 或新增 tag 类型（避免清单被固定枚举限制）。
+
+#### Scenario: Add new tag
+- **WHEN** 用户新增一个 tag（选择某个 tag 类型并输入名称）
+- **THEN** 页面调用 `date_tag_create({ typeId, name })`
+- **AND** 新 tag 可被用于选择与筛选
+
+#### Scenario: Add new tag type
+- **WHEN** 用户新增一个 tag 类型
+- **THEN** 页面调用 `date_tag_type_create({ name })`
+- **AND** 新类型出现在 tag 分类中
