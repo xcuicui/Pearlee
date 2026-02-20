@@ -42,10 +42,21 @@ async function ensureDefaultTaxonomy(relationshipId) {
   }
 }
 
+async function ensureCollection(name) {
+  try {
+    await db.createCollection(name)
+  } catch (e) {
+    // ignore
+  }
+}
+
 exports.main = async (event = {}) => {
   const { OPENID } = cloud.getWXContext()
   const rel = await getRel(OPENID)
   if (!rel) throw new BizError('还没有建立关系', 'NO_REL')
+
+  await ensureCollection('date_tag_types')
+  await ensureCollection('date_tags')
 
   await ensureDefaultTaxonomy(rel._id)
 

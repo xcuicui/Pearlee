@@ -26,10 +26,21 @@ async function assertTagsBelongToRel(relationshipId, tagIds) {
   return uniq
 }
 
+async function ensureCollection(name) {
+  try {
+    await db.createCollection(name)
+  } catch (e) {
+    // ignore
+  }
+}
+
 exports.main = async (event = {}) => {
   const { OPENID } = cloud.getWXContext()
   const rel = await getRel(OPENID)
   if (!rel) throw new BizError('还没有建立关系', 'NO_REL')
+
+  await ensureCollection('date_plans')
+  await ensureCollection('date_tags')
 
   const planId = String(event.planId || event.id || '').trim()
   if (!planId) throw new BizError('planId 必填', 'MISSING_ID')

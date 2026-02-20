@@ -30,11 +30,22 @@ async function assertTagsBelongToRel(relationshipId, tagIds) {
   }
 }
 
+async function ensureCollection(name) {
+  try {
+    await db.createCollection(name)
+  } catch (e) {
+    // ignore
+  }
+}
+
 exports.main = async (event = {}) => {
   const { OPENID } = cloud.getWXContext()
 
   const rel = await getRel(OPENID)
   if (!rel) throw new BizError('还没有建立关系', 'NO_REL')
+
+  await ensureCollection('date_plans')
+  await ensureCollection('date_tags')
 
   const title = cleanText(event.title)
   const notes = cleanText(event.notes)

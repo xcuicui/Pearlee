@@ -16,10 +16,21 @@ function cleanText(s) {
   return String(s || '').replace(/\r\n/g, '\n').trim()
 }
 
+async function ensureCollection(name) {
+  try {
+    await db.createCollection(name)
+  } catch (e) {
+    // ignore: already exists or no permission
+  }
+}
+
 exports.main = async (event = {}) => {
   const { OPENID } = cloud.getWXContext()
   const rel = await getRel(OPENID)
   if (!rel) throw new BizError('还没有建立关系', 'NO_REL')
+
+  // Some environments require explicit collection creation before first use.
+  await ensureCollection('date_tag_types')
 
   const name = cleanText(event.name)
   if (!name) throw new BizError('name 必填', 'EMPTY')
