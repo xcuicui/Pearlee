@@ -12,9 +12,9 @@
   <view class="filter">
     <scroll-view scroll-x class="tag-row">
       <view class="tag {{selectedTagId===''?'on':''}}" bindtap="onSelectTag" data-id="">全部</view>
-      <block wx:for="{{tagTypes}}" wx:key="id">
-        <block wx:for="{{tagsByType[item.id]}}" wx:key="id">
-          <view class="tag {{selectedTagId===item2.id?'on':''}}" data-id="{{item2.id}}" bindtap="onSelectTag">{{item2.name}}</view>
+      <block wx:for="{{tagTypes}}" wx:for-item="type" wx:key="id">
+        <block wx:for="{{tagsByType[type.id]}}" wx:for-item="tag" wx:key="id">
+          <view class="tag {{selectedTagId===tag.id?'on':''}}" data-id="{{tag.id}}" bindtap="onSelectTag">{{tag.name}}</view>
         </block>
       </block>
     </scroll-view>
@@ -24,12 +24,12 @@
     <block wx:if="{{items.length===0 && !loading}}">
       <view class="empty">先把想一起做的事收进来。</view>
     </block>
-    <block wx:for="{{items}}" wx:key="id">
-      <view class="card" data-id="{{item.id}}" bindtap="onOpenDetail">
-        <view class="title">{{item.title}}</view>
-        <view class="chips" wx:if="{{item.tags && item.tags.length}}">
-          <block wx:for="{{item.tags}}" wx:key="id">
-            <view class="chip">{{item2.name}}</view>
+    <block wx:for="{{items}}" wx:for-item="plan" wx:key="id">
+      <view class="card" data-id="{{plan.id}}" bindtap="onOpenDetail">
+        <view class="title">{{plan.title}}</view>
+        <view class="chips" wx:if="{{plan.tags && plan.tags.length}}">
+          <block wx:for="{{plan.tags}}" wx:for-item="tag" wx:key="id">
+            <view class="chip">{{tag.name}}</view>
           </block>
         </view>
       </view>
@@ -44,14 +44,14 @@
       <textarea class="textarea" placeholder="可选：写点备注" value="{{newNotes}}" bindinput="onNewNotes" />
 
       <view class="sheet-sub">选择标签（可选）</view>
-      <block wx:for="{{tagTypes}}" wx:key="id">
+      <block wx:for="{{tagTypes}}" wx:for-item="type" wx:key="id">
         <view class="type-line">
-          <view class="type-name">{{item.name}}</view>
-          <view class="mini" data-typeid="{{item.id}}" bindtap="openAddTag">+ 标签</view>
+          <view class="type-name">{{type.name}}</view>
+          <view class="mini" data-typeid="{{type.id}}" bindtap="openAddTag">+ 标签</view>
         </view>
         <view class="chips">
-          <block wx:for="{{tagsByType[item.id]}}" wx:key="id">
-            <view class="chip selectable {{newSelectedTagIds.indexOf(item2.id)>=0?'on':''}}" data-id="{{item2.id}}" bindtap="toggleNewTag">{{item2.name}}</view>
+          <block wx:for="{{tagsByType[type.id]}}" wx:for-item="tag" wx:key="id">
+            <view class="chip selectable {{newSelectedTagIds.indexOf(tag.id)>=0?'on':''}}" data-id="{{tag.id}}" bindtap="toggleNewTag">{{tag.name}}</view>
           </block>
         </view>
       </block>

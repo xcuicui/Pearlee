@@ -13,8 +13,8 @@
         <view class="link" bindtap="openEditTags">编辑</view>
       </view>
       <view class="chips" wx:if="{{item.tags && item.tags.length}}">
-        <block wx:for="{{item.tags}}" wx:key="id">
-          <view class="chip">{{item2.name}}</view>
+        <block wx:for="{{item.tags}}" wx:for-item="tag" wx:key="id">
+          <view class="chip">{{tag.name}}</view>
         </block>
       </view>
       <view class="chips" wx:else>
@@ -37,14 +37,14 @@
   <view class="modal" wx:if="{{editingTags}}">
     <view class="sheet">
       <view class="sheet-title">编辑标签</view>
-      <block wx:for="{{tagTypes}}" wx:key="id">
+      <block wx:for="{{tagTypes}}" wx:for-item="type" wx:key="id">
         <view class="type-line">
-          <view class="type-name">{{item.name}}</view>
-          <view class="mini" data-typeid="{{item.id}}" bindtap="openAddTag">+ 标签</view>
+          <view class="type-name">{{type.name}}</view>
+          <view class="mini" data-typeid="{{type.id}}" bindtap="openAddTag">+ 标签</view>
         </view>
         <view class="chips">
-          <block wx:for="{{tagsByType[item.id]}}" wx:key="id">
-            <view class="chip selectable {{editSelectedTagIds.indexOf(item2.id)>=0?'on':''}}" data-id="{{item2.id}}" bindtap="toggleEditTag">{{item2.name}}</view>
+          <block wx:for="{{tagsByType[type.id]}}" wx:for-item="tag" wx:key="id">
+            <view class="chip selectable {{editSelectedTagIds.indexOf(tag.id)>=0?'on':''}}" data-id="{{tag.id}}" bindtap="toggleEditTag">{{tag.name}}</view>
           </block>
         </view>
       </block>
