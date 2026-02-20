@@ -59,7 +59,7 @@
         <view class="chips" wx:else>
           <block wx:for="{{tagsByType[type.id]}}" wx:for-item="tag" wx:key="id">
             <view
-              class="chip selectable {{editSelectedTagIds.indexOf(tag.id)>=0?'on':''}}"
+              class="chip selectable {{editSelectedTagMap[tag.id]?'on':''}}"
               data-id="{{tag.id}}"
               data-name="{{tag.name}}"
               catchtap="toggleEditTag"

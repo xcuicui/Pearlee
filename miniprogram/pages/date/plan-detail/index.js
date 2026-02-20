@@ -10,6 +10,7 @@ Page({
     hintByTypeName: {},
     editingTags: false,
     editSelectedTagIds: [],
+    editSelectedTagMap: {},
 
     // add taxonomy
     showAddType: false,
@@ -100,18 +101,27 @@ Page({
   // ----- edit tags -----
   openEditTags() {
     const ids = (this.data.item && this.data.item.tagIds) ? this.data.item.tagIds : []
-    this.setData({ editingTags: true, editSelectedTagIds: ids.slice() })
+    const list = ids.map(x => String(x))
+    const map = Object.create(null)
+    for (const id of list) map[id] = true
+    this.setData({ editingTags: true, editSelectedTagIds: list, editSelectedTagMap: map })
   },
   closeEditTags() {
-    this.setData({ editingTags: false })
+    this.setData({ editingTags: false, editSelectedTagMap: {} })
   },
   toggleEditTag(e) {
     const id = String(e && e.currentTarget && e.currentTarget.dataset ? (e.currentTarget.dataset.id || '') : '').trim()
     if (!id) return
+
     const cur = new Set((this.data.editSelectedTagIds || []).map(x => String(x)))
     if (cur.has(id)) cur.delete(id)
     else cur.add(id)
-    this.setData({ editSelectedTagIds: Array.from(cur) })
+
+    const list = Array.from(cur)
+    const map = Object.create(null)
+    for (const x of list) map[x] = true
+
+    this.setData({ editSelectedTagIds: list, editSelectedTagMap: map })
   },
   async saveTags() {
     await this.call('date_plan_update', { planId: this.data.id, tagIds: this.data.editSelectedTagIds })
@@ -181,7 +191,10 @@ Page({
         // remove from current selected list
         const cur = new Set((this.data.editSelectedTagIds || []).map(x => String(x)))
         cur.delete(String(tagId))
-        this.setData({ editSelectedTagIds: Array.from(cur) })
+        const list = Array.from(cur)
+        const map = Object.create(null)
+        for (const x of list) map[x] = true
+        this.setData({ editSelectedTagIds: list, editSelectedTagMap: map })
         wx.showToast({ title: '已删除', icon: 'none' })
         await this.loadTagTaxonomy()
         await this.loadItem()
