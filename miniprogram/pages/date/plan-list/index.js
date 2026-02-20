@@ -194,5 +194,35 @@ Page({
         await this.loadList()
       }
     })
+  },
+
+  onLongPressType(e) {
+    const typeId = e.currentTarget.dataset.typeid
+    const typeName = e.currentTarget.dataset.name
+    if (!typeId) return
+
+    wx.showActionSheet({
+      itemList: ['删除类型'],
+      success: async (res) => {
+        if (!res || res.tapIndex !== 0) return
+        const ok = await new Promise(resolve => {
+          wx.showModal({
+            title: '删除标签类型',
+            content: `确定删除「${typeName || ''}」吗？该类型下的标签也会一起删除。`,
+            confirmText: '删除',
+            confirmColor: '#d14343',
+            success: (r) => resolve(!!(r && r.confirm)),
+            fail: () => resolve(false)
+          })
+        })
+        if (!ok) return
+
+        await this.call('date_tag_type_delete', { typeId })
+        wx.showToast({ title: '已删除', icon: 'none' })
+        if (this.data.selectedTagId) this.setData({ selectedTagId: '' })
+        await this.loadTagTaxonomy()
+        await this.loadList()
+      }
+    })
   }
 })

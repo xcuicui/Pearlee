@@ -200,5 +200,48 @@ Page({
         await this.loadItem()
       }
     })
+  },
+
+  onLongPressType(e) {
+    const typeId = e.currentTarget.dataset.typeid
+    const typeName = e.currentTarget.dataset.name
+    if (!typeId) return
+
+    wx.showActionSheet({
+      itemList: ['删除类型'],
+      success: async (res) => {
+        if (!res || res.tapIndex !== 0) return
+        const ok = await new Promise(resolve => {
+          wx.showModal({
+            title: '删除标签类型',
+            content: `确定删除「${typeName || ''}」吗？该类型下的标签也会一起删除。`,
+            confirmText: '删除',
+            confirmColor: '#d14343',
+            success: (r) => resolve(!!(r && r.confirm)),
+            fail: () => resolve(false)
+          })
+        })
+        if (!ok) return
+
+        await this.call('date_tag_type_delete', { typeId })
+        wx.showToast({ title: '已删除', icon: 'none' })
+
+        // refresh taxonomy + item (in case tags were removed)
+        await this.loadTagTaxonomy()
+        await this.loadItem()
+
+        // keep editor state in sync
+        const selected = new Set((this.data.editSelectedTagIds || []).map(x => String(x)))
+        // After taxonomy reload, remove any selected ids that no longer exist
+        const allTagIds = []
+        const byType = this.data.tagsByType || {}
+        Object.keys(byType).forEach(k => (byType[k] || []).forEach(tag => allTagIds.push(String(tag.id))))
+        const exists = new Set(allTagIds)
+        const next = Array.from(selected).filter(id => exists.has(id))
+        const map = Object.create(null)
+        for (const id of next) map[id] = true
+        this.setData({ editSelectedTagIds: next, editSelectedTagMap: map })
+      }
+    })
   }
 })

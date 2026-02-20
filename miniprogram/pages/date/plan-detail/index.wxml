@@ -47,7 +47,7 @@
       <block wx:else>
         <block wx:for="{{tagTypes}}" wx:for-item="type" wx:key="id">
         <view class="type-line">
-          <view class="type-name">{{type.name}}</view>
+          <view class="type-name" data-typeid="{{type.id}}" data-name="{{type.name}}" bindlongpress="onLongPressType">{{type.name}}</view>
           <view class="mini" data-typeid="{{type.id}}" bindtap="openAddTag">+ 标签</view>
         </view>
 
