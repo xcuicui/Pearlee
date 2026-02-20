@@ -17,7 +17,13 @@ const REQUIRED_COLLECTIONS = [
   'user_assets',
   'point_ledger',
   'coupons',
-  'gift_definitions'
+  'gift_definitions',
+
+  // Date plans & diaries
+  'date_plans',
+  'date_tag_types',
+  'date_tags',
+  'date_diaries'
 ]
 
 const REQUIRED_INDEXES = {
@@ -67,6 +73,23 @@ const REQUIRED_INDEXES = {
       name: 'idx_space_creator_recipient_deleted_updatedAt',
       keys: { space_id: 1, created_by_user_id: 1, recipient_user_id: 1, is_deleted: 1, updated_at: -1 }
     }
+  ],
+
+  // ---- Date plans & diaries ----
+  date_plans: [
+    { name: 'idx_rel_status_createdAt', keys: { relationshipId: 1, status: 1, createdAt: -1 } }
+  ],
+  date_tag_types: [
+    { name: 'idx_rel_createdAt', keys: { relationshipId: 1, createdAt: 1 } },
+    { name: 'idx_rel_name', keys: { relationshipId: 1, name: 1 } }
+  ],
+  date_tags: [
+    { name: 'idx_rel_type_createdAt', keys: { relationshipId: 1, typeId: 1, createdAt: 1 } },
+    { name: 'idx_rel_type_name', keys: { relationshipId: 1, typeId: 1, name: 1 } }
+  ],
+  date_diaries: [
+    { name: 'idx_rel_plan_occurAt', keys: { relationshipId: 1, planId: 1, occurAt: -1 } },
+    { name: 'idx_rel_occurAt', keys: { relationshipId: 1, occurAt: -1 } }
   ]
 }
 
