@@ -27,6 +27,29 @@
       </view>
       <view class="hint" style="margin-top:8rpx;">把这次约会，收进这里。</view>
 
+      <view class="diary-list" wx:if="{{diaries && diaries.length}}">
+        <block wx:for="{{diaries}}" wx:for-item="d" wx:key="id">
+          <view class="diary-item">
+            <view class="diary-time">{{d.occurText}}</view>
+            <view class="diary-text" wx:if="{{d.text}}">{{d.text}}</view>
+            <view class="diary-images" wx:if="{{d.images && d.images.length}}">
+              <image
+                class="diary-image"
+                wx:for="{{d.images}}"
+                wx:for-item="img"
+                wx:key="*this"
+                src="{{img.url || img}}"
+                mode="aspectFill"
+                lazy-load="true"
+              />
+            </view>
+          </view>
+        </block>
+      </view>
+      <view class="diary-empty" wx:else>
+        <view class="hint">还没有约会日记</view>
+      </view>
+
       <view class="actions">
         <view class="btn {{item.status==='done'?'ghost':'primary'}}" bindtap="toggleDone">{{item.status==='done'?'取消完成':'标记已完成'}}</view>
       </view>

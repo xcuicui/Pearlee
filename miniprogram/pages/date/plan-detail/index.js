@@ -4,6 +4,9 @@ Page({
     item: null,
     loading: false,
 
+    diaries: [],
+    diaryLoading: false,
+
     // tags
     tagTypes: [],
     tagsByType: {},
@@ -44,6 +47,7 @@ Page({
   async bootstrap() {
     await this.loadTagTaxonomy()
     await this.loadItem()
+    await this.loadDiaries()
   },
 
   async loadTagTaxonomy() {
@@ -95,6 +99,38 @@ Page({
       this.setData({ item, editSelectedTagIds: (item && item.tagIds) ? item.tagIds : [] })
     } finally {
       this.setData({ loading: false })
+    }
+  },
+
+  pad2(n) { return String(n).padStart(2, '0') },
+  formatOccurAt(ts) {
+    const n = Number(ts || 0)
+    if (!n) return ''
+    const d = new Date(n)
+    if (Number.isNaN(d.getTime())) return ''
+    return `${d.getMonth() + 1}月${d.getDate()}日 ${this.pad2(d.getHours())}:${this.pad2(d.getMinutes())}`
+  },
+
+  async loadDiaries() {
+    if (!this.data.id) return
+    if (this.data.diaryLoading) return
+    this.setData({ diaryLoading: true })
+    try {
+      const res = await this.call('date_diary_list_by_plan', { planId: this.data.id, limit: 30 })
+      const items = Array.isArray(res.items) ? res.items : []
+      const diaries = items.map(x => ({
+        id: x.id,
+        occurAt: x.occurAt,
+        occurText: this.formatOccurAt(x.occurAt),
+        text: String(x.text || ''),
+        images: Array.isArray(x.images) ? x.images.slice(0, 3) : []
+      }))
+      this.setData({ diaries })
+    } catch (e) {
+      // best-effort
+      this.setData({ diaries: [] })
+    } finally {
+      this.setData({ diaryLoading: false })
     }
   },
 
