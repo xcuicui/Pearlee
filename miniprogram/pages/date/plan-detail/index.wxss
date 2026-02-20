@@ -17,6 +17,12 @@
 .chip.selectable.on{background:#dbe7f1;color:#1f3b52;}
 
 .empty{padding:60rpx 0;color:#889;text-align:center;}
+.tag-empty{padding:18rpx 0;color:#667;}
+.tag-empty-title{font-size:26rpx;color:#334;}
+.tag-empty-sub{margin-top:8rpx;font-size:22rpx;color:#667;}
+.type-empty{padding:12rpx 0 6rpx;color:#667;}
+.type-empty-text{font-size:22rpx;color:#556;}
+.type-empty-sub{margin-top:6rpx;font-size:20rpx;color:#889;}
 
 .modal{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.35);display:flex;align-items:flex-end;z-index:999;}
 .sheet{width:100%;background:#fff;border-radius:24rpx 24rpx 0 0;padding:24rpx;}

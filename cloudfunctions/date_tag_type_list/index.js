@@ -1,5 +1,5 @@
 const cloud = require('wx-server-sdk')
-const { BizError, now } = require('./_shared')
+const { BizError } = require('./_shared')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
@@ -10,20 +10,6 @@ async function getRel(OPENID) {
     .limit(1)
     .get()
   return (q.data || [])[0] || null
-}
-
-async function ensureDefaultTypes(relationshipId) {
-  const q = await db.collection('date_tag_types').where({ relationshipId }).limit(1).get()
-  if ((q.data || []).length > 0) return
-
-  const ts = now()
-  const names = ['地点', '氛围']
-  for (const name of names) {
-    // eslint-disable-next-line no-await-in-loop
-    await db.collection('date_tag_types').add({
-      data: { relationshipId, name, createdAt: ts, updatedAt: ts }
-    })
-  }
 }
 
 async function ensureCollection(name) {
@@ -40,8 +26,6 @@ exports.main = async () => {
   if (!rel) throw new BizError('还没有建立关系', 'NO_REL')
 
   await ensureCollection('date_tag_types')
-
-  await ensureDefaultTypes(rel._id)
 
   const q = await db.collection('date_tag_types')
     .where({ relationshipId: rel._id })

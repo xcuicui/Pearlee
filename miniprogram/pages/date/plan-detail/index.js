@@ -7,6 +7,7 @@ Page({
     // tags
     tagTypes: [],
     tagsByType: {},
+    hintByTypeName: {},
     editingTags: false,
     editSelectedTagIds: [],
 
@@ -56,7 +57,13 @@ Page({
       if (!tagsByType[tag.typeId]) tagsByType[tag.typeId] = []
       tagsByType[tag.typeId].push(tag)
     }
-    this.setData({ tagTypes, tagsByType })
+
+    const hintByTypeName = {
+      '地点': '比如：深圳 / 广州 / 上海',
+      '氛围': '比如：松弛 / 浪漫 / 热闹'
+    }
+
+    this.setData({ tagTypes, tagsByType, hintByTypeName })
   },
 
   async loadItem() {
@@ -148,5 +155,37 @@ Page({
     wx.showToast({ title: '已新增标签', icon: 'none' })
     this.closeAddTag()
     await this.loadTagTaxonomy()
+  },
+
+  onLongPressTag(e) {
+    const tagId = e.currentTarget.dataset.id
+    const tagName = e.currentTarget.dataset.name
+    if (!tagId) return
+
+    wx.showActionSheet({
+      itemList: ['删除标签'],
+      success: async (res) => {
+        if (!res || res.tapIndex !== 0) return
+        const ok = await new Promise(resolve => {
+          wx.showModal({
+            title: '删除标签',
+            content: `确定删除“${tagName || ''}”吗？`,
+            confirmText: '删除',
+            confirmColor: '#d14343',
+            success: (r) => resolve(!!(r && r.confirm)),
+            fail: () => resolve(false)
+          })
+        })
+        if (!ok) return
+        await this.call('date_tag_delete', { tagId })
+        // remove from current selected list
+        const cur = new Set((this.data.editSelectedTagIds || []).map(x => String(x)))
+        cur.delete(String(tagId))
+        this.setData({ editSelectedTagIds: Array.from(cur) })
+        wx.showToast({ title: '已删除', icon: 'none' })
+        await this.loadTagTaxonomy()
+        await this.loadItem()
+      }
+    })
   }
 })

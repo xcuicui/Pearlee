@@ -14,10 +14,20 @@
       <view class="tag {{selectedTagId===''?'on':''}}" bindtap="onSelectTag" data-id="">全部</view>
       <block wx:for="{{tagTypes}}" wx:for-item="type" wx:key="id">
         <block wx:for="{{tagsByType[type.id]}}" wx:for-item="tag" wx:key="id">
-          <view class="tag {{selectedTagId===tag.id?'on':''}}" data-id="{{tag.id}}" bindtap="onSelectTag">{{tag.name}}</view>
+          <view
+            class="tag {{selectedTagId===tag.id?'on':''}}"
+            data-id="{{tag.id}}"
+            data-name="{{tag.name}}"
+            bindtap="onSelectTag"
+            bindlongpress="onLongPressTag"
+          >{{tag.name}}</view>
         </block>
       </block>
     </scroll-view>
+    <view wx:if="{{!tagTypes.length}}" class="tag-empty">
+      <view class="tag-empty-title">还没有标签类型</view>
+      <view class="tag-empty-sub">你可以先从「地点」「氛围」开始</view>
+    </view>
   </view>
 
   <view class="list">
@@ -44,18 +54,37 @@
       <textarea class="textarea" placeholder="可选：写点备注" value="{{newNotes}}" bindinput="onNewNotes" />
 
       <view class="sheet-sub">选择标签（可选）</view>
-      <block wx:for="{{tagTypes}}" wx:for-item="type" wx:key="id">
+      <view wx:if="{{!tagTypes.length}}" class="tag-empty">
+        <view class="tag-empty-title">还没有标签类型</view>
+        <view class="tag-empty-sub">建议先建「地点」「氛围」这两类</view>
+        <view class="mini" bindtap="openAddType">+ 新增类型</view>
+      </view>
+
+      <block wx:else wx:for="{{tagTypes}}" wx:for-item="type" wx:key="id">
         <view class="type-line">
           <view class="type-name">{{type.name}}</view>
           <view class="mini" data-typeid="{{type.id}}" bindtap="openAddTag">+ 标签</view>
         </view>
-        <view class="chips">
+
+        <view wx:if="{{!(tagsByType[type.id] && tagsByType[type.id].length)}}" class="type-empty">
+          <view class="type-empty-text">还没有「{{type.name}}」标签</view>
+          <view class="type-empty-sub">{{hintByTypeName[type.name] || '比如：写下你们常去/想去的关键词'}} </view>
+        </view>
+
+        <view class="chips" wx:else>
           <block wx:for="{{tagsByType[type.id]}}" wx:for-item="tag" wx:key="id">
-            <view class="chip selectable {{newSelectedTagIds.indexOf(tag.id)>=0?'on':''}}" data-id="{{tag.id}}" bindtap="toggleNewTag">{{tag.name}}</view>
+            <view
+              class="chip selectable {{newSelectedTagIds.indexOf(tag.id)>=0?'on':''}}"
+              data-id="{{tag.id}}"
+              data-name="{{tag.name}}"
+              bindtap="toggleNewTag"
+              bindlongpress="onLongPressTag"
+            >{{tag.name}}</view>
           </block>
         </view>
       </block>
-      <view class="mini" bindtap="openAddType">+ 类型</view>
+
+      <view wx:if="{{tagTypes.length}}" class="mini" bindtap="openAddType">+ 类型</view>
 
       <view class="sheet-actions">
         <view class="btn ghost" bindtap="closeCreate">取消</view>

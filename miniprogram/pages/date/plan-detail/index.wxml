@@ -37,18 +37,38 @@
   <view class="modal" wx:if="{{editingTags}}">
     <view class="sheet">
       <view class="sheet-title">编辑标签</view>
-      <block wx:for="{{tagTypes}}" wx:for-item="type" wx:key="id">
+
+      <view wx:if="{{!tagTypes.length}}" class="tag-empty">
+        <view class="tag-empty-title">还没有标签类型</view>
+        <view class="tag-empty-sub">建议先建「地点」「氛围」这两类</view>
+        <view class="mini" bindtap="openAddType">+ 新增类型</view>
+      </view>
+
+      <block wx:else wx:for="{{tagTypes}}" wx:for-item="type" wx:key="id">
         <view class="type-line">
           <view class="type-name">{{type.name}}</view>
           <view class="mini" data-typeid="{{type.id}}" bindtap="openAddTag">+ 标签</view>
         </view>
-        <view class="chips">
+
+        <view wx:if="{{!(tagsByType[type.id] && tagsByType[type.id].length)}}" class="type-empty">
+          <view class="type-empty-text">还没有「{{type.name}}」标签</view>
+          <view class="type-empty-sub">{{hintByTypeName[type.name] || '比如：写下你们常去/想去的关键词'}}</view>
+        </view>
+
+        <view class="chips" wx:else>
           <block wx:for="{{tagsByType[type.id]}}" wx:for-item="tag" wx:key="id">
-            <view class="chip selectable {{editSelectedTagIds.indexOf(tag.id)>=0?'on':''}}" data-id="{{tag.id}}" catchtap="toggleEditTag">{{tag.name}}</view>
+            <view
+              class="chip selectable {{editSelectedTagIds.indexOf(tag.id)>=0?'on':''}}"
+              data-id="{{tag.id}}"
+              data-name="{{tag.name}}"
+              catchtap="toggleEditTag"
+              bindlongpress="onLongPressTag"
+            >{{tag.name}}</view>
           </block>
         </view>
       </block>
-      <view class="mini" bindtap="openAddType">+ 类型</view>
+
+      <view wx:if="{{tagTypes.length}}" class="mini" bindtap="openAddType">+ 类型</view>
 
       <view class="sheet-actions">
         <view class="btn ghost" bindtap="closeEditTags">取消</view>

@@ -1,5 +1,5 @@
 const cloud = require('wx-server-sdk')
-const { BizError, now } = require('./_shared')
+const { BizError } = require('./_shared')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
@@ -11,38 +11,6 @@ async function getRel(OPENID) {
     .limit(1)
     .get()
   return (q.data || [])[0] || null
-}
-
-async function ensureDefaultTagTaxonomy(relationshipId) {
-  const typeQ = await db.collection('date_tag_types').where({ relationshipId }).limit(1).get()
-  if ((typeQ.data || []).length > 0) return
-
-  const ts = now()
-  const defaults = [
-    { name: '地点', tags: ['室内', '户外'] },
-    { name: '氛围', tags: ['松弛', '浪漫', '热闹'] }
-  ]
-
-  // Create types
-  const createdTypeIds = {}
-  for (const t of defaults) {
-    // eslint-disable-next-line no-await-in-loop
-    const r = await db.collection('date_tag_types').add({
-      data: { relationshipId, name: t.name, createdAt: ts, updatedAt: ts }
-    })
-    createdTypeIds[t.name] = r._id
-  }
-
-  // Create tags
-  for (const t of defaults) {
-    const typeId = createdTypeIds[t.name]
-    for (const name of t.tags) {
-      // eslint-disable-next-line no-await-in-loop
-      await db.collection('date_tags').add({
-        data: { relationshipId, typeId, name, createdAt: ts, updatedAt: ts }
-      })
-    }
-  }
 }
 
 async function ensureCollection(name) {
@@ -61,8 +29,6 @@ exports.main = async (event = {}) => {
   await ensureCollection('date_tag_types')
   await ensureCollection('date_tags')
   await ensureCollection('date_plans')
-
-  await ensureDefaultTagTaxonomy(rel._id)
 
   const status = String(event.status || 'open')
   if (!['open', 'done'].includes(status)) throw new BizError('status 仅支持 open/done', 'INVALID_STATUS')
