@@ -31,11 +31,7 @@ function metaDateText(ymd) {
   return `${p.y}.${pad2(p.mo)}.${pad2(p.d)}`
 }
 
-function dayNumber(ymd) {
-  const p = ymdToParts(ymd)
-  if (!p) return ''
-  return String(p.d)
-}
+// (removed) big day number per design feedback
 
 function extOf(path) {
   const s = String(path || '')
@@ -87,7 +83,6 @@ Page({
     // occur time
     occurDate: '',
     occurTime: '',
-    dayNumber: '',
     metaDateText: '',
     metaWeekText: '',
 
@@ -157,7 +152,6 @@ Page({
   recomputeMeta() {
     const occurDate = this.data.occurDate
     this.setData({
-      dayNumber: dayNumber(occurDate),
       metaDateText: metaDateText(occurDate),
       metaWeekText: weekdayCN(occurDate)
     })

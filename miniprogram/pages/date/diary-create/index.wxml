@@ -7,7 +7,6 @@
 
   <!-- Date emphasis -->
   <view class="date-emphasis">
-    <view class="big-day" aria-hidden="true">{{dayNumber}}</view>
     <view class="date-meta">
       <picker mode="date" value="{{occurDate}}" bindchange="onPickOccurDate">
         <view class="meta-item">{{metaDateText}}</view>

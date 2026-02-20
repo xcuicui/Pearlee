@@ -27,13 +27,6 @@
 ### Requirement: Date emphasis block
 页面 MUST 展示日期强化区（书页感增强，但克制）。
 
-#### Scenario: Big day number
-- **GIVEN** 发生日期为 YYYY-MM-DD
-- **WHEN** 渲染日期强化区
-- **THEN** 展示大号背景数字（DD）
-- **AND** 透明度为 5%~8%
-- **AND** 不抢视觉焦点
-
 #### Scenario: Meta line
 - **WHEN** 渲染日期强化区
 - **THEN** 展示小字：`YYYY.MM.DD · 周X · HH:MM`

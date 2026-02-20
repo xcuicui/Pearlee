@@ -18,7 +18,6 @@
     - H1: 这一天的回忆
     - Secondary: 和 {TaNickname} 的一次约会（best-effort ctx_get）
   - DateEmphasis
-    - BigDayNumber (opacity 0.05~0.08)
     - MetaLine: YYYY.MM.DD · 周X · HH:MM（点击可编辑日期/时间，复用 picker）
   - MediaSection (priority)
     - if images.length==0: light button “+ 加一张那天的照片”
@@ -40,13 +39,9 @@
 - Use light containers with subtle borders; avoid heavy dividers.
 - Secondary text uses existing palette: rgba(38,35,31,0.45~0.6).
 
-## Big day number implementation
-- Derive day-of-month from selected occurDate (YYYY-MM-DD).
-- Render as absolutely positioned large text behind the date emphasis block.
-- Style:
-  - font-size: 140~180rpx
-  - opacity: 0.05~0.08
-  - color: inherit (primary tint), but very low opacity
+## Date emphasis implementation
+- Keep a single meta line (YYYY.MM.DD · 周X · HH:MM).
+- Meta items are tappable to edit date/time via pickers, but should not look like form inputs.
 
 ## Floating CTA implementation
 - Keep existing submit logic, only rename copy.
