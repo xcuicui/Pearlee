@@ -19,7 +19,7 @@
 #### Scenario: Create success
 - **GIVEN** 用户输入标题并选择若干 tags
 - **WHEN** 用户提交创建
-- **THEN** 页面调用 `date_plan_create({ title, notes?, tags? })`
+- **THEN** 页面调用 `date_plan_create({ title, notes?, tagIds? })`
 - **AND** 成功后清单列表刷新，新的清单项出现在 open 列表
 
 ### Requirement: Tag filter in list
@@ -48,3 +48,27 @@
 - **WHEN** 用户新增一个 tag 类型
 - **THEN** 页面调用 `date_tag_type_create({ name })`
 - **AND** 新类型出现在 tag 分类中
+
+### Requirement: Tag empty-state prompts
+当没有任何 tag 类型或某个类型下没有任何 tag 时，页面 MUST 给出明确提示与轻量示例，引导用户创建。
+
+#### Scenario: No tag types
+- **GIVEN** `date_tag_type_list()` 返回 items 为空
+- **WHEN** 页面渲染标签选择/筛选区域
+- **THEN** 展示提示：`还没有标签类型`
+- **AND** 展示轻量示例：`你可以先从「地点」「氛围」开始`（示例，不要求完全一致）
+
+#### Scenario: Tag type has no tags
+- **GIVEN** 存在某个 tag 类型（例如“地点”）但 `date_tag_list({ typeId })` 返回为空
+- **WHEN** 页面渲染该类型下的 tag 列表
+- **THEN** 展示提示：`还没有「地点」标签`
+- **AND** 展示示例：`比如：深圳 / 广州 / 上海`（根据类型不同可变化）
+
+### Requirement: Tag deletion
+页面 MUST 支持删除 tag（用于清理不再需要的标签），并在删除后更新可选项与筛选项。
+
+#### Scenario: Delete a tag
+- **GIVEN** 某 tag 存在且属于当前关系
+- **WHEN** 用户在 tag 管理入口触发删除
+- **THEN** 页面调用 `date_tag_delete({ tagId })`
+- **AND** 删除成功后该 tag 不再出现在选择列表与筛选列表

@@ -8,10 +8,12 @@
 ## What Changes
 - 新增「约会清单」能力：支持创建/浏览/完成约会清单项（open / done）。
 - 清单项支持 tags：
-  - 默认 tag 类型包含：地点（室内、户外）、氛围（松弛、浪漫、热闹）
+  - 默认 tag 类型包含：地点、氛围
   - 支持新增 tag
   - 支持新增 tag 类型
+  - 支持删除 tag
   - 列表页支持按 tag 筛选展示
+  - 当缺少 tag 类型或某类型下缺少 tags 时，提供明确空态提示与示例（降低创建门槛）
 - 新增清单项详情页：展示清单项信息，并展示其关联的「约会日记」列表入口位（记录功能在另一个 change 实现）。
 
 ## Impact
@@ -21,10 +23,12 @@
   - fn-date_plan_list
   - fn-date_plan_create
   - fn-date_plan_done
+  - fn-date_plan_update
   - fn-date_tag_type_list
   - fn-date_tag_type_create
   - fn-date_tag_list
   - fn-date_tag_create
+  - fn-date_tag_delete
 - Affected code (expected):
   - miniprogram/pages/date/**
   - cloudfunctions/date_plan_* / date_tag_*（或合并模块）
