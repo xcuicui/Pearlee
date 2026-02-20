@@ -1,9 +1,14 @@
 .page{padding:16rpx 24rpx 140rpx;}
 .section{margin-bottom:22rpx;}
 .h{font-size:28rpx;color:#334;margin-bottom:12rpx;}
-.plan-row{white-space:nowrap;}
-.plan-chip{display:inline-block;padding:10rpx 18rpx;margin-right:12rpx;border-radius:999rpx;background:#f3f4f6;color:#445;font-size:26rpx;max-width:420rpx;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.plan-chip.on{background:#5F7D95;color:#fff;}
+.plan-box{background:rgba(255,255,255,.35);border-radius:18rpx;padding:14rpx 14rpx;}
+.plan-list{display:flex;flex-direction:column;gap:12rpx;}
+.plan-item{display:flex;align-items:center;justify-content:space-between;padding:14rpx 14rpx;border-radius:16rpx;background:rgba(255,255,255,.55);border:2rpx solid rgba(0,0,0,.04);}
+.plan-item.temp{background:rgba(245,247,251,.75);}
+.plan-item.on{border-color:rgba(95,125,149,.38);background:rgba(95,125,149,.10);}
+.plan-title{font-size:28rpx;color:#223;max-width:520rpx;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.plan-mark{font-size:24rpx;color:rgba(38,35,31,.45);}
+.plan-item.on .plan-mark{color:rgba(31,59,82,.85);}
 .plan-hint{margin-top:10rpx;color:#889;font-size:26rpx;}
 
 .time-row{display:flex;gap:14rpx;}

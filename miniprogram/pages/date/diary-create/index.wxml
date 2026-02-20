@@ -3,13 +3,22 @@
     <view class="h">关联清单</view>
 
     <view class="plan-box">
-      <scroll-view scroll-x class="plan-row">
-        <block wx:for="{{plans}}" wx:key="id">
-          <view class="plan-chip {{planId===item.id && !useTemporary?'on':''}}" data-id="{{item.id}}" bindtap="onPickPlan">{{item.title}}</view>
+      <view class="plan-list">
+        <block wx:for="{{plans}}" wx:for-item="p" wx:key="id">
+          <view class="plan-item {{planId===p.id && !useTemporary?'on':''}}" data-id="{{p.id}}" bindtap="onPickPlan">
+            <view class="plan-title">{{p.title}}</view>
+            <view class="plan-mark">{{planId===p.id && !useTemporary ? '已选' : ''}}</view>
+          </view>
         </block>
-        <view class="plan-chip {{useTemporary?'on':''}}" bindtap="onUseTemporary">临时约会</view>
-      </scroll-view>
-      <view class="plan-hint" wx:if="{{!useTemporary && !planId}}">先选一个清单项</view>
+
+        <view class="plan-item temp {{useTemporary?'on':''}}" bindtap="onUseTemporary">
+          <view class="plan-title">临时约会</view>
+          <view class="plan-mark">{{useTemporary ? '已选' : ''}}</view>
+        </view>
+      </view>
+
+      <view class="plan-hint" wx:if="{{!useTemporary && !planId}}">先从清单里选一个（也可以用“临时约会”）</view>
+      <view class="plan-hint" wx:if="{{plans.length===0}}">清单里还没有条目。先去约会清单加一条吧。</view>
     </view>
   </view>
 
