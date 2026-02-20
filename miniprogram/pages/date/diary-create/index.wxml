@@ -1,23 +1,73 @@
 <view class="page">
-  <view class="section">
-    <view class="h">关联清单</view>
-
-    <view class="plan-selector" bindtap="openPlanPicker" hover-class="tap-down" hover-stay-time="60">
-      <view class="sel-left">
-        <view class="sel-title" wx:if="{{useTemporary}}">临时约会</view>
-        <view class="sel-title" wx:elif="{{planTitle}}">{{planTitle}}</view>
-        <view class="sel-title placeholder" wx:else>选一条清单</view>
-        <view class="sel-sub" wx:if="{{useTemporary}}">先把这一篇收好就行</view>
-        <view class="sel-sub" wx:elif="{{planTitle}}">这篇会归在这条清单里</view>
-        <view class="sel-sub" wx:else>也可以选「临时约会」</view>
-      </view>
-      <view class="sel-right">›</view>
-    </view>
-
-    <view class="plan-hint" wx:if="{{plans.length===0}}">清单里还空着，先去加一条想做的约会。</view>
+  <!-- Header -->
+  <view class="header">
+    <view class="h1">这一天的回忆</view>
+    <view class="h2">和 {{taNickname}} 的一次约会</view>
   </view>
 
-  <!-- plan picker sheet -->
+  <!-- Date emphasis -->
+  <view class="date-emphasis">
+    <view class="big-day" aria-hidden="true">{{dayNumber}}</view>
+    <view class="date-meta">
+      <picker mode="date" value="{{occurDate}}" bindchange="onPickOccurDate">
+        <view class="meta-item">{{metaDateText}}</view>
+      </picker>
+      <view class="dot">·</view>
+      <view class="meta-item">{{metaWeekText}}</view>
+      <view class="dot">·</view>
+      <picker mode="time" value="{{occurTime}}" bindchange="onPickOccurTime">
+        <view class="meta-item">{{occurTime}}</view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- Media section (priority) -->
+  <view class="media">
+    <view wx:if="{{!images || images.length===0}}" class="add-photo" bindtap="chooseImages" hover-class="tap-down" hover-stay-time="60">+ 加一张那天的照片</view>
+
+    <view wx:elif="{{images.length===1}}" class="single">
+      <image class="single-img" src="{{images[0].path}}" mode="aspectFill" bindtap="previewImage" data-idx="0" lazy-load="true" />
+      <view class="single-actions">
+        <view class="mini" bindtap="chooseImages">再加一张</view>
+        <view class="mini danger" bindtap="removeImage" data-idx="0">移除</view>
+      </view>
+    </view>
+
+    <view wx:else class="grid">
+      <view class="grid-row">
+        <block wx:for="{{images}}" wx:key="path">
+          <view class="grid-item" bindtap="previewImage" data-idx="{{index}}">
+            <image class="grid-img" src="{{item.path}}" mode="aspectFill" lazy-load="true" />
+            <view class="grid-rm" catchtap="removeImage" data-idx="{{index}}">移除</view>
+          </view>
+        </block>
+        <view class="grid-add" wx:if="{{images.length<3}}" bindtap="chooseImages">+ 添一张</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Text section -->
+  <view class="paper">
+    <textarea
+      class="textarea"
+      placeholder="那天发生了什么？"
+      value="{{text}}"
+      bindinput="onText"
+    />
+  </view>
+
+  <!-- Association (downgraded) -->
+  <view class="assoc" bindtap="openPlanPicker" hover-class="tap-down" hover-stay-time="60">
+    <view class="assoc-left">
+      <view class="assoc-title">关联到某个清单</view>
+      <view class="assoc-sub" wx:if="{{useTemporary}}">临时约会</view>
+      <view class="assoc-sub" wx:elif="{{planTitle}}">{{planTitle}}</view>
+      <view class="assoc-sub muted" wx:else>未关联</view>
+    </view>
+    <view class="assoc-right">›</view>
+  </view>
+
+  <!-- plan picker sheet (reuse existing logic) -->
   <view class="modal" wx:if="{{showPlanPicker}}" catchtap="closePlanPicker">
     <view class="sheet" catchtap="noop">
       <view class="sheet-head">
@@ -44,33 +94,8 @@
     </view>
   </view>
 
-  <view class="section">
-    <view class="h">约会时间</view>
-    <view class="time-row">
-      <picker mode="date" value="{{occurDate}}" bindchange="onPickOccurDate">
-        <view class="pick">{{occurDate}}</view>
-      </picker>
-      <picker mode="time" value="{{occurTime}}" bindchange="onPickOccurTime">
-        <view class="pick">{{occurTime}}</view>
-      </picker>
-    </view>
-  </view>
-
-  <view class="section">
-    <textarea class="textarea" placeholder="把这次约会，收进这里。" value="{{text}}" bindinput="onText" />
-
-    <view class="imgs">
-      <view class="img-add" bindtap="chooseImages">+ 添一张照片</view>
-      <block wx:for="{{images}}" wx:key="path">
-        <view class="img" bindtap="previewImage" data-idx="{{index}}">
-          <image src="{{item.path}}" mode="aspectFill" />
-          <view class="rm" bindtap="removeImage" data-idx="{{index}}">移除</view>
-        </view>
-      </block>
-    </view>
-  </view>
-
-  <view class="bottom">
-    <view class="btn {{canSubmit?'on':''}}" bindtap="onSubmit">收好</view>
+  <!-- Floating CTA -->
+  <view class="cta">
+    <view class="cta-btn {{canSubmit?'on':''}}" bindtap="onSubmit">把这一天留下</view>
   </view>
 </view>

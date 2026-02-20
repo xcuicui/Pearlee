@@ -10,6 +10,33 @@ function formatTimeHm(d) {
   return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`
 }
 
+function ymdToParts(ymd) {
+  const m = String(ymd || '').trim().match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (!m) return null
+  return { y: Number(m[1]), mo: Number(m[2]), d: Number(m[3]) }
+}
+
+function weekdayCN(ymd) {
+  const p = ymdToParts(ymd)
+  if (!p) return ''
+  const d = new Date(p.y, p.mo - 1, p.d)
+  if (Number.isNaN(d.getTime())) return ''
+  const labels = ['日', '一', '二', '三', '四', '五', '六']
+  return `周${labels[d.getDay()]}`
+}
+
+function metaDateText(ymd) {
+  const p = ymdToParts(ymd)
+  if (!p) return ''
+  return `${p.y}.${pad2(p.mo)}.${pad2(p.d)}`
+}
+
+function dayNumber(ymd) {
+  const p = ymdToParts(ymd)
+  if (!p) return ''
+  return String(p.d)
+}
+
 function extOf(path) {
   const s = String(path || '')
   const m = s.match(/(\.[a-zA-Z0-9]+)(?:\?|$)/)
@@ -47,6 +74,9 @@ function compressImageBestEffort(filePath, width) {
 
 Page({
   data: {
+    // naming
+    taNickname: '对方',
+
     // plan association
     plans: [],
     planId: '',
@@ -57,6 +87,9 @@ Page({
     // occur time
     occurDate: '',
     occurTime: '',
+    dayNumber: '',
+    metaDateText: '',
+    metaWeekText: '',
 
     // content
     text: '',
@@ -68,11 +101,23 @@ Page({
 
   onLoad(query) {
     const now = new Date()
-    this.setData({
-      occurDate: formatDateYmd(now),
-      occurTime: formatTimeHm(now),
-      planId: query.planId ? String(query.planId) : ''
-    })
+    const occurDate = formatDateYmd(now)
+    const occurTime = formatTimeHm(now)
+    const planId = query.planId ? String(query.planId) : ''
+
+    this.setData({ occurDate, occurTime, planId })
+    this.recomputeMeta()
+    this.recompute()
+
+    // best-effort partner nickname
+    wx.cloud.callFunction({ name: 'ctx_get', data: {} })
+      .then((res) => {
+        const ctx = res && res.result ? res.result : null
+        const rel = ctx && ctx.relationship ? ctx.relationship : null
+        const nickname = rel && rel.partner ? String(rel.partner.nickname || '').trim() : ''
+        if (nickname) this.setData({ taNickname: nickname })
+      })
+      .catch(() => {})
   },
 
   onShow() {
@@ -105,9 +150,17 @@ Page({
       else planId = ''
     }
 
-    // If user didn't preselect plan, do not auto-pick; keep it explicit.
-    this.setData({ plans, planId, planTitle })
+    this.setData({ plans, planId, planTitle, useTemporary })
     this.recompute()
+  },
+
+  recomputeMeta() {
+    const occurDate = this.data.occurDate
+    this.setData({
+      dayNumber: dayNumber(occurDate),
+      metaDateText: metaDateText(occurDate),
+      metaWeekText: weekdayCN(occurDate)
+    })
   },
 
   recompute() {
@@ -148,6 +201,7 @@ Page({
 
   onPickOccurDate(e) {
     this.setData({ occurDate: e.detail.value })
+    this.recomputeMeta()
   },
 
   onPickOccurTime(e) {
@@ -222,7 +276,7 @@ Page({
 
     const occurAt = this.occurAtTs()
     if (!occurAt) {
-      wx.showToast({ title: '选择一个约会时间', icon: 'none' })
+      wx.showToast({ title: '选一个时间', icon: 'none' })
       return
     }
 
@@ -234,7 +288,7 @@ Page({
       const images = await this.uploadSelectedImages()
       await this.call('date_diary_create', { planId, occurAt, text, images })
       wx.hideLoading()
-      wx.showToast({ title: '收好了', icon: 'none' })
+      wx.showToast({ title: '把这一天留下了', icon: 'none' })
       wx.navigateBack({ delta: 1 })
     } catch (e) {
       wx.hideLoading()
