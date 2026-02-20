@@ -6,23 +6,23 @@
       <view class="sel-left">
         <view class="sel-title" wx:if="{{useTemporary}}">临时约会</view>
         <view class="sel-title" wx:elif="{{planTitle}}">{{planTitle}}</view>
-        <view class="sel-title placeholder" wx:else>请选择</view>
-        <view class="sel-sub" wx:if="{{useTemporary}}">不进清单，只收一篇日记</view>
-        <view class="sel-sub" wx:elif="{{planTitle}}">已关联到这条清单项</view>
-        <view class="sel-sub" wx:else>从清单里选一条（或用临时约会）</view>
+        <view class="sel-title placeholder" wx:else>选一条清单</view>
+        <view class="sel-sub" wx:if="{{useTemporary}}">先把这一篇收好就行</view>
+        <view class="sel-sub" wx:elif="{{planTitle}}">这篇会归在这条清单里</view>
+        <view class="sel-sub" wx:else>也可以选「临时约会」</view>
       </view>
       <view class="sel-right">›</view>
     </view>
 
-    <view class="plan-hint" wx:if="{{plans.length===0}}">清单里还没有条目。先去约会清单加一条吧。</view>
+    <view class="plan-hint" wx:if="{{plans.length===0}}">清单里还空着，先去加一条想做的约会。</view>
   </view>
 
   <!-- plan picker sheet -->
   <view class="modal" wx:if="{{showPlanPicker}}" catchtap="closePlanPicker">
     <view class="sheet" catchtap="noop">
       <view class="sheet-head">
-        <view class="sheet-title">选择清单项</view>
-        <view class="sheet-close" bindtap="closePlanPicker">关闭</view>
+        <view class="sheet-title">选一条清单</view>
+        <view class="sheet-close" bindtap="closePlanPicker">收起</view>
       </view>
 
       <scroll-view scroll-y class="sheet-list">
@@ -37,7 +37,7 @@
 
         <view class="sheet-item temp {{useTemporary?'on':''}}" bindtap="onUseTemporary">
           <view class="sheet-item-title">临时约会</view>
-          <view class="sheet-item-desc">不进清单，只收一篇日记</view>
+          <view class="sheet-item-desc">不放进清单，也可以收好这一篇</view>
           <view class="sheet-item-mark">{{useTemporary ? '已选' : ''}}</view>
         </view>
       </scroll-view>
