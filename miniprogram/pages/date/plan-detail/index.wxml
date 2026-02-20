@@ -23,8 +23,9 @@
 
       <view class="row" style="margin-top:18rpx;">
         <view class="sub">约会日记</view>
-        <view class="hint">（后续接入）</view>
+        <view class="link" bindtap="goDiaryCreate">写一篇</view>
       </view>
+      <view class="hint" style="margin-top:8rpx;">把这次约会，收进这里。</view>
 
       <view class="actions">
         <view class="btn {{item.status==='done'?'ghost':'primary'}}" bindtap="toggleDone">{{item.status==='done'?'取消完成':'标记已完成'}}</view>

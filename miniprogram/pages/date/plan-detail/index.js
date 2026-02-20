@@ -85,6 +85,11 @@ Page({
     await this.loadItem()
   },
 
+  goDiaryCreate() {
+    if (!this.data.id) return
+    wx.navigateTo({ url: `/pages/date/diary-create/index?planId=${encodeURIComponent(this.data.id)}` })
+  },
+
   // ----- edit tags -----
   openEditTags() {
     const ids = (this.data.item && this.data.item.tagIds) ? this.data.item.tagIds : []
