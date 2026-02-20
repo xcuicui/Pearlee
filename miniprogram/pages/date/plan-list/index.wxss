@@ -20,7 +20,8 @@
 .chips{margin-top:12rpx;display:flex;flex-wrap:wrap;gap:10rpx;}
 .chip{padding:6rpx 14rpx;border-radius:999rpx;background:#eef2f7;color:#456;font-size:24rpx;border:2rpx solid rgba(0,0,0,0);}
 .chip.selectable{background:#f3f4f6;color:#445;}
-.chip.selectable.on{box-shadow:0 0 0 2rpx rgba(95,125,149,.22) inset;}
+.chip.selectable.on{box-shadow:0 0 0 2rpx rgba(38,35,31,.18) inset, 0 10rpx 22rpx rgba(0,0,0,.06);}
+.check{margin-right:8rpx;font-size:22rpx;color:rgba(38,35,31,.62);}
 .empty{padding:60rpx 0;color:#889;text-align:center;}
 .tag-empty{padding:18rpx 0;color:#667;}
 .tag-empty-title{font-size:26rpx;color:#334;}

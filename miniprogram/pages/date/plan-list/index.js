@@ -15,6 +15,7 @@ Page({
     newTitle: '',
     newNotes: '',
     newSelectedTagIds: [],
+    newSelectedTagMap: {},
 
     // manage taxonomy
     showAddType: false,
@@ -110,7 +111,7 @@ Page({
 
   // ----- create plan -----
   openCreate() {
-    this.setData({ showCreate: true, newTitle: '', newNotes: '', newSelectedTagIds: [] })
+    this.setData({ showCreate: true, newTitle: '', newNotes: '', newSelectedTagIds: [], newSelectedTagMap: {} })
   },
   closeCreate() {
     this.setData({ showCreate: false })
@@ -122,11 +123,17 @@ Page({
     this.setData({ newNotes: e.detail.value })
   },
   toggleNewTag(e) {
-    const id = e.currentTarget.dataset.id
-    const cur = new Set(this.data.newSelectedTagIds)
+    const id = String(e && e.currentTarget && e.currentTarget.dataset ? (e.currentTarget.dataset.id || '') : '').trim()
+    if (!id) return
+    const cur = new Set((this.data.newSelectedTagIds || []).map(x => String(x)))
     if (cur.has(id)) cur.delete(id)
     else cur.add(id)
-    this.setData({ newSelectedTagIds: Array.from(cur) })
+
+    const list = Array.from(cur)
+    const map = Object.create(null)
+    for (const x of list) map[x] = true
+
+    this.setData({ newSelectedTagIds: list, newSelectedTagMap: map })
   },
   async submitCreate() {
     const title = (this.data.newTitle || '').trim()
