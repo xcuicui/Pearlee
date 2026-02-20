@@ -2,23 +2,45 @@
   <view class="section">
     <view class="h">关联清单</view>
 
-    <view class="plan-box">
-      <view class="plan-list">
+    <view class="plan-selector" bindtap="openPlanPicker" hover-class="tap-down" hover-stay-time="60">
+      <view class="sel-left">
+        <view class="sel-title" wx:if="{{useTemporary}}">临时约会</view>
+        <view class="sel-title" wx:elif="{{planTitle}}">{{planTitle}}</view>
+        <view class="sel-title placeholder" wx:else>请选择</view>
+        <view class="sel-sub" wx:if="{{useTemporary}}">不进清单，只收一篇日记</view>
+        <view class="sel-sub" wx:elif="{{planTitle}}">已关联到这条清单项</view>
+        <view class="sel-sub" wx:else>从清单里选一条（或用临时约会）</view>
+      </view>
+      <view class="sel-right">›</view>
+    </view>
+
+    <view class="plan-hint" wx:if="{{plans.length===0}}">清单里还没有条目。先去约会清单加一条吧。</view>
+  </view>
+
+  <!-- plan picker sheet -->
+  <view class="modal" wx:if="{{showPlanPicker}}" catchtap="closePlanPicker">
+    <view class="sheet" catchtap="noop">
+      <view class="sheet-head">
+        <view class="sheet-title">选择清单项</view>
+        <view class="sheet-close" bindtap="closePlanPicker">关闭</view>
+      </view>
+
+      <scroll-view scroll-y class="sheet-list">
         <block wx:for="{{plans}}" wx:for-item="p" wx:key="id">
-          <view class="plan-item {{planId===p.id && !useTemporary?'on':''}}" data-id="{{p.id}}" bindtap="onPickPlan">
-            <view class="plan-title">{{p.title}}</view>
-            <view class="plan-mark">{{planId===p.id && !useTemporary ? '已选' : ''}}</view>
+          <view class="sheet-item {{planId===p.id && !useTemporary?'on':''}}" data-id="{{p.id}}" bindtap="onPickPlan">
+            <view class="sheet-item-title">{{p.title}}</view>
+            <view class="sheet-item-mark">{{planId===p.id && !useTemporary ? '已选' : ''}}</view>
           </view>
         </block>
 
-        <view class="plan-item temp {{useTemporary?'on':''}}" bindtap="onUseTemporary">
-          <view class="plan-title">临时约会</view>
-          <view class="plan-mark">{{useTemporary ? '已选' : ''}}</view>
-        </view>
-      </view>
+        <view class="sheet-divider"></view>
 
-      <view class="plan-hint" wx:if="{{!useTemporary && !planId}}">先从清单里选一个（也可以用“临时约会”）</view>
-      <view class="plan-hint" wx:if="{{plans.length===0}}">清单里还没有条目。先去约会清单加一条吧。</view>
+        <view class="sheet-item temp {{useTemporary?'on':''}}" bindtap="onUseTemporary">
+          <view class="sheet-item-title">临时约会</view>
+          <view class="sheet-item-desc">不进清单，只收一篇日记</view>
+          <view class="sheet-item-mark">{{useTemporary ? '已选' : ''}}</view>
+        </view>
+      </scroll-view>
     </view>
   </view>
 

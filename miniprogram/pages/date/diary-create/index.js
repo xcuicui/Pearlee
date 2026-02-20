@@ -52,6 +52,7 @@ Page({
     planId: '',
     planTitle: '',
     useTemporary: false,
+    showPlanPicker: false,
 
     // occur time
     occurDate: '',
@@ -62,6 +63,8 @@ Page({
     images: [],
     canSubmit: false
   },
+
+  noop() {},
 
   onLoad(query) {
     const now = new Date()
@@ -102,12 +105,7 @@ Page({
       else planId = ''
     }
 
-    // If user didn't preselect plan, default to first open plan and require association.
-    if (!planId && !useTemporary && plans.length > 0) {
-      planId = plans[0].id
-      planTitle = plans[0].title
-    }
-
+    // If user didn't preselect plan, do not auto-pick; keep it explicit.
     this.setData({ plans, planId, planTitle })
     this.recompute()
   },
@@ -128,15 +126,23 @@ Page({
     this.recompute()
   },
 
+  openPlanPicker() {
+    this.setData({ showPlanPicker: true })
+  },
+
+  closePlanPicker() {
+    this.setData({ showPlanPicker: false })
+  },
+
   onPickPlan(e) {
     const planId = e.currentTarget.dataset.id
     const plan = (this.data.plans || []).find(p => p.id === planId)
-    this.setData({ planId, planTitle: plan ? plan.title : '', useTemporary: false })
+    this.setData({ planId, planTitle: plan ? plan.title : '', useTemporary: false, showPlanPicker: false })
     this.recompute()
   },
 
   onUseTemporary() {
-    this.setData({ useTemporary: true, planId: '', planTitle: '' })
+    this.setData({ useTemporary: true, planId: '', planTitle: '', showPlanPicker: false })
     this.recompute()
   },
 
