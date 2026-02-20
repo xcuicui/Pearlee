@@ -72,3 +72,12 @@
 - **WHEN** 用户在 tag 管理入口触发删除
 - **THEN** 页面调用 `date_tag_delete({ tagId })`
 - **AND** 删除成功后该 tag 不再出现在选择列表与筛选列表
+
+### Requirement: Tag type deletion
+页面 MUST 支持删除 tag 类型，并连同该类型下 tags 一并处理（级联删除）。
+
+#### Scenario: Delete a tag type
+- **GIVEN** 某 tag 类型存在且属于当前关系
+- **WHEN** 用户在 tag 类型管理入口触发删除
+- **THEN** 页面调用 `date_tag_type_delete({ typeId })`
+- **AND** 删除成功后该类型与其 tags 不再出现在选择与筛选中
