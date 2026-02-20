@@ -21,6 +21,10 @@
         <view class="week-arrow" bindtap="tapNextWeek" hover-class="tap-down" hover-stay-time="60">›</view>
       </view>
     </view>
+    <view class="checkin-tip-row">
+      <view class="checkin-tip-text">{{checkinTipText}}</view>
+      <view class="checkin-tip-link" bindtap="goPointsHelp" hover-class="tap-down" hover-stay-time="60">{{pointsHelpLinkText}}</view>
+    </view>
 
     <swiper
       class="week-swiper"
@@ -33,9 +37,13 @@
     >
       <swiper-item wx:for="{{weekPages}}" wx:for-index="idx" wx:key="idx">
         <view class="week-bar">
+          <view class="mood-overlay" aria-hidden="true">
+            <view wx:for="{{item.moodLines}}" wx:key="key" class="mood-line" style="{{item.style}}"></view>
+            <view wx:for="{{item.moodDots}}" wx:key="key" class="mood-dot" style="{{item.style}}"></view>
+          </view>
           <view
             class="week-day"
-            wx:for="{{item}}"
+            wx:for="{{item.days}}"
             wx:key="date"
             data-key="{{item.date}}"
             bindtap="onPickDay"
@@ -43,10 +51,6 @@
             <view class="week-chip {{item.isToday ? 'today' : ''}}">
               <view class="week-name">{{item.weekLabel}}</view>
               <view class="week-num">{{item.dayLabel}}</view>
-              <view class="dot-row {{item.hasRecord ? 'active' : ''}} {{item.hasRecord && item.recordLevel === 2 ? 'lv2' : ''}}">
-                <view class="dot"></view>
-                <view wx:if="{{item.hasRecord && item.recordLevel === 2}}" class="dot ghost"></view>
-              </view>
             </view>
           </view>
         </view>
@@ -75,6 +79,7 @@
       <swiper-item wx:for="{{cards}}" wx:key="id">
         <view class="emotion card emotion-item" bindtap="openEmotion" hover-class="tap-down" hover-stay-time="80">
           <view class="emotion-time">{{item.timeText}}</view>
+          <view wx:if="{{item.moodText}}" class="emotion-mood">{{item.moodText}}</view>
 
           <view wx:if="{{item.images && item.images.length}}" class="emotion-images" aria-label="emotion images">
             <image

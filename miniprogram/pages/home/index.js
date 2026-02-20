@@ -1,7 +1,13 @@
 const api = require('../../utils/api')
 const rewards = require('../../utils/rewards')
 const { t } = require('../../utils/strings')
+const { POINTS_HELP_PATH, getPointsHelpCopy } = require('../../utils/pointsHelpCopy')
 const { fallbackTa } = require('../../utils/naming')
+const { moodMeta, normalizeMoodLevel } = require('../../utils/mood')
+
+const MOOD_OVERLAY_TOP_PADDING = 16
+const MOOD_OVERLAY_BOTTOM_PADDING = 18
+const MOOD_SUMMARY_LIMIT = 56
 
 function calcDaysSinceStart(startDateYmd) {
   const d = parseYmd(startDateYmd)
@@ -51,24 +57,114 @@ function weekTitle(startYmd) {
   return `${s.getMonth() + 1}.${s.getDate()} - ${e.getMonth() + 1}.${e.getDate()}`
 }
 
-function normalizeWeekDays(week) {
+function moodPointTopPercent(level) {
+  const usableHeight = 100 - MOOD_OVERLAY_TOP_PADDING - MOOD_OVERLAY_BOTTOM_PADDING
+  const ratio = (level - 1) / (4 - 1)
+  return 100 - MOOD_OVERLAY_BOTTOM_PADDING - ratio * usableHeight
+}
+
+function summarizeMoodText(text) {
+  const raw = String(text || '').replace(/\s+/g, ' ').trim()
+  if (!raw) return ''
+  if (raw.length <= MOOD_SUMMARY_LIMIT) return raw
+  return `${raw.slice(0, MOOD_SUMMARY_LIMIT - 1)}…`
+}
+
+function formatMoodDate(dateYmd) {
+  const d = parseYmd(dateYmd)
+  if (!d) return dateYmd || ''
+  return `${d.getMonth() + 1}月${d.getDate()}日`
+}
+
+function buildMoodByDate(mood7d) {
+  const list = Array.isArray(mood7d) ? mood7d : []
+  const out = Object.create(null)
+  for (const item of list) {
+    const date = String((item && item.date) || '').trim()
+    if (!date) continue
+    const moodLevel = normalizeMoodLevel(item && item.mood_level)
+    if (!moodLevel) continue
+    const meta = moodMeta(moodLevel)
+    if (!meta) continue
+    const lastEntry = item && item.lastEntry && typeof item.lastEntry === 'object' ? item.lastEntry : {}
+    out[date] = {
+      date,
+      moodLevel,
+      moodEmoji: meta.emoji,
+      moodLabel: meta.label,
+      moodSummary: summarizeMoodText(lastEntry.contentText),
+      moodDateText: formatMoodDate(date)
+    }
+  }
+  return out
+}
+
+function buildMoodOverlay(days) {
+  const points = []
+  const lines = []
+  const dayList = Array.isArray(days) ? days : []
+
+  for (let i = 0; i < dayList.length; i++) {
+    const day = dayList[i]
+    if (!day || !day.hasMood) continue
+    const x = ((i + 0.5) / 7) * 100
+    const y = Number(day.moodTopPercent || 0)
+    points.push({
+      key: day.date,
+      style: `left:${x.toFixed(4)}%;top:${y.toFixed(4)}%;`
+    })
+  }
+
+  for (let i = 0; i < dayList.length - 1; i++) {
+    const a = dayList[i]
+    const b = dayList[i + 1]
+    if (!a || !b || !a.hasMood || !b.hasMood) continue
+    const x1 = ((i + 0.5) / 7) * 100
+    const x2 = ((i + 1.5) / 7) * 100
+    const y1 = Number(a.moodTopPercent || 0)
+    const y2 = Number(b.moodTopPercent || 0)
+    const dx = x2 - x1
+    const dy = y2 - y1
+    const width = Math.sqrt(dx * dx + dy * dy)
+    const angle = Math.atan2(dy, dx) * (180 / Math.PI)
+    lines.push({
+      key: `${a.date}_${b.date}`,
+      style: `left:${x1.toFixed(4)}%;top:${y1.toFixed(4)}%;width:${width.toFixed(4)}%;transform:rotate(${angle.toFixed(4)}deg);`
+    })
+  }
+
+  return { points, lines }
+}
+
+function normalizeWeekDays(week, moodByDate) {
   const w = week || {}
   const days = Array.isArray(w.days) ? w.days : []
   const levelByDate = w && w.levelByDate && typeof w.levelByDate === 'object' ? w.levelByDate : {}
   const activeDates = Array.isArray(w.activeDates) ? w.activeDates : []
   const todayKey = String(w.todayKey || '')
+  const moodMap = moodByDate && typeof moodByDate === 'object' ? moodByDate : {}
 
   return days.map((date) => {
     const baseLevel = Number(levelByDate[date] || 0)
     const hasRecord = activeDates.includes(date)
     const recordLevel = hasRecord ? Math.max(baseLevel, 1) : baseLevel
+    const mood = moodMap[date]
+    const moodLevel = mood ? normalizeMoodLevel(mood.moodLevel) : 0
+    const hasMood = !!moodLevel
     return {
       date,
       dayLabel: String(date || '').slice(-2),
       weekLabel: weekdayLabel(date),
       hasRecord,
       recordLevel,
-      isToday: date === todayKey
+      isToday: date === todayKey,
+      hasMood,
+      moodLevel,
+      moodEmoji: mood ? mood.moodEmoji : '',
+      moodLabel: mood ? mood.moodLabel : '',
+      moodSummary: mood ? mood.moodSummary : '',
+      moodDateText: mood ? mood.moodDateText : formatMoodDate(date),
+      moodTopPercent: hasMood ? moodPointTopPercent(moodLevel) : 0
     }
   })
 }
@@ -82,9 +178,26 @@ function buildPlaceholderWeekDays(startYmd, todayKey) {
       weekLabel: weekdayLabel(date),
       hasRecord: false,
       recordLevel: 0,
-      isToday: date === todayKey
+      isToday: date === todayKey,
+      hasMood: false,
+      moodLevel: 0,
+      moodEmoji: '',
+      moodLabel: '',
+      moodSummary: '',
+      moodDateText: formatMoodDate(date),
+      moodTopPercent: 0
     }
   })
+}
+
+function makeWeekPage(days) {
+  const list = Array.isArray(days) ? days : []
+  const overlay = buildMoodOverlay(list)
+  return {
+    days: list,
+    moodDots: overlay.points,
+    moodLines: overlay.lines
+  }
 }
 
 function mod3(n) {
@@ -112,6 +225,8 @@ Page({
 
     // rewards
     checkinText: '',
+    checkinTipText: '',
+    pointsHelpLinkText: '',
     checkinDone: false,
     checkinLoading: false,
     assets: { points_balance: 0, ticket_balance: 0, last_checkin_date: '', coupon_counts: { unused: 0, used: 0 } },
@@ -129,13 +244,15 @@ Page({
     weekStart: weekStartOfToday(),
     weekTitle: '',
     weekDays: [],
+    moodByDate: {},
 
     // swiper state (IMPORTANT: we do NOT reset current after swipe)
     swiperCurrent: 1,
-    weekPages: [[], [], []]
+    weekPages: [{ days: [], moodDots: [], moodLines: [] }, { days: [], moodDots: [], moodLines: [] }, { days: [], moodDots: [], moodLines: [] }]
   },
 
   onLoad() {
+    const pointsHelpCopy = getPointsHelpCopy()
     // Ensure week strip renders immediately (placeholder) even before any network requests.
     const weekStart = this.data.weekStart || weekStartOfToday()
     const current = Number(this.data.swiperCurrent || 1)
@@ -146,6 +263,7 @@ Page({
       weekDays,
       weekPages: this._buildPagesForCurrent(current, weekStart)
     })
+    this._loadWeek(weekStart)
 
     // Best-effort hydrate relationship header (nickname/days) without pulling full home_feed.
     api.call('ctx_get')
@@ -167,6 +285,10 @@ Page({
       })
 
     this.applyNamingCopies()
+    this.setData({
+      checkinTipText: pointsHelpCopy.checkinTip,
+      pointsHelpLinkText: pointsHelpCopy.linkText
+    })
     this.loadRewardsBestEffort()
     this.fetchCardFeed()
   },
@@ -225,6 +347,8 @@ Page({
       const x = item && typeof item === 'object' ? item : {}
       const id = String(x.id || x.entryId || '')
       const entryId = String(x.entryId || id)
+      const moodLevel = normalizeMoodLevel(x.mood_level)
+      const mood = moodMeta(moodLevel)
       const images0 = normalizeImages(x.images)
       const coverImage0 = String(x.coverImage || images0[0] || '')
       const images = images0.length ? images0 : (coverImage0 ? [coverImage0] : [])
@@ -235,6 +359,8 @@ Page({
         timeText: String(x.timeText || ''),
         text: String(x.text || ''),
         from: String(x.from || ''),
+        moodLevel,
+        moodText: mood ? `${mood.emoji} ${mood.label}` : '',
         images,
         coverImage: coverImage0
       }
@@ -287,6 +413,10 @@ Page({
       .finally(() => {
         this.setData({ checkinLoading: false })
       })
+  },
+
+  goPointsHelp() {
+    wx.navigateTo({ url: POINTS_HELP_PATH })
   },
 
   async fetchCardFeed() {
@@ -353,14 +483,14 @@ Page({
   },
 
   _buildPagesForCurrent(currentIndex, centerStart) {
-    const pages = [[], [], []]
+    const pages = [null, null, null]
 
     const prevIdx = mod3(currentIndex - 1)
     const nextIdx = mod3(currentIndex + 1)
 
-    pages[currentIndex] = this._getWeekDaysFor(centerStart)
-    pages[prevIdx] = this._getWeekDaysFor(addDaysYmd(centerStart, -7))
-    pages[nextIdx] = this._getWeekDaysFor(addDaysYmd(centerStart, 7))
+    pages[currentIndex] = makeWeekPage(this._getWeekDaysFor(centerStart))
+    pages[prevIdx] = makeWeekPage(this._getWeekDaysFor(addDaysYmd(centerStart, -7)))
+    pages[nextIdx] = makeWeekPage(this._getWeekDaysFor(addDaysYmd(centerStart, 7)))
 
     return pages
   },
@@ -377,7 +507,8 @@ Page({
 
       const week = res.week || {}
       const weekStart = week.start || this.data.weekStart
-      const weekDays = normalizeWeekDays(week)
+      const moodByDate = buildMoodByDate(res.mood7d)
+      const weekDays = normalizeWeekDays(week, moodByDate)
 
       this._setCachedWeek(weekStart, weekDays)
 
@@ -392,6 +523,7 @@ Page({
         streak: res.streak || { current: 0, visible: false },
         emotion: res.emotion || { empty: true },
         today: res.today || { key: this.data.today.key, hasAny: false },
+        moodByDate,
 
         weekStart,
         weekTitle: weekTitle(weekStart),
@@ -421,7 +553,8 @@ Page({
       const week = res && res.week ? res.week : null
       if (!week || !week.start) return
 
-      const weekDays = normalizeWeekDays(week)
+      const moodByDate = buildMoodByDate(res.mood7d)
+      const weekDays = normalizeWeekDays(week, moodByDate)
       this._setCachedWeek(week.start, weekDays)
 
       // best-effort: refresh pages while keeping swiperCurrent unchanged
@@ -520,13 +653,15 @@ Page({
       if (!week || !week.start) return
 
       const start = week.start
-      const weekDays = normalizeWeekDays(week)
+      const moodByDate = buildMoodByDate(res.mood7d)
+      const weekDays = normalizeWeekDays(week, moodByDate)
       this._setCachedWeek(start, weekDays)
 
       if (start !== this.data.weekStart) return
 
       const current = Number(this.data.swiperCurrent || 1)
       this.setData({
+        moodByDate,
         weekTitle: weekTitle(start),
         weekDays,
         weekPages: this._buildPagesForCurrent(current, start)
@@ -543,15 +678,16 @@ Page({
   onPickDay(e) {
     const key = e && e.currentTarget && e.currentTarget.dataset ? String(e.currentTarget.dataset.key || '') : ''
     if (!key) return
-    wx.navigateTo({ url: `/pages/day/detail?date=${key}` })
+    wx.navigateTo({ url: `/pages/murmur/timeline/index?anchorDate=${key}&entry=calendar` })
   },
 
   openEmotion() {
     const active = this.getActiveCard()
     const id = active && active.entryId ? active.entryId : ''
     const date = active && active.date ? active.date : ''
-    if (id && date) {
-      wx.navigateTo({ url: `/pages/day/detail?date=${date}&focus=${id}` })
+    if (date) {
+      const focusQuery = id ? `&focus=${id}` : ''
+      wx.navigateTo({ url: `/pages/murmur/timeline/index?anchorDate=${date}&entry=card${focusQuery}` })
       return
     }
     this.goPublish()

@@ -6,7 +6,9 @@
 .images{margin-top:16rpx;display:flex;gap:12rpx;flex-wrap:wrap}
 .entry-image{width:calc((100% - 24rpx)/3);height:210rpx;border-radius:16rpx;background:rgba(245,247,251,.92)}
 .meta{margin-top:18rpx;display:flex;justify-content:space-between;align-items:center}
+.meta-left{display:flex;align-items:center;gap:12rpx}
 .time{font-size:22rpx;color:rgba(38,35,31,.45)}
+.entry-mood{display:inline-flex;align-items:center;padding:4rpx 12rpx;border-radius:999rpx;font-size:22rpx;line-height:1.4;color:rgba(38,35,31,.62);background:rgba(255,255,255,.35)}
 .like{display:flex;align-items:center;gap:8rpx;font-size:22rpx;color:rgba(38,35,31,.55)}
 .like-icon{color:rgba(231,92,140,.92)}
 .comments{margin-top:18rpx;padding:20rpx 22rpx;border-radius:22rpx;background:rgba(245,247,251,.92)}

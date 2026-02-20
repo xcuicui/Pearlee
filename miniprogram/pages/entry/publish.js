@@ -1,8 +1,10 @@
 const api = require('../../utils/api')
 const rewards = require('../../utils/rewards')
 const { t } = require('../../utils/strings')
+const { POINTS_HELP_PATH, getPointsHelpCopy } = require('../../utils/pointsHelpCopy')
 const { formatMonthDay } = require('../../utils/format')
 const { fallbackMe } = require('../../utils/naming')
+const { moodOptions, normalizeMoodLevel } = require('../../utils/mood')
 
 const MAX_IMAGES = 9
 
@@ -62,17 +64,23 @@ Page({
     error: '',
     showCount: false,
     canSubmit: false,
+    moodLevel: 0,
+    moodOptions: [],
 
     // naming system copies
     titleText: '',
     subtitleText: '',
     hintText: '',
+    publishTipText: '',
+    pointsHelpLinkText: '',
     placeholderText: '',
     addPhotoText: '',
-    submitText: ''
+    submitText: '',
+    moodTitleText: ''
   },
 
   onLoad() {
+    const pointsHelpCopy = getPointsHelpCopy()
     const title = titleForToday()
     wx.setNavigationBarTitle({ title })
 
@@ -81,9 +89,13 @@ Page({
       titleText: title,
       subtitleText: t('COMPOSER_SUBTITLE_BOX', { MyNickname: '我' }),
       hintText: t('COMPOSER_HINT_LINE'),
+      publishTipText: pointsHelpCopy.publishTip,
+      pointsHelpLinkText: pointsHelpCopy.linkText,
       placeholderText: t('COMPOSER_PLACEHOLDER'),
       addPhotoText: t('COMPOSER_ADD_PHOTO'),
-      submitText: t('COMPOSER_SUBMIT')
+      submitText: t('COMPOSER_SUBMIT'),
+      moodTitleText: t('MOOD_TITLE'),
+      moodOptions: moodOptions()
     })
 
     this.recompute()
@@ -118,6 +130,14 @@ Page({
   onText(e) {
     this.setData({ text: e && e.detail ? String(e.detail.value || '') : '' })
     this.recompute()
+  },
+
+  onPickMood(e) {
+    const level = normalizeMoodLevel(
+      e && e.currentTarget && e.currentTarget.dataset ? e.currentTarget.dataset.level : 0
+    )
+    if (!level) return
+    this.setData({ moodLevel: level, error: '' })
   },
 
   chooseImages() {
@@ -179,6 +199,12 @@ Page({
   async onSubmit() {
     if (!this.data.canSubmit) return
 
+    const moodLevel = normalizeMoodLevel(this.data.moodLevel)
+    if (!moodLevel) {
+      wx.showToast({ title: t('MOOD_PUBLISH_REQUIRED_TOAST'), icon: 'none' })
+      return
+    }
+
     const text = String(this.data.text || '').trim()
     const content_len = text.length
     const image_count = Array.isArray(this.data.images) ? this.data.images.length : 0
@@ -199,7 +225,7 @@ Page({
     try {
       wx.showLoading({ title: '发布中' })
       const images = await this.uploadSelectedImages()
-      const created = await api.call('entry_create', { text, images })
+      const created = await api.call('entry_create', { text, images, mood_level: moodLevel })
 
       // Best-effort: earn shells after publish; never block success flow.
       const entryId = created && created.id ? String(created.id) : ''
@@ -227,5 +253,9 @@ Page({
       wx.hideLoading()
       this.setData({ error: e.message || '发布失败' })
     }
+  },
+
+  goPointsHelp() {
+    wx.navigateTo({ url: POINTS_HELP_PATH })
   }
 })

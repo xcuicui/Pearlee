@@ -19,7 +19,10 @@
       />
     </view>
     <view class="meta">
-      <view class="time">{{item.timeText}}</view>
+      <view class="meta-left">
+        <view class="time">{{item.timeText}}</view>
+        <view wx:if="{{item.moodText}}" class="entry-mood">{{item.moodText}}</view>
+      </view>
       <view class="actions">
         <view class="like" bindtap="toggleLike" data-id="{{item.id}}" hover-class="tap-down" hover-stay-time="60">
           <text class="like-icon">♥</text>

@@ -9,6 +9,12 @@ function dayKey(ts) {
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 
+function normalizeMoodLevel(v) {
+  const n = Number(v)
+  if (!Number.isInteger(n) || n < 1 || n > 4) return 0
+  return n
+}
+
 function formatTime(ts) {
   const d = new Date(ts)
   if (Number.isNaN(d.getTime())) return ''
@@ -85,6 +91,7 @@ function toCardBase(entry, myOpenid) {
     timeText: formatTime(entry && entry.createdAt),
     text: (entry && entry.contentText) || '',
     from: isSelf ? '你' : '对方',
+    mood_level: normalizeMoodLevel(entry && entry.mood_level) || undefined,
     images: [],
     coverImage: ''
   }

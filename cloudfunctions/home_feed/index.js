@@ -51,6 +51,43 @@ function dayRange(dateYmd) {
   }
 }
 
+function normalizeMoodLevel(v) {
+  const n = Number(v)
+  if (!Number.isInteger(n) || n < 1 || n > 4) return 0
+  return n
+}
+
+function listRecent7DatesAsc() {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const out = []
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today.getTime())
+    d.setDate(today.getDate() - i)
+    out.push(ymdDate(d))
+  }
+  return out
+}
+
+function normalizeMoodImages(images) {
+  const src = Array.isArray(images) ? images : []
+  return src
+    .map((x) => {
+      if (!x) return null
+      if (typeof x === 'string') {
+        const s = String(x).trim()
+        return s || null
+      }
+      if (typeof x === 'object') {
+        const s = String(x.url || x.fileID || x.fileId || '').trim()
+        return s || null
+      }
+      return null
+    })
+    .filter(Boolean)
+    .slice(0, 9)
+}
+
 async function getRel(OPENID) {
   const q = await db.collection('relationships').where({ memberOpenids: OPENID, archived: false }).limit(1).get()
   return (q.data || [])[0] || null
@@ -85,6 +122,47 @@ async function listEntriesByCreatedAt(relId, startTs, endTs, limit = 1000) {
     .limit(limit)
     .get()
   return q.data || []
+}
+
+async function buildMood7d(relId) {
+  const dates = listRecent7DatesAsc()
+  const start = parseYmd(dates[0])
+  const end = parseYmd(addDaysYmd(dates[6], 1))
+  const startTs = start ? start.getTime() : Date.now()
+  const endTs = end ? end.getTime() : startTs
+  const dateSet = new Set(dates)
+
+  const q = await db.collection('entries')
+    .where({
+      relationshipId: relId,
+      isDeleted: false,
+      createdAt: db.command.gte(startTs).and(db.command.lt(endTs))
+    })
+    .orderBy('createdAt', 'asc')
+    .limit(1000)
+    .get()
+
+  const byDate = Object.create(null)
+  for (const e of (q.data || [])) {
+    const moodLevel = normalizeMoodLevel(e && e.mood_level)
+    if (!moodLevel) continue
+    const date = dayKey(e.createdAt)
+    if (!dateSet.has(date)) continue
+    byDate[date] = {
+      date,
+      mood_level: moodLevel,
+      lastEntry: {
+        contentText: String((e && e.contentText) || ''),
+        images: normalizeMoodImages(e && e.images)
+      }
+    }
+  }
+
+  return dates.map((date) => {
+    const hit = byDate[date]
+    if (!hit) return { date }
+    return hit
+  })
 }
 
 async function hasAnyEntryByDate(relId, dateYmd) {
@@ -193,6 +271,7 @@ async function getEmotion(relId, myOpenid, partnerOpenid, myNickname, partnerNic
         timeText: formatTime(hit.createdAt),
         text: hit.contentText || '',
         from: partnerNickname || '对方',
+        mood_level: normalizeMoodLevel(hit.mood_level) || undefined,
         images: imgs,
         coverImage: imgs[0] || ''
       }
@@ -220,6 +299,7 @@ async function getEmotion(relId, myOpenid, partnerOpenid, myNickname, partnerNic
     timeText: formatTime(pick.createdAt),
     text: pick.contentText || '',
     from: pick.userOpenid === myOpenid ? (myNickname || '你') : (partnerNickname || '对方'),
+    mood_level: normalizeMoodLevel(pick.mood_level) || undefined,
     images: imgs,
     coverImage: imgs[0] || ''
   }
@@ -285,6 +365,7 @@ exports.main = async (event = {}) => {
     getEmotion(rel._id, OPENID, partnerOpenid, myNickname, partnerNickname),
     getStreak(rel._id)
   ])
+  const mood7d = await buildMood7d(rel._id)
 
   const todayKey = dayKey(Date.now())
   const todayHasAny = await hasAnyEntryByDate(rel._id, todayKey)
@@ -306,6 +387,7 @@ exports.main = async (event = {}) => {
       levelByDate: marks.levelByDate,
       todayKey
     },
+    mood7d,
     emotion,
     today: { key: todayKey, hasAny: todayHasAny }
   }

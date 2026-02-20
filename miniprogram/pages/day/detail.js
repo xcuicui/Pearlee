@@ -1,5 +1,6 @@
 const api = require('../../utils/api')
 const { t } = require('../../utils/strings')
+const { moodMeta, normalizeMoodLevel } = require('../../utils/mood')
 
 function pad2(n) { return String(n).padStart(2, '0') }
 function timeText(ts) {
@@ -111,6 +112,8 @@ Page({
       console.log('[day.detail] first raw images=', res && res.items && res.items[0] ? res.items[0].images : null)
 
       const items = (res.items || []).map(x => {
+        const moodLevel = normalizeMoodLevel(x.mood_level)
+        const mood = moodMeta(moodLevel)
         const raw = Array.isArray(x.images) ? x.images : []
         const mapped = raw
           .map(v => norm(extractFileID(v)))
@@ -139,6 +142,7 @@ Page({
           images: mapped,
           createdAt: x.createdAt,
           timeText: timeText(x.createdAt),
+          moodText: mood ? `${mood.emoji} ${mood.label}` : '',
           likeCount: x.likeCount || 0,
           liked: !!x.liked,
           commentCount: Number(x.commentCount || 0)

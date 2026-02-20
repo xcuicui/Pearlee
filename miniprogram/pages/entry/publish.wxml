@@ -17,6 +17,24 @@
 
     <view class="count" wx:if="{{showCount}}">{{text.length}}/500</view>
 
+    <view class="mood-box">
+      <view class="mood-title">{{moodTitleText}}</view>
+      <view class="mood-options">
+        <view
+          wx:for="{{moodOptions}}"
+          wx:key="level"
+          class="mood-option {{moodLevel === item.level ? 'active' : ''}}"
+          data-level="{{item.level}}"
+          bindtap="onPickMood"
+          hover-class="tap-down"
+          hover-stay-time="60"
+        >
+          <view class="mood-emoji">{{item.emoji}}</view>
+          <view class="mood-label">{{item.label}}</view>
+        </view>
+      </view>
+    </view>
+
     <view class="img-head">
       <view class="img-add" bindtap="chooseImages" hover-class="tap-down" hover-stay-time="60">{{addPhotoText}}</view>
     </view>
@@ -28,6 +46,10 @@
     </view>
 
     <view class="actions">
+      <view class="publish-tip-row">
+        <view class="publish-tip-text">{{publishTipText}}</view>
+        <view class="publish-tip-link" bindtap="goPointsHelp" hover-class="tap-down" hover-stay-time="60">{{pointsHelpLinkText}}</view>
+      </view>
       <view class="btn-primary {{canSubmit ? '' : 'btn-primary--disabled'}}" bindtap="onSubmit" hover-class="tap-down" hover-stay-time="80">{{submitText}}</view>
     </view>
   </view>

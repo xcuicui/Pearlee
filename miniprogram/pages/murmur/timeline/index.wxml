@@ -1,0 +1,56 @@
+<view class="page">
+  <scroll-view
+    id="timeline-scroll"
+    class="timeline-scroll"
+    scroll-y
+    enhanced
+    show-scrollbar="{{false}}"
+    lower-threshold="180"
+    scroll-into-view="{{scrollIntoView}}"
+    bindscroll="onScroll"
+    bindscrolltolower="onReachBottom"
+  >
+    <view class="timeline-content">
+      <view wx:for="{{groups}}" wx:for-item="group" wx:key="date" class="date-group">
+        <view class="date-header" id="{{group.headerId}}">
+          <text class="date-text">{{group.headerText}}</text>
+        </view>
+
+        <view wx:if="{{group.isEmptyAnchor}}" class="anchor-empty">这一天还没有收纳碎碎念。</view>
+
+        <view wx:for="{{group.items}}" wx:for-item="entry" wx:key="id" class="card entry">
+          <view class="text">{{entry.text}}</view>
+
+          <view class="images" wx:if="{{entry.images && entry.images.length}}">
+            <image
+              class="entry-image"
+              wx:for="{{entry.images}}"
+              wx:for-item="img"
+              wx:key="*this"
+              src="{{img}}"
+              mode="aspectFill"
+              bindtap="previewEntryImage"
+              data-id="{{entry.id}}"
+              data-idx="{{index}}"
+            />
+          </view>
+
+          <view class="meta">
+            <view class="meta-left">
+              <view class="time">{{entry.timeText}}</view>
+              <view wx:if="{{entry.moodText}}" class="entry-mood">{{entry.moodText}}</view>
+            </view>
+            <view class="meta-right">
+              <text class="meta-stat">♥ {{entry.likeCount}}</text>
+              <text class="meta-stat">评论 {{entry.commentCount}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view wx:if="{{loadingOlder}}" class="loading-tip">加载更早内容中...</view>
+      <view wx:if="{{!hasOlder && !loadingInitial}}" class="loading-tip">没有更早了</view>
+      <view wx:if="{{error}}" class="err">{{error}}</view>
+    </view>
+  </scroll-view>
+</view>

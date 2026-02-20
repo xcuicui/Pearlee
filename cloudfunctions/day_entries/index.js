@@ -16,6 +16,12 @@ function getImageRef(v) {
   return ''
 }
 
+function normalizeMoodLevel(level) {
+  const n = Number(level)
+  if (!Number.isInteger(n) || n < 1 || n > 4) return 0
+  return n
+}
+
 async function getTempUrlMap(fileIds) {
   const list = Array.from(new Set((fileIds || []).map(x => String(x || '').trim()).filter(Boolean)))
   const map = new Map()
@@ -108,7 +114,7 @@ exports.main = async (event = {}) => {
         .filter(Boolean)
         .slice(0, 9)
 
-      return {
+      const item = {
         id: e._id,
         text: e.contentText || '',
         images: urls,
@@ -117,6 +123,11 @@ exports.main = async (event = {}) => {
         liked: likedSet.has(e._id),
         commentCount: commentCount.get(e._id) || 0
       }
+
+      const moodLevel = normalizeMoodLevel(e.mood_level)
+      if (moodLevel) item.mood_level = moodLevel
+
+      return item
     })
   }
 }

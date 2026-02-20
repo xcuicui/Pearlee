@@ -60,6 +60,15 @@ function cleanImages(images) {
     .slice(0, 9)
 }
 
+function parseMoodLevel(v) {
+  if (v === undefined || v === null || v === '') return null
+  const n = Number(v)
+  if (!Number.isInteger(n) || n < 1 || n > 4) {
+    throw new BizError('mood_level 仅支持 1-4', 'INVALID_MOOD_LEVEL')
+  }
+  return n
+}
+
 async function hasAnyByDate(relationshipId, date) {
   const q = await db.collection('entries')
     .where(_.or([
@@ -136,23 +145,25 @@ exports.main = async (event = {}) => {
     throw new BizError('最多 9 张图片', 'TOO_MANY_IMAGES')
   }
   const images = cleanImages(event.images)
+  const moodLevel = parseMoodLevel(event.mood_level)
   if (!text && images.length === 0) throw new BizError('写点什么吧', 'EMPTY')
 
   const ts = now()
   const date = dayKey(ts)
-  const res = await db.collection('entries').add({
-    data: {
-      relationshipId: rel._id,
-      userOpenid: OPENID,
-      contentText: text,
-      images,
-      createdAt: ts,
-      updatedAt: ts,
-      date,
-      dayKey: date,
-      isDeleted: false
-    }
-  })
+  const entryData = {
+    relationshipId: rel._id,
+    userOpenid: OPENID,
+    contentText: text,
+    images,
+    createdAt: ts,
+    updatedAt: ts,
+    date,
+    dayKey: date,
+    isDeleted: false
+  }
+  if (moodLevel) entryData.mood_level = moodLevel
+
+  const res = await db.collection('entries').add({ data: entryData })
 
   await updateRelationshipStats(rel._id, date, ts)
 
