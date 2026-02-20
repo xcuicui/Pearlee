@@ -1,0 +1,45 @@
+<view class="page">
+  <view class="section">
+    <view class="h">关联清单</view>
+
+    <view class="plan-box">
+      <scroll-view scroll-x class="plan-row">
+        <block wx:for="{{plans}}" wx:key="id">
+          <view class="plan-chip {{planId===item.id && !useTemporary?'on':''}}" data-id="{{item.id}}" bindtap="onPickPlan">{{item.title}}</view>
+        </block>
+        <view class="plan-chip {{useTemporary?'on':''}}" bindtap="onUseTemporary">临时约会</view>
+      </scroll-view>
+      <view class="plan-hint" wx:if="{{!useTemporary && !planId}}">先选一个清单项</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="h">约会时间</view>
+    <view class="time-row">
+      <picker mode="date" value="{{occurDate}}" bindchange="onPickOccurDate">
+        <view class="pick">{{occurDate}}</view>
+      </picker>
+      <picker mode="time" value="{{occurTime}}" bindchange="onPickOccurTime">
+        <view class="pick">{{occurTime}}</view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="section">
+    <textarea class="textarea" placeholder="把这次约会，收进这里。" value="{{text}}" bindinput="onText" />
+
+    <view class="imgs">
+      <view class="img-add" bindtap="chooseImages">+ 添一张照片</view>
+      <block wx:for="{{images}}" wx:key="path">
+        <view class="img" bindtap="previewImage" data-idx="{{index}}">
+          <image src="{{item.path}}" mode="aspectFill" />
+          <view class="rm" bindtap="removeImage" data-idx="{{index}}">移除</view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <view class="bottom">
+    <view class="btn {{canSubmit?'on':''}}" bindtap="onSubmit">收好</view>
+  </view>
+</view>

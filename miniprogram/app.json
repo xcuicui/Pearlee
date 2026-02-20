@@ -13,6 +13,7 @@
     "pages/murmur/timeline/index",
     "pages/date/plan-list/index",
     "pages/date/plan-detail/index",
+    "pages/date/diary-create/index",
     "pages/day/detail"
   ],
   "window": {
