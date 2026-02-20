@@ -104,6 +104,24 @@
     </swiper>
   </view>
 
+  <view class="write-hub card">
+    <view class="hub-title">写点什么</view>
+    <view class="hub-row">
+      <view class="hub-item" bindtap="goDatePlanList" hover-class="tap-down" hover-stay-time="60">
+        <view class="hub-name">约会清单</view>
+        <view class="hub-desc">把想做的先收起来</view>
+      </view>
+      <view class="hub-item" bindtap="goDateDiary" hover-class="tap-down" hover-stay-time="60">
+        <view class="hub-name">约会日记</view>
+        <view class="hub-desc">把这次约会收好</view>
+      </view>
+      <view class="hub-item" bindtap="goPublish" hover-class="tap-down" hover-stay-time="60">
+        <view class="hub-name">碎碎念</view>
+        <view class="hub-desc">想到你的一刻</view>
+      </view>
+    </view>
+  </view>
+
   <view class="fab" bindtap="goPublish" hover-class="tap-down" hover-stay-time="80" aria-label="{{fabAriaLabel}}">
     <view class="fab-bubble">{{fabBubbleText}}</view>
     <view class="fab-icon">+</view>

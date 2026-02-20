@@ -693,6 +693,14 @@ Page({
     this.goPublish()
   },
 
+  goDatePlanList() {
+    wx.navigateTo({ url: '/pages/date/plan-list/index' })
+  },
+
+  goDateDiary() {
+    wx.navigateTo({ url: '/pages/date/diary-create/index' })
+  },
+
   goPublish() {
     wx.navigateTo({ url: '/pages/entry/publish' })
   },
