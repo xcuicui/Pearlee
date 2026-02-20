@@ -62,10 +62,11 @@
 
       <block wx:else>
         <block wx:for="{{tagTypes}}" wx:for-item="type" wx:key="id">
-        <view class="type-line">
-          <view class="type-name" data-typeid="{{type.id}}" data-name="{{type.name}}" bindlongpress="onLongPressType">{{type.name}}</view>
-          <view class="mini" data-typeid="{{type.id}}" bindtap="openAddTag">+ 标签</view>
-        </view>
+        <view class="type-block">
+          <view class="type-line">
+            <view class="type-name" data-typeid="{{type.id}}" data-name="{{type.name}}" bindlongpress="onLongPressType">{{type.name}}</view>
+            <view class="mini" data-typeid="{{type.id}}" bindtap="openAddTag">+ 标签</view>
+          </view>
 
         <view wx:if="{{!(tagsByType[type.id] && tagsByType[type.id].length)}}" class="type-empty">
           <view class="type-empty-text">还没有「{{type.name}}」标签</view>
@@ -82,6 +83,7 @@
               bindlongpress="onLongPressTag"
             >{{tag.name}}</view>
           </block>
+        </view>
         </view>
         </block>
       </block>
