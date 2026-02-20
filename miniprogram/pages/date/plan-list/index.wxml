@@ -60,7 +60,8 @@
         <view class="mini" bindtap="openAddType">+ 新增类型</view>
       </view>
 
-      <block wx:else wx:for="{{tagTypes}}" wx:for-item="type" wx:key="id">
+      <block wx:else>
+        <block wx:for="{{tagTypes}}" wx:for-item="type" wx:key="id">
         <view class="type-line">
           <view class="type-name">{{type.name}}</view>
           <view class="mini" data-typeid="{{type.id}}" bindtap="openAddTag">+ 标签</view>
@@ -82,6 +83,7 @@
             >{{tag.name}}</view>
           </block>
         </view>
+        </block>
       </block>
 
       <view wx:if="{{tagTypes.length}}" class="mini" bindtap="openAddType">+ 类型</view>
