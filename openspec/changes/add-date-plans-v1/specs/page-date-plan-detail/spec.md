@@ -16,6 +16,21 @@
 - **WHEN** 渲染清单项详情页
 - **THEN** 页面以 chips 形式展示 tags（按 tag 类型分组或混排均可）
 
+### Requirement: Edit plan tags
+清单项详情页 MUST 支持编辑 tags（新增/移除），并在保存后更新清单项。
+
+#### Scenario: Add a tag
+- **GIVEN** 清单项当前未包含某个 tag
+- **WHEN** 用户在编辑面板中选择该 tag 并保存
+- **THEN** 页面调用 `date_plan_update({ planId, tagIds })`
+- **AND** 成功后详情页展示更新后的 tags
+
+#### Scenario: Remove a tag
+- **GIVEN** 清单项当前已包含某个 tag
+- **WHEN** 用户取消选择该 tag 并保存
+- **THEN** 页面调用 `date_plan_update({ planId, tagIds })`
+- **AND** 成功后详情页展示更新后的 tags
+
 ### Requirement: Plan completion toggle
 清单项详情页 MUST 支持标记完成与取消完成。
 
