@@ -99,8 +99,9 @@ Page({
     this.setData({ editingTags: false })
   },
   toggleEditTag(e) {
-    const id = e.currentTarget.dataset.id
-    const cur = new Set(this.data.editSelectedTagIds)
+    const id = String(e && e.currentTarget && e.currentTarget.dataset ? (e.currentTarget.dataset.id || '') : '').trim()
+    if (!id) return
+    const cur = new Set((this.data.editSelectedTagIds || []).map(x => String(x)))
     if (cur.has(id)) cur.delete(id)
     else cur.add(id)
     this.setData({ editSelectedTagIds: Array.from(cur) })

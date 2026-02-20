@@ -44,7 +44,7 @@
         </view>
         <view class="chips">
           <block wx:for="{{tagsByType[type.id]}}" wx:for-item="tag" wx:key="id">
-            <view class="chip selectable {{editSelectedTagIds.indexOf(tag.id)>=0?'on':''}}" data-id="{{tag.id}}" bindtap="toggleEditTag">{{tag.name}}</view>
+            <view class="chip selectable {{editSelectedTagIds.indexOf(tag.id)>=0?'on':''}}" data-id="{{tag.id}}" catchtap="toggleEditTag">{{tag.name}}</view>
           </block>
         </view>
       </block>
